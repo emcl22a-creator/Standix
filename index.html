@@ -77,11 +77,11 @@
    "description": "Filmez le geste une fois : l'IA rédige la procédure, et votre équipe la retrouve sur son téléphone ou d'un scan de QR code.",
    "offers": {
     "@type": "Offer",
-    "price": "69",
+    "price": "99",
     "priceCurrency": "EUR",
     "url": "https://standix.app/#tarifs",
     "availability": "https://schema.org/InStock",
-    "description": "À partir de 69 € par mois, 14 jours d'essai sans carte bancaire."
+    "description": "À partir de 99 € par mois, 14 jours d'essai sans carte bancaire."
    }
   },
   {
@@ -2768,7 +2768,7 @@ section[id]{scroll-margin-top:clamp(64px, 9vh, 88px)}
 /* ═══ LES ABONNEMENTS SUR TABLETTE ═══
    ⚠ GRILLE DE DEUX COLONNES, PAS UNE LIGNE QUI GLISSE : à cette largeur la
    ligne ne montrait que deux cartes et demie, étriquées à 320 px, et la carte
-   Entreprise restait seule dans un grand vide. En grille, les quatre formules
+   Entreprise restait seule dans un grand vide. En grille, toutes les formules
    sont visibles d'un coup et chaque carte gagne près de 180 px. */
 @media (min-width:768px) and (max-width:1100px){
   .abo-rail{
@@ -2782,6 +2782,31 @@ section[id]{scroll-margin-top:clamp(64px, 9vh, 88px)}
   /* ⚠ ENTREPRISE PREND TOUTE LA LARGEUR, sous les quatre formules : une carte
      de 320 px seule sous une grille pleine largeur faisait un trou. */
   .abo-seule .abo-carte{flex:none; width:100%; max-width:none}
+  /* ⚠ TROIS FORMULES DEPUIS LA GRILLE DU 22 OCTOBRE 2026 : la dernière se
+     retrouvait seule à gauche, une case vide à côté. Une carte seule sur sa
+     ligne prend toute la largeur, comme Entreprise juste dessous. */
+  .abo-rail .abo-carte:last-child:nth-child(odd){grid-column:1 / -1}
+}
+
+/* ═══ LES TROIS FORMULES SUR ORDINATEUR : UNE LIGNE QUI NE GLISSE PLUS ═══
+   Depuis que Réseau n'est plus vendu (grille du 22 octobre 2026), il reste
+   trois formules payantes. En ligne glissante, elles tenaient presque à
+   l'écran : la ligne ne bougeait que de quelques dizaines de pixels, et les
+   flèches s'allumaient pour rien. Trois colonnes égales, calées sur la
+   largeur du contenu (1 180 px au plus), sans flèches.
+   ⚠ `align-items:start` : un tiroir ouvert allonge SA carte, pas les deux
+   autres. La carte Entreprise, dessous, prend la largeur d'une colonne. */
+@media (min-width:1101px){
+  .abo-rail{
+    display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); align-items:start;
+    overflow:visible; scroll-snap-type:none;
+    padding-left:var(--bord); padding-right:var(--bord);
+  }
+  .abo-rail .abo-carte{flex:none; width:auto; max-width:none; scroll-snap-align:none}
+  .abo-car .abo-bas{display:none}
+  .abo-seule .abo-carte{flex:0 0 calc((100% - 36px) / 3); max-width:none}
+  /* « Sans risque » : les trois filets tombent juste sous les trois cartes */
+  .tar-gar-grille{gap:18px}
 }
 
 
@@ -4293,9 +4318,9 @@ body.pret .sc-in::before{animation-play-state:running}
    · Une carte par vidéo de présentation (motion design de l'app), au
      format 16:9, avec un CONTOUR BLANC APPLE de 3 px : sur le noir, c'est
      lui qui dessine la carte.
-   · POUR L'INSTANT : une seule carte, avec le chiffre « 1 » à la place de
-     la vidéo. Pour mettre la vraie vidéo, remplacer `<span class="hv-num">`
-     par la balise `<video>` laissée en commentaire dans le balisage.
+   · POUR L'INSTANT : une seule carte, la vidéo de présentation (voir « LES
+     COMMANDES DE LA VIDÉO » plus bas). `.hv-num` (le grand chiffre d'attente)
+     reste disponible pour une carte encore sans vidéo.
    · DÉFILEMENT PAR L'UTILISATEUR UNIQUEMENT, JAMAIS AUTOMATIQUE : glisser
      au doigt ou au pavé tactile, les flèches, ou les points. Les cartes se
      calent au centre (`scroll-snap`) ; les voisines dépassent sur les côtés,
@@ -4351,6 +4376,49 @@ body.pret .hv{animation-play-state:running}
   font-size:clamp(64px, 11vw, 168px);
   background:linear-gradient(180deg, #FFFFFF 0%, #B9C3D6 100%);
   -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+
+/* ═══ LES COMMANDES DE LA VIDÉO, COMME SUR APPLE.COM ═══
+   Deux pastilles rondes en verre gris clair, en bas à droite de la carte :
+   le son (coupé au départ : un navigateur ne lance une vidéo tout seul que
+   muette — les sous-titres sont dans l'image) et lecture / pause.
+   Même matière que les commandes vidéo d'apple.com : gris translucide
+   flouté, pictogramme sombre. */
+.hv-video{background:#FAF9FC}
+.hv-cmd{
+  position:absolute; z-index:2; right:clamp(10px, 1.25vw, 18px); bottom:clamp(10px, 1.25vw, 18px);
+  display:flex; gap:8px;
+}
+.hv-cmd button{
+  width:36px; height:36px; padding:0; border:0; border-radius:50%;
+  display:grid; place-items:center; cursor:pointer;
+  color:rgba(0,0,0,.56);
+  background:rgba(210,210,215,.64);
+  -webkit-backdrop-filter:saturate(180%) blur(14px); backdrop-filter:saturate(180%) blur(14px);
+  transition:background-color .25s ease, color .25s ease, transform .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.hv-cmd button:hover{background:rgba(223,223,227,.72); color:rgba(0,0,0,.64)}
+.hv-cmd button:active{transform:scale(.94)}
+.hv-cmd button:focus-visible{outline:2px solid #0071E3; outline-offset:2px}
+.hv-cmd svg{grid-area:1 / 1; width:20px; height:20px; fill:currentColor}
+.hv-cmd .trait{fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round}
+/* l'icône montre l'état : haut-parleur barré quand le son est coupé,
+   « lire » quand la vidéo est arrêtée, « pause » pendant la lecture */
+.hv-son .i-muet, .hv-son.muet .i-son{display:none}
+.hv-son.muet .i-muet{display:block}
+.hv-lecture .i-lire, .hv-lecture.en-pause .i-pause{display:none}
+.hv-lecture.en-pause .i-lire{display:block}
+/* plus petites quand la carte est petite : elles ne doivent pas toucher les
+   sous-titres, au centre en bas de la vidéo */
+@media (max-width:980px){
+  .hv-cmd button{width:32px; height:32px}
+  .hv-cmd svg{width:18px; height:18px}
+}
+@media (max-width:599px){
+  .hv-cmd{right:8px; bottom:8px; gap:6px}
+  .hv-cmd button{width:28px; height:28px}
+  .hv-cmd svg{width:16px; height:16px}
 }
 
 /* Les commandes, à la manière des galeries d'Apple : une pilule de points
@@ -4746,6 +4814,28 @@ body.pret .hero.pc-a .marque-app{animation-play-state:running}
 @media (max-width:980px) and (max-height:619px){
   .hero.pc-a .marque-app{display:none}
 }
+/* « Standix app » DANS LA MATIÈRE DE LA PLAQUE D'ABONNEMENT (à la demande) :
+   le même argent que `.abo-plaque` (145°, #FBFCFD → #DDE1E7 → #A9AEB8) et le
+   même reflet en biais, découpés dans les lettres.
+   ⚠ ANGLES 169° ET 153° (et non 145° et 118° comme la plaque) : la plaque est
+   carrée, le texte environ 3,7 fois plus large que haut. Ces angles sont ceux
+   de la plaque étirée à la forme du mot : la lumière tombe pareil, claire en
+   haut à gauche, plus soutenue en bas à droite, avec le reflet en travers.
+   ⚠ LARGEUR AU TEXTE (`fit-content`) : sinon le dégradé s'étale sur toute la
+   largeur de la page et les lettres n'en reçoivent que le milieu, tout plat.
+   ⚠ LE FOND NE SE PEINT QUE DANS LA BOÎTE : avec `line-height:1`, le haut du
+   S et les jambages des p en dépassent. La boîte est agrandie de .25 em en
+   haut et en bas, et les marges reprennent exactement ces .25 em : la place
+   occupée reste nulle, rien ne bouge. */
+.hero.pc-a .marque-app{
+  width:-webkit-fit-content; width:fit-content;
+  padding:.25em .08em; margin:-1.25em auto -.25em;
+  color:#DDE1E7; -webkit-text-fill-color:transparent;
+  background-image:
+    linear-gradient(153deg, rgba(255,255,255,0) 14%, rgba(255,255,255,.62) 29%, rgba(255,255,255,0) 42%),
+    linear-gradient(169deg, #FBFCFD 0%, #DDE1E7 38%, #A9AEB8 100%);
+  -webkit-background-clip:text; background-clip:text;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════
    L'AUBE : LE BAS DE LA SECTION 1 S'ÉCLAIRE (à la demande, 22 oct. 2026 —
@@ -5098,14 +5188,36 @@ body.pret .barre-hote{animation-play-state:running}
 
   <!-- ═══ LES VIDÉOS DE PRÉSENTATION ═══ (voir « LE CARROUSEL DES VIDÉOS »
        dans le style). Une `<figure class="hv-c">` par vidéo, dans l'ordre.
-       ⚠ POUR METTRE LA VIDÉO : remplacer `<span class="hv-num">1</span>` par
-       <video src="video-1.mp4" muted loop playsinline autoplay preload="metadata"></video>
-       — le fichier à la racine du dépôt, PAS dans cette page : une vidéo
-       recopiée ici en texte alourdirait tout le site. -->
+       ⚠ LES FICHIERS VIDÉO SONT À LA RACINE DU DÉPÔT, PAS DANS CETTE PAGE :
+       une vidéo recopiée ici en texte alourdirait tout le site.
+       ⚠ POUR AJOUTER UNE VIDÉO : recopier la `<figure>` de la vidéo 1 (vidéo
+       + boutons) et changer les noms de fichiers ; le script « LA LECTURE
+       DES VIDÉOS » s'occupe de toutes les cartes. -->
   <div class="hv" id="presentation" role="region" aria-roledescription="carrousel" aria-label="Vidéos de présentation">
     <div class="hv-piste" tabindex="0">
       <figure class="hv-c" aria-label="Vidéo 1">
-        <div class="hv-cadre"><span class="hv-num" aria-hidden="true">1</span></div>
+        <div class="hv-cadre">
+          <!-- ⚠ `video-1.mp4` (4,6 Mo, H.264 1080p, lisible partout) : la version
+               légère choisie plutôt que l'original (28,7 Mo, HEVC). Identique
+               à l'œil (similarité 99,9 %), mais l'original dépassait la limite
+               de 25 Mo des dépôts par navigateur sur GitHub, et son débit
+               (près de 9 Mb/s) aurait saccadé en 4G.
+               ⚠ L'AFFICHE est la toute première image de la vidéo (un blanc
+               uni) : pas d'éclair sombre avant la lecture. -->
+          <video class="hv-video" muted loop playsinline preload="auto" poster="data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvDwACAAfQ/OqXv/+BiOh/AAA=" aria-label="Présentation de Standix en vidéo">
+            <source src="video-1.mp4" type="video/mp4">
+          </video>
+          <div class="hv-cmd">
+            <button class="hv-son muet" type="button" aria-label="Activer le son" aria-pressed="false">
+              <svg class="i-muet" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.6 9.4h3.1l4.4-3.6c.6-.5 1.5 0 1.5.8v10.8c0 .8-.9 1.3-1.5.8l-4.4-3.6H3.6a1 1 0 0 1-1-1V10.4a1 1 0 0 1 1-1Z"/><path class="trait" d="M16.2 9.6l4.8 4.8M21 9.6l-4.8 4.8"/></svg>
+              <svg class="i-son" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.6 9.4h3.1l4.4-3.6c.6-.5 1.5 0 1.5.8v10.8c0 .8-.9 1.3-1.5.8l-4.4-3.6H3.6a1 1 0 0 1-1-1V10.4a1 1 0 0 1 1-1Z"/><path class="trait" d="M15.6 9.3a3.9 3.9 0 0 1 0 5.4M18.3 6.8a7.5 7.5 0 0 1 0 10.4"/></svg>
+            </button>
+            <button class="hv-lecture en-pause" type="button" aria-label="Lire la vidéo">
+              <svg class="i-lire" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.2 5.9v12.2c0 .8.9 1.3 1.6.9l9.6-6.1c.6-.4.6-1.4 0-1.8L9.8 5c-.7-.4-1.6.1-1.6.9Z"/></svg>
+              <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.6" y="5.2" width="3.9" height="13.6" rx="1.2"/><rect x="13.5" y="5.2" width="3.9" height="13.6" rx="1.2"/></svg>
+            </button>
+          </div>
+        </div>
       </figure>
     </div>
     <div class="hv-nav" hidden>
@@ -5114,6 +5226,75 @@ body.pret .barre-hote{animation-play-state:running}
       <button class="hv-f hv-d" type="button" aria-label="Vidéo suivante"><svg viewBox="0 0 24 24"><path d="M9.5 5 16 12l-6.5 7"/></svg></button>
     </div>
   </div>
+  <script>
+  /* LA LECTURE DES VIDÉOS, COMME SUR APPLE.COM. Une vidéo joue seulement si
+     les quatre conditions sont réunies :
+       · le visiteur ne l'a pas mise en pause (et ne demande pas « réduire
+         les animations » : dans ce cas elle attend qu'on appuie sur lire) ;
+       · sa carte est celle du milieu du carrousel ;
+       · elle est à l'écran — hors de l'écran, ou onglet caché, elle se met
+         en pause et reprend en revenant, là où elle en était ;
+       · la carte est apparue : la lecture commence avec son fondu, pas
+         pendant que la page est encore cachée.
+     Muette au départ (seule une vidéo muette peut démarrer toute seule) ;
+     le bouton son la rend audible et la relance si elle était arrêtée.
+     ⚠ CE SCRIPT EST PLACÉ AVANT CELUI DU CARROUSEL : celui-ci annonce la
+     carte active dès son lancement, il faut déjà l'écouter. */
+  (function(){
+    var calme=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var apparue=false, attentes=[];
+    function quandApparue(f){ if(apparue) f(); else attentes.push(f); }
+    function verifier(){
+      if(apparue || !document.body.classList.contains('pret')) return;
+      /* la carte arrive avec les boutons, environ .55 s après `pret` */
+      apparue=true; setTimeout(function(){ attentes.splice(0).forEach(function(f){ f(); }); }, 550);
+    }
+    new MutationObserver(verifier).observe(document.body, {attributes:true, attributeFilter:['class']});
+    verifier();
+
+    [].forEach.call(document.querySelectorAll('.hv-c'), function(c, n){
+      var v=c.querySelector('video'); if(!v) return;
+      var bLire=c.querySelector('.hv-lecture'), bSon=c.querySelector('.hv-son');
+      var voulue=!calme, active=n===0, visible=true, prete=false;
+      function maj(){
+        if(bLire){
+          bLire.classList.toggle('en-pause', v.paused);
+          bLire.setAttribute('aria-label', v.paused ? 'Lire la vidéo' : 'Mettre la vidéo en pause');
+        }
+        if(bSon){
+          bSon.classList.toggle('muet', v.muted);
+          bSon.setAttribute('aria-label', v.muted ? 'Activer le son' : 'Couper le son');
+          bSon.setAttribute('aria-pressed', v.muted ? 'false' : 'true');
+        }
+      }
+      function regler(){
+        var doit=voulue && active && visible && prete && !document.hidden;
+        if(doit && v.paused){ var p=v.play(); if(p && p.catch) p.catch(maj); }
+        else if(!doit && !v.paused) v.pause();
+        maj();
+      }
+      ['play','playing','pause','volumechange'].forEach(function(e){ v.addEventListener(e, maj); });
+      v.addEventListener('hv-actif', function(){ active=true; regler(); });
+      v.addEventListener('hv-inactif', function(){ active=false; regler(); });
+      document.addEventListener('visibilitychange', regler);
+      if('IntersectionObserver' in window){
+        new IntersectionObserver(function(e){ visible=e[e.length-1].isIntersecting; regler(); }, {threshold:.2}).observe(v);
+      }
+      if(bLire) bLire.addEventListener('click', function(){
+        prete=true; visible=true;
+        if(v.paused){ voulue=true; } else { voulue=false; }
+        regler();
+      });
+      if(bSon) bSon.addEventListener('click', function(){
+        v.muted=!v.muted;
+        if(!v.muted){ voulue=true; prete=true; visible=true; }
+        regler();
+      });
+      quandApparue(function(){ prete=true; regler(); });
+      maj();
+    });
+  })();
+  </script>
   <script>
   /* Le carrousel des vidéos : JAMAIS de défilement automatique. On lit la
      position de la piste et on l'affiche (point actif, flèches) ; les
@@ -5136,7 +5317,8 @@ body.pret .barre-hote{animation-play-state:running}
       if(best===actif) return; actif=best;
       cartes.forEach(function(c,i){
         c.classList.toggle('actif', i===best);
-        var v=c.querySelector('video'); if(v){ if(i===best){ var p=v.play(); if(p&&p.catch)p.catch(function(){}); } else v.pause(); }
+        /* la lecture elle-même est réglée par « LA LECTURE DES VIDÉOS » */
+        var v=c.querySelector('video'); if(v) v.dispatchEvent(new CustomEvent(i===best ? 'hv-actif' : 'hv-inactif'));
       });
       [].forEach.call(hv.querySelectorAll('.hv-points button'), function(b,i){ b.setAttribute('aria-current', i===best ? 'true' : 'false'); });
       var g=hv.querySelector('.hv-g'), dr=hv.querySelector('.hv-d');
@@ -5438,7 +5620,7 @@ body.pret .barre-hote{animation-play-state:running}
      précédente affirmait que deux heures dépassaient le prix : à 30 € de
      l'heure, deux heures font 60 € et l'abonnement 69 € — c'était faux. La
      comparaison actuelle porte sur une DEMI-JOURNÉE : 4 h × 30 € = 120 €,
-     contre 69 €. Elle tient, et avec de la marge.
+     contre 99 € (grille du 22 octobre 2026). Elle tient encore.
      ⚠ LES TROIS POINTS SONT DES BÉNÉFICES, PAS DES CHIFFRES (à la demande) :
      temps gagné, argent économisé, savoir-faire conservé. Le titre annonce le
      gain, la phrase le prouve en une ligne. Pas de deuxième phrase. -->
@@ -5541,13 +5723,18 @@ body.pret .barre-hote{animation-play-state:running}
     </svg>
   </div>
 
-  <!-- ⚠ LES QUATRE FORMULES PAYANTES SUR UNE LIGNE QUI GLISSE (ordinateur et
-       tablette), avec le mécanisme des carrousels : `.abo-car` est pris en
-       charge par le même script que `section.car`. Sur téléphone, colonne.
-       La formule Entreprise est À PART, en dessous. -->
+  <!-- ⚠ LA GRILLE DU 22 OCTOBRE 2026, reprise de l'app (`OFFRES`, app.js) et
+       du document du projet `claude/tarifs.md` : Pro 299 €, Équipe 199 €,
+       Essentiel 99 € (30, 15 et 5 membres ; 60, 50 et 40 analyses par mois),
+       −15 % à l'année ; Entreprise au-delà de 30 membres, sur devis. Réseau
+       n'est plus vendu. ORDRE : du plus cher au moins cher, comme dans l'app.
+       Les lignes cochées sont celles de la carte de l'app, mot pour mot.
+       ⚠ TROIS FORMULES PAYANTES : sur ordinateur elles tiennent sur une ligne
+       sans glisser (grille de trois colonnes) ; sur tablette, deux colonnes ;
+       sur téléphone, une colonne. La formule Entreprise est À PART, en
+       dessous. -->
   <div class="abo-car">
     <div class="abo-liste abo-rail" tabindex="0" aria-label="Formules, faites défiler latéralement">
-
       <article class="abo-carte" data-monte>
         <div class="abo-haut">
           <span class="abo-plaque" aria-hidden="true">
@@ -5555,39 +5742,40 @@ body.pret .barre-hote{animation-play-state:running}
             <span class="abo-pl-nom">Standix</span>
           </span>
           <div class="abo-tx">
-            <h3 class="abo-nom">Essentiel</h3>
-            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Jusqu’à <b>5 membres</b></span></span>
+            <h3 class="abo-nom">Pro</h3>
+            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Jusqu’à <b>30 membres</b></span></span>
             <span class="abo-illim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.2 8.4a3.6 3.6 0 0 1 0 7.2c-2 0-3.2-1.6-4.6-3.6S11 8.4 9 8.4a3.6 3.6 0 0 0 0 7.2c2 0 3.2-1.6 4.6-3.6"/></svg><span>Procédures <b>illimitées</b></span></span>
           </div>
         </div>
 
-        <button type="button" class="abo-pied" data-tiroir="essentiel" aria-expanded="false" aria-controls="tiroir-essentiel">
+        <button type="button" class="abo-pied" data-tiroir="pro" aria-expanded="false" aria-controls="tiroir-pro">
           <span class="abo-pied-g">
-            <span class="ap-prix">69 €</span>
+            <span class="ap-prix">299 €</span>
             <span class="ap-u">/ mois</span>
           </span>
           <span class="abo-pied-d"><span>Détails</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
         </button>
 
-        <div class="abo-tiroir" id="tiroir-essentiel">
+        <div class="abo-tiroir" id="tiroir-pro">
           <div class="abo-tiroir-in">
             <div class="abo-prix">
-              <span class="abo-p-v">69 €</span>
+              <span class="abo-p-v">299 €</span>
               <span class="abo-p-u">par mois, hors taxes</span>
             </div>
             <div class="abo-annee">
-              <span class="abo-annee-bad">−20 %</span>
-              <span class="abo-annee-tx"><b>55 € par mois</b> en payant à l’année</span>
+              <span class="abo-annee-bad">−15 %</span>
+              <span class="abo-annee-tx"><b>254 € par mois</b> en payant à l’année</span>
             </div>
             <div class="abo-inclus">
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Jusqu’à <b>5 membres</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>30 analyses vidéo IA</b> par mois</span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Procédures <b>illimitées</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>60 analyses vidéo IA</b> générées par mois par Standix</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Un <b>QR code</b> par procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Un <b>PDF</b> par procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Rédiger soi-même</b> la procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Interface en <b>français, anglais et allemand</b></span></div>
             </div>
             <a class="abo-cta" href="/app/" target="_blank" rel="noopener">Essayer 14 jours</a>
-            <button type="button" class="abo-fermer" data-tiroir="essentiel">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
+            <button type="button" class="abo-fermer" data-tiroir="pro">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
           </div>
         </div>
       </article>
@@ -5607,7 +5795,7 @@ body.pret .barre-hote{animation-play-state:running}
 
         <button type="button" class="abo-pied" data-tiroir="equipe" aria-expanded="false" aria-controls="tiroir-equipe">
           <span class="abo-pied-g">
-            <span class="ap-prix">129 €</span>
+            <span class="ap-prix">199 €</span>
             <span class="ap-u">/ mois</span>
           </span>
           <span class="abo-pied-d"><span>Détails</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
@@ -5616,19 +5804,20 @@ body.pret .barre-hote{animation-play-state:running}
         <div class="abo-tiroir" id="tiroir-equipe">
           <div class="abo-tiroir-in">
             <div class="abo-prix">
-              <span class="abo-p-v">129 €</span>
+              <span class="abo-p-v">199 €</span>
               <span class="abo-p-u">par mois, hors taxes</span>
             </div>
             <div class="abo-annee">
-              <span class="abo-annee-bad">−20 %</span>
-              <span class="abo-annee-tx"><b>103 € par mois</b> en payant à l’année</span>
+              <span class="abo-annee-bad">−15 %</span>
+              <span class="abo-annee-tx"><b>169 € par mois</b> en payant à l’année</span>
             </div>
             <div class="abo-inclus">
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Jusqu’à <b>15 membres</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>60 analyses vidéo IA</b> par mois</span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Procédures <b>illimitées</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>50 analyses vidéo IA</b> générées par mois par Standix</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Un <b>QR code</b> par procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Un <b>PDF</b> par procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Rédiger soi-même</b> la procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Interface en <b>français, anglais et allemand</b></span></div>
             </div>
             <a class="abo-cta" href="/app/" target="_blank" rel="noopener">Essayer 14 jours</a>
             <button type="button" class="abo-fermer" data-tiroir="equipe">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
@@ -5643,87 +5832,43 @@ body.pret .barre-hote{animation-play-state:running}
             <span class="abo-pl-nom">Standix</span>
           </span>
           <div class="abo-tx">
-            <h3 class="abo-nom">Pro</h3>
-            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Jusqu’à <b>40 membres</b></span></span>
+            <h3 class="abo-nom">Essentiel</h3>
+            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Jusqu’à <b>5 membres</b></span></span>
             <span class="abo-illim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.2 8.4a3.6 3.6 0 0 1 0 7.2c-2 0-3.2-1.6-4.6-3.6S11 8.4 9 8.4a3.6 3.6 0 0 0 0 7.2c2 0 3.2-1.6 4.6-3.6"/></svg><span>Procédures <b>illimitées</b></span></span>
           </div>
         </div>
 
-        <button type="button" class="abo-pied" data-tiroir="pro" aria-expanded="false" aria-controls="tiroir-pro">
+        <button type="button" class="abo-pied" data-tiroir="essentiel" aria-expanded="false" aria-controls="tiroir-essentiel">
           <span class="abo-pied-g">
-            <span class="ap-prix">239 €</span>
+            <span class="ap-prix">99 €</span>
             <span class="ap-u">/ mois</span>
           </span>
           <span class="abo-pied-d"><span>Détails</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
         </button>
 
-        <div class="abo-tiroir" id="tiroir-pro">
+        <div class="abo-tiroir" id="tiroir-essentiel">
           <div class="abo-tiroir-in">
             <div class="abo-prix">
-              <span class="abo-p-v">239 €</span>
+              <span class="abo-p-v">99 €</span>
               <span class="abo-p-u">par mois, hors taxes</span>
             </div>
             <div class="abo-annee">
-              <span class="abo-annee-bad">−20 %</span>
-              <span class="abo-annee-tx"><b>189 € par mois</b> en payant à l’année</span>
+              <span class="abo-annee-bad">−15 %</span>
+              <span class="abo-annee-tx"><b>84 € par mois</b> en payant à l’année</span>
             </div>
             <div class="abo-inclus">
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Jusqu’à <b>40 membres</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>120 analyses vidéo IA</b> par mois</span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Procédures <b>illimitées</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>40 analyses vidéo IA</b> générées par mois par Standix</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Un <b>QR code</b> par procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Un <b>PDF</b> par procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Rédiger soi-même</b> la procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Interface en <b>français, anglais et allemand</b></span></div>
             </div>
             <a class="abo-cta" href="/app/" target="_blank" rel="noopener">Essayer 14 jours</a>
-            <button type="button" class="abo-fermer" data-tiroir="pro">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
+            <button type="button" class="abo-fermer" data-tiroir="essentiel">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
           </div>
         </div>
       </article>
-
-      <article class="abo-carte" data-monte>
-        <div class="abo-haut">
-          <span class="abo-plaque" aria-hidden="true">
-            <img class="abo-pl-logo" data-signe-fonce alt="">
-            <span class="abo-pl-nom">Standix</span>
-          </span>
-          <div class="abo-tx">
-            <h3 class="abo-nom">Réseau</h3>
-            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Jusqu’à <b>100 membres</b></span></span>
-            <span class="abo-illim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.2 8.4a3.6 3.6 0 0 1 0 7.2c-2 0-3.2-1.6-4.6-3.6S11 8.4 9 8.4a3.6 3.6 0 0 0 0 7.2c2 0 3.2-1.6 4.6-3.6"/></svg><span>Procédures <b>illimitées</b></span></span>
-          </div>
-        </div>
-
-        <button type="button" class="abo-pied" data-tiroir="reseau" aria-expanded="false" aria-controls="tiroir-reseau">
-          <span class="abo-pied-g">
-            <span class="ap-prix">499 €</span>
-            <span class="ap-u">/ mois</span>
-          </span>
-          <span class="abo-pied-d"><span>Détails</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
-        </button>
-
-        <div class="abo-tiroir" id="tiroir-reseau">
-          <div class="abo-tiroir-in">
-            <div class="abo-prix">
-              <span class="abo-p-v">499 €</span>
-              <span class="abo-p-u">par mois, hors taxes</span>
-            </div>
-            <div class="abo-annee">
-              <span class="abo-annee-bad">−20 %</span>
-              <span class="abo-annee-tx"><b>399 € par mois</b> en payant à l’année</span>
-            </div>
-            <div class="abo-inclus">
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Jusqu’à <b>100 membres</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>250 analyses vidéo IA</b> par mois</span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Procédures <b>illimitées</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
-            </div>
-            <a class="abo-cta" href="/app/" target="_blank" rel="noopener">Essayer 14 jours</a>
-            <button type="button" class="abo-fermer" data-tiroir="reseau">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-          </div>
-        </div>
-      </article>
-
     </div>
     <div class="abo-bas">
       <div class="car-fleches">
@@ -5748,7 +5893,7 @@ body.pret .barre-hote{animation-play-state:running}
           </span>
           <div class="abo-tx">
             <h3 class="abo-nom">Entreprise</h3>
-            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Plus de <b>100 membres</b></span></span>
+            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Plus de <b>30 membres</b></span></span>
             <span class="abo-illim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.2 8.4a3.6 3.6 0 0 1 0 7.2c-2 0-3.2-1.6-4.6-3.6S11 8.4 9 8.4a3.6 3.6 0 0 0 0 7.2c2 0 3.2-1.6 4.6-3.6"/></svg><span>Procédures <b>illimitées</b></span></span>
           </div>
         </div>
@@ -5763,14 +5908,15 @@ body.pret .barre-hote{animation-play-state:running}
         <div class="abo-tiroir" id="tiroir-entreprise">
           <div class="abo-tiroir-in">
             <div class="abo-prix">
-              <span class="abo-devis">Au-delà de cent personnes, on en discute : accompagnement à la mise en place, interlocuteur dédié, engagement de disponibilité écrit.</span>
+              <span class="abo-devis">Au-delà de trente personnes, un tarif établi avec vous en fonction du nombre de membres et de votre engagement.</span>
             </div>
             <div class="abo-inclus">
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Plus de 100 membres</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Analyses vidéo IA</b> selon vos besoins</span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Procédures <b>illimitées</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Analyses vidéo IA illimitées</b> générées par mois par Standix</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Un <b>QR code</b> par procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Un <b>PDF</b> par procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Rédiger soi-même</b> la procédure</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Interface en <b>français, anglais et allemand</b></span></div>
             </div>
             <a class="abo-cta" href="mailto:Standix.app@gmail.com?subject=Offre%20Entreprise">Nous contacter</a>
             <button type="button" class="abo-fermer" data-tiroir="entreprise">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
@@ -5801,7 +5947,7 @@ body.pret .barre-hote{animation-play-state:running}
        ouvre, sans promettre une interface pensée pour le grand écran.
      ⚠ RÉPONSES VÉRIFIÉES sur l'app et ses formules (vidéo de 5 min au plus ;
        texte, PDF ou Word ; code d'invitation 15 min / 2 h / 7 jours ; FR, EN,
-       DE ; analyses par formule ; prix HT, −20 % à l'année ; durée d'analyse
+       DE ; analyses par formule ; prix HT, −15 % à l'année ; durée d'analyse
        d'après les mesures d'Em, environ 10 min). NE RIEN AJOUTER SANS
        CONFIRMATION : fin de l'essai, lieu de stockage, compte des employés.
      ⚠ `class="car"` pour la limite gauche (--bord). -->
@@ -5911,7 +6057,7 @@ body.pret .barre-hote{animation-play-state:running}
          place ses garanties à l'endroit où l'on décide) : prix de départ,
          lieu d'hébergement, engagement. -->
     <p class="fin-gages" data-monte style="--d:240ms">
-      <span>À partir de 69&nbsp;€ par mois</span>
+      <span>À partir de 99&nbsp;€ par mois</span>
       <span>Résiliable à tout moment</span>
     </p>
   </div>

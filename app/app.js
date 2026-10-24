@@ -1102,6 +1102,7 @@ const DICO = {
     "Photo de l'étape {v}": "Photo of step {v}",
     "Photo HEIC illisible ici : enregistrez-la en JPEG.": "This HEIC photo can’t be read here: save it as JPEG.",
     "Photo illisible : {name}": "Unreadable photo: {name}",
+    "Photo trop lourde : 40 Mo maximum.": "Photo too large: 40 MB at most.",
     "Photo trop lourde : 6 Mo maximum.": "Photo too large: 6 MB at most.",
     "Photographier le texte": "Photograph the text",
     "Placez la lecture au milieu du clip pour le diviser.": "Put the playhead in the middle of the clip to split it.",
@@ -1358,6 +1359,7 @@ const DICO = {
     "Une seule personne peut encore rejoindre votre équipe.": "Only one more person can join your team.",
     "Une seule vidéo de": "Only one video of",
     "Une seule vidéo de <b>{size}</b>, à partir de {n} prises. Regardez-la avant de la garder : c’est le seul moyen de vérifier que l’ordre est le bon.": "One video of <b>{size}</b>, from {n} takes. Watch it before keeping it: it is the only way to check the order is right.",
+    "Une vidéo est en cours d’envoi. Attendez la fin de l’envoi.": "A video is being uploaded. Please wait until the upload is finished.",
     "Une vidéo est en cours d’envoi. Patientez quelques secondes.": "A video is being uploaded. Please wait a few seconds.",
     "Une étape doit durer au moins une seconde.": "A step must last at least one second.",
     "Utilisateur": "User",
@@ -2463,6 +2465,7 @@ const DICO = {
     "Photo de l'étape {v}": "Foto von Schritt {v}",
     "Photo HEIC illisible ici : enregistrez-la en JPEG.": "Dieses HEIC-Foto kann hier nicht gelesen werden: Speichern Sie es als JPEG.",
     "Photo illisible : {name}": "Foto nicht lesbar: {name}",
+    "Photo trop lourde : 40 Mo maximum.": "Foto zu groß: höchstens 40 MB.",
     "Photo trop lourde : 6 Mo maximum.": "Foto zu groß: höchstens 6 MB.",
     "Photographier le texte": "Text abfotografieren",
     "Placez la lecture au milieu du clip pour le diviser.": "Setzen Sie die Wiedergabe in die Mitte des Ausschnitts, um ihn zu teilen.",
@@ -2719,6 +2722,7 @@ const DICO = {
     "Une seule personne peut encore rejoindre votre équipe.": "Nur noch eine Person kann Ihrem Team beitreten.",
     "Une seule vidéo de": "Nur ein Video mit",
     "Une seule vidéo de <b>{size}</b>, à partir de {n} prises. Regardez-la avant de la garder : c’est le seul moyen de vérifier que l’ordre est le bon.": "Ein Video mit <b>{size}</b> aus {n} Aufnahmen. Sehen Sie es sich vor dem Behalten an: Nur so prüfen Sie, ob die Reihenfolge stimmt.",
+    "Une vidéo est en cours d’envoi. Attendez la fin de l’envoi.": "Ein Video wird hochgeladen. Bitte warten Sie, bis das Hochladen abgeschlossen ist.",
     "Une vidéo est en cours d’envoi. Patientez quelques secondes.": "Ein Video wird hochgeladen. Bitte warten Sie einige Sekunden.",
     "Une étape doit durer au moins une seconde.": "Ein Schritt muss mindestens eine Sekunde dauern.",
     "Utilisateur": "Nutzer",
@@ -3561,7 +3565,21 @@ function nomTraduit(texte) {
 function paramsNoms(params) {
   if (!params || langueApp === 'fr' || !NOMS.size) return params
   const o = {}
-  for (const [cle, v] of Object.entries(params)) o[cle] = (typeof v === 'string' && nomTraduit(v)) || v
+  for (const [cle, v] of Object.entries(params)) {
+    if (typeof v !== 'string') { o[cle] = v; continue }
+    let t = nomTraduit(v)
+    /* ⚠ UN NOM DÉJÀ ÉCHAPPÉ SE RECONNAÎT AUSSI (relecture du 25 octobre 2026).
+       `escapeHtml` convertit maintenant les apostrophes : « Plan d'hygiène »,
+       passé échappé, arrivait en « Plan d&#39;hygiène » et n'était plus
+       traduit. On le cherche sous sa forme lisible, et la traduction repart
+       échappée, comme le texte qu'elle remplace. */
+    if (!t && v.includes('&')) {
+      const lisible = decoderEntites(v)
+      const t2 = lisible !== v && nomTraduit(lisible)
+      if (t2) t = escapeHtml(t2)
+    }
+    o[cle] = t || v
+  }
   return o
 }
 
@@ -3619,8 +3637,12 @@ async function majNomsTraduits() {
    remplie n'est dans aucun dictionnaire, et l'observateur la remettait en
    français par-dessus la bonne traduction. */
 const ORIGINES = new Map()
-const decoderEntites = (s) => String(s).replace(/&(amp|lt|gt|quot|#39|nbsp);/g,
-  (m, e) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", nbsp: '\u00a0' })[e])
+/* Une déclaration de fonction, pas une constante : `paramsNoms`, écrite plus
+   haut, s'en sert aussi. */
+function decoderEntites(s) {
+  return String(s).replace(/&(amp|lt|gt|quot|#39|nbsp);/g,
+    (m, e) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", nbsp: '\u00a0' })[e])
+}
 const morceaux = (s) => decoderEntites(s).split(/<[^>]*>/).map(cleTexte)
 
 function retenirOrigine(sortie, francais, cle, params, brut) {
@@ -5537,16 +5559,18 @@ document.getElementById(idBouton)?.addEventListener('click', async () => {
   const membre = choisirFicheMembre(fiches, selectedSpace)
 
   if (!membre) {
-    setButtonLoading(btn, false)
     if (erreur) {
+      setButtonLoading(btn, false)
       errorEl.textContent = tLang('Impossible de lire votre fiche : {erreur}', { erreur })
       return
     }
     /* Compte valide, mais rattaché à aucune entreprise : ce n'est pas une erreur
        de connexion, c'est une étape qui manque. On ouvre le champ du code plutôt
-       que d'afficher un refus. */
+       que d'afficher un refus. Le bouton reste en attente jusqu'au bout : un
+       second appui relançait la reprise par-dessus la première. */
     await fermerBienvenue()
     const reprise = await reprendreInscription(data.user)
+    setButtonLoading(btn, false)
     if (reprise) { enterApp(reprise); return }
     montrerOrphelin()
     return
@@ -6515,6 +6539,9 @@ function prendrePrelecture(cle) {
 
 async function enterApp(membre) {
   refermerLesVoiles()
+  /* Une déconnexion volontaire précédente (sans rechargement) ne doit pas
+     couper la détection « session fermée ailleurs » pour ce nouveau compte. */
+  window.__sortieVoulue = false
 
   /* ═══ ON CHANGE D'ENTREPRISE : ON VIDE TOUT ═══
 
@@ -6936,7 +6963,7 @@ async function ouvrirCibleQR() {
     if (eTitre) {
       fermerFenetreBienvenue()
       cibleQR.traitee = false
-      try { history.replaceState({}, '', '?proc=' + encodeURIComponent(id)) } catch (e) {}
+      try { history.replaceState({}, '', '?proc=' + encodeURIComponent(id) + (cibleQR.code ? '&e=' + encodeURIComponent(cibleQR.code) : '')) } catch (e) {}
       toast(tLang('Réseau indisponible : rechargez la page pour réessayer.'))
       return
     }
@@ -10553,7 +10580,7 @@ function peindreClassementCat(cle, animerDes) {
     return `
       <button type="button" class="fm-lg${neuve ? ' neuve' : ''}"
               ${neuve ? `style="animation-delay:${(rang - animerDes) * 0.05}s"` : ''}
-              data-part="${rang}" data-cat-nom="${escapeHtml(x.nom)}">
+              data-part="${rang}"${x.estAutres ? '' : ` data-cat-nom="${escapeHtml(x.nom)}"`}>
         <span class="pt" style="background:${x.couleur}"></span>
         <span class="co">
           <span class="nm">${escapeHtml(x.nom)}</span>
@@ -10597,6 +10624,8 @@ function peindreClassementCat(cle, animerDes) {
 
     b.addEventListener('pointerdown', () => {
       ouverte = false
+      /* La part grise « N autres » n'est pas un dossier : rien à ouvrir. */
+      if (!b.dataset.catNom) return
       /* `openCategory` n'existait pas — voir `renderTopCategories`. */
       minuteur = setTimeout(() => { ouverte = true; openCategoryProcedures(b.dataset.catNom) }, 550)
     })
@@ -12679,7 +12708,7 @@ async function loadGestionProcedures() {
     /* `#p-list-subhead` n'existe plus : l'erreur ne s'affichait nulle part et
        la page restait vide sans explication (audit du 24 octobre 2026). */
     ecrireSous(tLang('Erreur : {message}', { message: error.message }))
-    toast(tLang('Liste non actualisée : {message}', { message: error.message }))
+    if (!chargementDiscret) toast(tLang('Liste non actualisée : {message}', { message: error.message }))
     return
   }
   allGestionProcedures = procedures
@@ -21311,7 +21340,7 @@ function goToCreateMode(mode) {
      en cours ; l'envoi encore en route perdait alors sa procédure, et la
      vidéo partait dans le vide. L'envoi ne dure que quelques secondes. */
   if (mode === 'ai' && aiLancementEnCours) {
-    toast(tLang('Une vidéo est en cours d’envoi. Patientez quelques secondes.'))
+    toast(tLang('Une vidéo est en cours d’envoi. Attendez la fin de l’envoi.'))
     return
   }
   if (mode === 'ai') resetAiScreen()
@@ -23522,7 +23551,7 @@ function titreAccesFerme() {
 
 /* Le portail Stripe, ouvert directement — pour mettre à jour la carte après
    un paiement refusé. Même appel que le bouton « Gérer ou résilier ». */
-async function ouvrirPortailStripe() {
+async function ouvrirPortailStripe(changement = null) {
   try {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/stripe-portail`, {
       method: 'POST',
@@ -23530,6 +23559,8 @@ async function ouvrirPortailStripe() {
       body: JSON.stringify({
         entreprise_id: currentMembre.entreprise_id,
         retour: window.location.origin + window.location.pathname,
+        /* Un changement d'offre précis : `{ offre, formule }`. */
+        ...(changement || {}),
       }),
     })
     const data = await rep.json()
@@ -24296,6 +24327,16 @@ async function reduireImage(fichier, cote = 2000, qualite = 0.85) {
     const blob = await new Promise(ok => c.toBlob(ok, 'image/jpeg', qualite))
     return blob ? new File([blob], 'page.jpg', { type: 'image/jpeg' }) : fichier
   } catch (e) {
+    /* ⚠ UNE PAGE ILLISIBLE NE PART PLUS TELLE QUELLE (relecture du
+       25 octobre 2026). Une photo HEIC que ce navigateur ne sait pas ouvrir
+       (Chrome, Android) partait brute — jusqu'à 25 Mo par page — pour un refus
+       certain de l'IA après une longue attente. On le dit tout de suite. */
+    if (/hei[cf]/i.test(fichier?.type || '') || /\.hei[cf]$/i.test(fichier?.name || '')) {
+      throw new Error(tLang('Photo HEIC illisible ici : enregistrez-la en JPEG.'))
+    }
+    if (!/jpe?g|png|webp|gif/i.test(fichier?.type || '') || fichier.size > 3.5 * 1024 * 1024) {
+      throw new Error(tLang('Photo illisible : {name}', { name: fichier?.name || '' }))
+    }
     return fichier
   } finally {
     if (url) URL.revokeObjectURL(url)
@@ -24512,7 +24553,10 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
   const pctDocEl = document.getElementById('doc-attente-pct')
   if (pctDocEl) pctDocEl.textContent = '0%'
   clearInterval(docMinuteur)
-  docMinuteur = setInterval(() => {
+  /* ⚠ LE MINUTEUR DE CETTE GÉNÉRATION, PAS « LE » MINUTEUR (relecture du
+     25 octobre 2026). Une réponse périmée arrêtait celui d'une génération
+     relancée entre-temps : son pourcentage se figeait. */
+  const monMinuteur = docMinuteur = setInterval(() => {
     pctDoc = Math.min(90, pctDoc + (pctDoc < 60 ? 4 : 1.5))
     if (pctDocEl) pctDocEl.textContent = Math.round(pctDoc) + '%'
   }, 700)
@@ -24529,7 +24573,7 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
        résultat sautait par-dessus ce qu'on faisait — une modification en
        cours était remplacée par les étapes du document. */
     if (tourDoc !== docTour || !document.getElementById('p-create-doc')?.classList.contains('active')) {
-      clearInterval(docMinuteur)
+      clearInterval(monMinuteur)
       return
     }
     if (!rep.ok || data.error) throw new Error(data.error || tLang('La g\u00e9n\u00e9ration a \u00e9chou\u00e9.'))
@@ -24545,7 +24589,7 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
 /* On termine à 100 %, la coche prend la place du chiffre, puis on passe à
        la relecture. Sauter cette seconde donnerait l'impression que rien ne
        s'est passé — l'écran changerait avant qu'on ait vu le résultat. */
-clearInterval(docMinuteur)
+clearInterval(monMinuteur)
 if (pctDocEl) pctDocEl.textContent = '100%'
 figDoc?.classList.add('fini')
 await new Promise(r => setTimeout(r, 900))
@@ -24560,7 +24604,10 @@ await new Promise(r => setTimeout(r, 900))
     toast((manualSteps.length > 1 ? tLang('{length} étapes proposées · relisez avant de publier', { length: manualSteps.length }) : tLang('{length} étape proposée · relisez avant de publier', { length: manualSteps.length })))
     resetDocScreen()
   } catch (ex) {
-    clearInterval(docMinuteur)
+    clearInterval(monMinuteur)
+    /* Une erreur périmée (coupure, délai dépassé) ne recouvre pas la
+       génération relancée depuis. */
+    if (tourDoc !== docTour) return
     document.getElementById('doc-attente-card').style.display = 'none'
     document.getElementById('doc-saisie-card').style.display = 'block'
     err.textContent = ex instanceof Error ? ex.message : String(ex)
@@ -29252,7 +29299,7 @@ function renderManualSteps() {
       /* ⚠ LE POIDS SE JUGE APRÈS LA RÉDUCTION (audit du 24 octobre 2026).
          Une photo d'iPhone récent pèse 6 à 9 Mo et était refusée, alors que
          le recadrage la ramène à quelques centaines de Ko. */
-      if (f.size > 40 * 1024 * 1024) { toast(tLang('Photo trop lourde : 6 Mo maximum.')); return }
+      if (f.size > 40 * 1024 * 1024) { toast(tLang('Photo trop lourde : 40 Mo maximum.')); return }
       /* Le recadrage est asynchrone : on affiche l'etape des qu'il est fait,
          pas avant, sinon la vignette montrerait brievement l'image d'origine. */
       recadrerCarre(f).then(carre => {
@@ -30379,6 +30426,34 @@ async function insertEtapes(rows) {
   if (!res?.error) pretraduireProcedure(rows?.[0]?.procedure_id, true)
   return res
 }
+/* ⚠ REMPLACER LES ÉTAPES D'UNE PROCÉDURE QUI EXISTE (relecture du 25 octobre
+   2026). Deux pièges, l'un derrière l'autre :
+   • Effacer d'abord, puis écrire : une coupure entre les deux laissait une
+     procédure PUBLIÉE sans aucune étape pour toute l'équipe.
+   • Écrire d'abord, puis effacer : la base refuse deux étapes au même rang
+     d'une procédure (index unique `procedure_id, ordre`). Chaque modification
+     échouait sur « duplicate key ».
+   D'où une seule requête qui écrit chaque étape À SON RANG, en remplaçant
+   celle qui l'occupait : tout passe, ou rien ne change. Puis on retire les
+   rangs en trop, si la procédure a raccourci.
+
+   Chaque étape reçoit un identifiant neuf, comme quand on effaçait tout : les
+   coches d'un employé en pleine lecture ne restent pas sur une étape dont le
+   texte vient de changer. Un navigateur trop ancien pour en fabriquer garde
+   les anciens identifiants — sans autre conséquence. */
+async function remplacerEtapes(procId, rows) {
+  const ids = rows.map(() => globalThis.crypto?.randomUUID?.() || null)
+  const lignes = ids.every(Boolean) ? rows.map((r, i) => ({ ...r, id: ids[i] })) : rows
+  if (lignes.length) {
+    const res = await supabase.from('etapes').upsert(lignes, { onConflict: 'procedure_id,ordre' })
+    if (res.error) return res
+  }
+  /* Si ce retrait échoue, on le dit : les anciennes étapes de fin seraient
+     encore lues par l'équipe. Un nouvel essai refait tout proprement. */
+  return await supabase.from('etapes').delete()
+    .eq('procedure_id', procId).gt('ordre', lignes.length)
+}
+
 async function insererEtapes(rows) {
   let res = await supabase.from('etapes').insert(rows)
   // Replis successifs si la base n'a pas encore les colonnes ajoutées.
@@ -30485,25 +30560,8 @@ async function publishProcedure(errorElId, btnId) {
   }
 
   /* Les anciennes étapes sont remplacées : c'est plus sûr que de rapprocher
-     ligne à ligne, et l'ordre reste celui de l'écran.
-
-   ⚠ ON EFFACE APRÈS AVOIR ÉCRIT, PLUS AVANT (audit du 24 octobre 2026). Les
-     étapes étaient supprimées d'abord, puis venaient l'envoi des photos et
-     l'écriture des nouvelles. Une coupure entre les deux laissait une
-     procédure PUBLIÉE sans aucune étape pour toute l'équipe. On note donc les
-     anciennes ici, on écrit les nouvelles, et on ne retire les anciennes
-     qu'une fois les nouvelles en place. */
-  let anciennesEtapes = []
-  if (enCours && !procError) {
-    const { data: anciennes, error: eLire } = await supabase.from('etapes')
-      .select('id').eq('procedure_id', enCours)
-    if (eLire) {
-      errorEl.textContent = tLang('Erreur : {message}', { message: eLire.message })
-      setButtonLoading(publishBtn, false)
-      return
-    }
-    anciennesEtapes = (anciennes || []).map(r => r.id)
-  }
+     ligne à ligne, et l'ordre reste celui de l'écran. Comment, sans jamais
+     laisser la procédure vide : voir `remplacerEtapes`. */
 
   if (procError) {
     /* PGRST116 : aucune ligne — un autre gérant l'a supprimée entre-temps. */
@@ -30567,12 +30625,9 @@ async function publishProcedure(errorElId, btnId) {
   /* `insererEtapes` et non `insertEtapes` : la pré-traduction ne doit partir
      qu'une fois les anciennes étapes retirées, sinon elle les traduirait
      avec les nouvelles. */
-  const { error: etapesError } = await insererEtapes(etapesToInsert)
-
-  if (!etapesError && anciennesEtapes.length) {
-    const { error: eRetrait } = await supabase.from('etapes').delete().in('id', anciennesEtapes)
-    if (eRetrait) console.warn('Standix · anciennes étapes non retirées :', eRetrait.message)
-  }
+  const { error: etapesError } = enCours
+    ? await remplacerEtapes(newProc.id, etapesToInsert)
+    : await insererEtapes(etapesToInsert)
 
   setButtonLoading(publishBtn, false)
 
@@ -31833,10 +31888,17 @@ async function proposerReprise(proc) {
        URL »), et la relance échouait toujours avec un message faux. On signe
        l'adresse, comme au premier lancement. */
     const chemin = cheminFichier(proc.video_url)
-    const { data: sig } = chemin
+    const { data: sig, error: eSig } = chemin
       ? await supabase.storage.from('procedo-videos').createSignedUrl(chemin, 6 * 3600)
-      : { data: null }
-    if (!sig?.signedUrl) throw new Error('valid URL')
+      : { data: null, error: null }
+    if (!sig?.signedUrl) {
+      /* ⚠ « INTROUVABLE » SEULEMENT SI ELLE L'EST (relecture du 25 octobre
+         2026). Une coupure réseau pendant la signature finissait en « la
+         vidéo est introuvable, refilmez » — un conseil faux et coûteux. */
+      const raison = String(eSig?.message || '') + ' ' + String(eSig?.statusCode ?? eSig?.status ?? '')
+      if (eSig && !/not.?found|404|400/i.test(raison)) throw new Error(eSig.message || 'Failed to fetch')
+      throw new Error('valid URL')
+    }
 
     await supabase.from('etapes').delete().eq('procedure_id', proc.id)
     await supabase.from('procedures')
@@ -33180,12 +33242,11 @@ async function lireQuota() {
 
        Elle porte quand meme le quota et le reste : les afficher vaut mieux que
        de montrer un tiret, qui laisse croire a un incident. */
-    /* ⚠ `partage` : `verifier_analyse` ne le renvoie pas, et la mention
-       « commun à vos établissements » ne s'affichait jamais (audit du
-       24 octobre 2026). Même règle que la base : plus d'un établissement
-       fondé par la même personne. */
-    const partage = data.partage != null ? !!data.partage
-      : (mesEtablissements || []).filter(e => e.role === 'gestion' && !e.promu_par).length > 1
+    /* ⚠ `partage` VIENT DE LA BASE, ET D'ELLE SEULE (relecture du 25 octobre
+       2026). `verifier_analyse` et `consommer_analyse` comptent les analyses
+       PAR établissement. Le déduire du nombre d'établissements fondés
+       affichait « commun à vos établissements » — faux. */
+    const partage = !!data.partage
     quotaConnu = { quota: Number(data.quota) || 0, reste: Number(data.reste) || 0, partage }
     return quotaConnu
   } catch (e) {
@@ -35644,10 +35705,16 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
      SECONDE (audit du 24 octobre 2026). Choisir une autre carte ouvrait un
      nouveau paiement : deux abonnements prélevés chaque mois, et l'ancien
      écrasait l'état du nouveau à chaque renouvellement. Le portail de
-     Stripe sait changer d'offre proprement. */
+     Stripe sait changer d'offre proprement.
+
+   ⚠ ET IL S'OUVRE SUR CETTE OFFRE-LÀ, PAS SUR TOUTES (relecture du
+     25 octobre 2026). Le portail entier laissait choisir n'importe quelle
+     offre, sans rien savoir de l'équipe : douze personnes pouvaient y passer
+     en Essentiel. `stripe-portail` vérifie les places sur la base, puis ouvre
+     directement la confirmation de l'offre touchée ici. */
   if (/^sub_/.test(cachedEntreprise?.stripe_abonnement_id || '') &&
       ['actif', 'impaye'].includes(cachedEntreprise?.abonnement_statut)) {
-    await ouvrirPortailStripe()
+    await ouvrirPortailStripe({ offre: o.cle, formule: rythmeChoisi })
     return
   }
 
@@ -39089,6 +39156,11 @@ window.startScanner = async function(espace, { garderMessage = false } = {}) {
     scanLoopActive = true
     requestAnimationFrame(scanLoop)
   } catch (e) {
+    /* ⚠ UNE OUVERTURE PÉRIMÉE SE TAIT (relecture du 25 octobre 2026). Quitter
+       l'écran puis y revenir relance une ouverture : le refus de la première,
+       arrivé ensuite, coupait la seconde (`stopScanner`) et affichait une
+       erreur par-dessus une caméra qui marchait. */
+    if (tour !== scanTour) return
     stopScanner()
     const nom = e && e.name
     if (nom === 'NotAllowedError' || nom === 'SecurityError') {
@@ -39523,23 +39595,28 @@ function fenetreBienvenue(titre, categorie, avecAccueil) {
 function handleScanResult(text) {
   const espace = scanEspace
   dernierTexteScan = text
-  stopScanner()
-  scanEl('scan-hint').textContent = tLang('Code reconnu')
   let procId = null
   try { const url = new URL(text); procId = url.searchParams.get('proc') } catch (e) {}
   const resultZone = scanEl('scan-result-zone')
-  if (procId) {
-    resultZone.innerHTML = `
-      <div class="scan-result">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div><div style="font-weight:300; font-size:14px;">${tLang('Code reconnu')}</div><div style="font-size:12.5px; color:var(--label-2);">${tLang('Ouverture de la procédure...')}</div></div>
-      </div>`
-    setTimeout(() => confirmerOuvertureScan(procId, espace), 400)
-  } else {
+  /* ⚠ UN CODE ÉTRANGER NE COUPE PAS LA CAMÉRA (relecture du 25 octobre 2026).
+     On l'éteignait puis la rallumait ; le code, toujours dans le cadre, était
+     relu six secondes plus tard — et la caméra recoupée, en boucle. Sur
+     iPhone, chaque rallumage peut redemander l'autorisation. On l'écarte
+     simplement, et la lecture continue. */
+  if (!procId) {
     resultZone.innerHTML = `<div class="error-msg">${tLang('Ce code ne correspond à aucune procédure Standix.')}</div>`
     ignorerCodeUnMoment(text)
-    relancerScannerSiEnVue(900, { garderMessage: true })
+    if (scanLoopActive) requestAnimationFrame(scanLoop)
+    return
   }
+  stopScanner()
+  scanEl('scan-hint').textContent = tLang('Code reconnu')
+  resultZone.innerHTML = `
+    <div class="scan-result">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div><div style="font-weight:300; font-size:14px;">${tLang('Code reconnu')}</div><div style="font-size:12.5px; color:var(--label-2);">${tLang('Ouverture de la procédure...')}</div></div>
+    </div>`
+  setTimeout(() => confirmerOuvertureScan(procId, espace), 400)
 }
 
 /* La lampe du téléphone. Une cuisine est souvent sombre, et un QR code collé

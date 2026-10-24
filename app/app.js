@@ -17384,6 +17384,147 @@ function termesRecherche(q) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   LA RECHERCHE DE PROCÉDURES — UNE SEULE, POUR LES QUATRE CHAMPS
+
+ ⚠ DEMANDE D'EM (24 octobre 2026) : « Rechercher une procédure » doit
+   montrer UNIQUEMENT des procédures, choisies intelligemment d'après le
+   texte tapé — jamais un dossier ni un sous-dossier. Côté équipe, la
+   recherche rendait encore des cartes de dossier ; et partout, une procédure
+   sortait parce que le NOM DE SON DOSSIER contenait le mot tapé.
+
+   Ce qui compte désormais, c'est la procédure elle-même :
+     · son titre, d'abord ;
+     · le texte de ses étapes, ensuite — un signal plus faible, qui ne sert
+       que s'il est déjà chargé (il l'est dans l'espace équipe).
+
+   « INTELLIGENTE », CONCRÈTEMENT :
+     · sans accents ni majuscules : « securite » trouve « Sécurité » ;
+     · mot par mot, dans n'importe quel ordre : « friteuse nettoyer » trouve
+       « Nettoyer la friteuse » ;
+     · le dernier mot peut être en cours de frappe : « nett » suffit ;
+     · les petits mots ne comptent pas (« la », « de », « comment »…) ;
+     · les synonymes de `FAMILLES_MOTS` : « laver » trouve « Nettoyage » ;
+     · une faute de frappe est pardonnée : « firteuse » trouve « friteuse »
+       (une lettre d'écart à partir de 4 lettres, deux à partir de 7) ;
+     · les meilleurs résultats d'abord : titre qui commence par la saisie,
+       mot exact, début de mot, synonyme, puis faute de frappe, puis étapes.
+
+ ⚠ TOUS LES MOTS DOIVENT ÊTRE TROUVÉS. Si aucune procédure ne les a tous, on
+   montre celles qui en ont le plus, plutôt qu'une page vide. */
+const MOTS_VIDES_RECHERCHE = new Set([
+  'le', 'la', 'les', 'l', 'un', 'une', 'des', 'de', 'du', 'd', 'a', 'au', 'aux',
+  'et', 'ou', 'en', 'pour', 'par', 'sur', 'dans', 'avec', 'comment', 'quoi',
+  'the', 'an', 'of', 'to', 'how', 'and', 'for', 'in', 'on',
+  'der', 'die', 'das', 'den', 'dem', 'des', 'ein', 'eine', 'und', 'zu', 'wie', 'mit', 'im', 'am',
+])
+
+function motsNormalises(s) {
+  return sansAccents(s).replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean)
+}
+
+/* Écart entre deux mots, en lettres changées, ajoutées, retirées ou
+   inversées. On s'arrête dès que `max` est dépassé : la plupart des mots
+   comparés n'ont rien à voir, inutile de finir le calcul. */
+function ecartMots(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return max + 1
+  let avant = null, prec = Array.from({ length: b.length + 1 }, (_, j) => j)
+  for (let i = 1; i <= a.length; i++) {
+    const cour = [i]
+    let mini = i
+    for (let j = 1; j <= b.length; j++) {
+      let v = Math.min(prec[j] + 1, cour[j - 1] + 1, prec[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1))
+      if (avant && i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, avant[j - 2] + 1)
+      cour.push(v)
+      if (v < mini) mini = v
+    }
+    if (mini > max) return max + 1
+    avant = prec; prec = cour
+  }
+  return prec[b.length]
+}
+
+/* La note d'UN mot tapé face à un titre (ses mots, et le titre entier). */
+function noteMot(mot, motsTitre, titreEntier, flou = true) {
+  let note = 0
+  const syn = termesRecherche(mot).filter(t => t !== mot)
+  for (const w of motsTitre) {
+    if (w === mot) return 10
+    if (w.startsWith(mot)) note = Math.max(note, 8)
+    else if (mot.length >= 3 && w.includes(mot)) note = Math.max(note, 4)
+  }
+  for (const t of syn) {
+    if (t.includes(' ')) { if (titreEntier.includes(t)) note = Math.max(note, 7); continue }
+    for (const w of motsTitre) {
+      if (w === t) note = Math.max(note, 7)
+      else if (t.length >= 4 && w.startsWith(t)) note = Math.max(note, 6)
+    }
+  }
+  if (note || !flou) return note
+  /* La faute de frappe : contre le mot entier, et contre son début (le mot
+     est peut-être encore en train d'être tapé). */
+  const tol = mot.length >= 7 ? 2 : mot.length >= 4 ? 1 : 0
+  if (tol) {
+    for (const w of motsTitre) {
+      if (w.length < 3) continue
+      const e = Math.min(ecartMots(mot, w, tol),
+        w.length > mot.length && mot.length >= 5 ? ecartMots(mot, w.slice(0, mot.length), tol) : tol + 1)
+      if (e <= tol) return 3
+    }
+  }
+  return 0
+}
+
+/* Classe des procédures pour une saisie. `etapesDe(p)` rend ses étapes
+   (facultatif). Rend les procédures retenues, les meilleures d'abord. */
+function chercherProcedures(procs, saisie, etapesDe) {
+  const tous = motsNormalises(saisie)
+  if (!tous.length) return [...procs]
+  const utiles = tous.filter(m => !MOTS_VIDES_RECHERCHE.has(m))
+  const mots = utiles.length ? utiles : tous
+  const phrase = mots.join(' ')
+
+  const fiches = procs.map(p => {
+    const titreEntier = motsNormalises(p.titre || '').join(' ')
+    return { p, titreEntier, motsTitre: titreEntier.split(' ').filter(Boolean), etapes: null }
+  })
+  const texteEtapes = (f) => {
+    if (f.etapes === null) {
+      f.etapes = etapesDe ? ' ' + motsNormalises((etapesDe(f.p) || [])
+        .map(e => [e.titre, e.texte, e.vigilance].filter(Boolean).join(' ')).join(' ')).join(' ') + ' ' : ''
+    }
+    return f.etapes
+  }
+  /* ⚠ LA FAUTE DE FRAPPE N'EST QU'UN DERNIER RECOURS. Si le mot tapé existe
+     tel quel quelque part (« cuis » → Cuisine), on ne va pas chercher plus
+     loin : sinon « cuis » ramenait aussi « Caisse », à une lettre près. */
+  const sansFaute = new Set(mots.filter(m => fiches.some(f =>
+    noteMot(m, f.motsTitre, f.titreEntier, false) || (m.length >= 3 && texteEtapes(f).includes(' ' + m)))))
+
+  const notes = []
+  for (const f of fiches) {
+    const { p, titreEntier, motsTitre } = f
+    let total = 0, trouves = 0
+    for (const m of mots) {
+      let n = noteMot(m, motsTitre, titreEntier, !sansFaute.has(m))
+      if (!n && m.length >= 3 && texteEtapes(f).includes(' ' + m)) n = 2
+      if (n) { trouves++; total += n }
+    }
+    if (!trouves) continue
+    if (titreEntier.startsWith(phrase)) total += 15
+    else if (titreEntier.includes(phrase)) total += 8
+    notes.push({ p, total, trouves })
+  }
+
+  const complets = notes.filter(x => x.trouves === mots.length)
+  const garde = complets.length ? complets
+    : notes.filter(x => x.trouves === Math.max(...notes.map(y => y.trouves)))
+  return garde
+    .sort((a, b) => (b.total - a.total) ||
+      (a.p.titre || '').localeCompare(b.p.titre || '', 'fr', { sensitivity: 'base' }))
+    .map(x => x.p)
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    L'APPARITION AU DÉFILEMENT
 
    Une carte qui entre dans l'écran monte de quelques pixels en se révélant.
@@ -17763,18 +17904,24 @@ function renderCategoryGrid() {
      ═══════════════════════════════════════════════════════════════════════ */
   if (filtreEtatDossiers !== 'tout') {
     const vus = new Set()
-    const liste = []
-    for (const cat of visibles) {
+    let liste = []
+    /* En recherche, on parcourt TOUS les dossiers : c'est la procédure qui
+       doit correspondre, pas son dossier. */
+    for (const cat of (q ? sorted : visibles)) {
       for (const p of (cat.procsInCat || [])) {
         if (vus.has(p.id)) continue
         const enLigne = !!p.publiee_le
         if (filtreEtatDossiers === 'ligne' ? !enLigne : enLigne) continue
-        /* La recherche, si elle est active, s'applique aussi ici : les deux
-           filtres se cumulent au lieu de s'annuler. */
-        if (q && !termes.some(t => sansAccents(p.titre).includes(t))) continue
         vus.add(p.id)
         liste.push({ proc: p, dossier: cat.nom })
       }
+    }
+    /* La recherche, si elle est active, s'applique aussi ici : les deux
+       filtres se cumulent au lieu de s'annuler. */
+    if (q) {
+      const ordre = chercherProcedures(liste.map(x => x.proc), rechercheDossiers, p => cachedEtapesByProc[p.id])
+      const parId = new Map(liste.map(x => [x.proc.id, x]))
+      liste = ordre.map(p => parId.get(p.id))
     }
 
     if (nb) {
@@ -17814,22 +17961,26 @@ function renderCategoryGrid() {
   poserIconeRang(false)
 
   if (q) {
+    /* ⚠ TOUS LES DOSSIERS SONT PARCOURUS, et seule la procédure compte —
+       voir `chercherProcedures`. Une procédure ne sort plus parce que son
+       dossier porte le mot tapé. */
     const vus = new Set()
-    const trouvees = []
-    for (const cat of visibles) {
+    const candidates = []
+    for (const cat of sorted) {
       for (const p of (cat.procsInCat || [])) {
         if (vus.has(p.id)) continue
-        const titre = sansAccents(p.titre)
-        /* Le dossier a deja ete retenu parce qu'il correspond ; on ne garde
-           ici que les procedures qui correspondent ELLES-MEMES, sinon toutes
-           celles d'un dossier trouve par son nom sortiraient avec. */
-        if (!termes.some(t => titre.includes(t))) continue
         vus.add(p.id)
-        trouvees.push({ proc: p, dossier: cat.nom })
+        candidates.push({ proc: p, dossier: cat.nom })
       }
     }
+    const parId = new Map(candidates.map(x => [x.proc.id, x]))
+    const trouvees = chercherProcedures(candidates.map(x => x.proc), rechercheDossiers,
+      p => cachedEtapesByProc[p.id]).map(p => parId.get(p.id))
 
     if (!trouvees.length) {
+      /* La ligne disait « Aucun dossier » : on cherchait une procédure. */
+      if (nb) nb.textContent = tLang('Aucun résultat')
+      poserIconeRang(true)
       catGridEl.innerHTML =
         '<div class="cl-rien">' +
         tLang('Aucune procédure ne correspond à « {q} ».', { q: escapeHtml(rechercheDossiers) }) + '</div>'
@@ -18887,19 +19038,13 @@ function renderCategoryProceduresListInterne() {
      ⚠ LES DEUX PAGES PARTAGENT `sansAccents` ET `termesRecherche`. Ecrire ici
        une seconde version du meme filtre garantissait qu'un jour l'une des
        deux comprendrait un mot que l'autre ignore. */
-  const termesCat = currentCategoryQuery ? termesRecherche(sansAccents(currentCategoryQuery)) : []
+  /* ⚠ LA PROCÉDURE SEULE, PLUS SON DOSSIER NI SON SOUS-DOSSIER (demande
+     d'Em, 24 octobre 2026) — voir `chercherProcedures`. Le rang de chaque
+     résultat est gardé pour les ranger du meilleur au moins bon. */
+  const rangRecherche = new Map()
   const filtered = currentCategoryQuery
-    ? dansLaVue.filter(d => {
-        const titre = sansAccents(d.proc.titre || '')
-        // En vue globale, on peut aussi chercher par nom de dossier
-        const cat = toutesProcedures ? sansAccents(d.proc.categorie || tLang('sans dossier')) : ''
-        /* Le sous-dossier est cherchable partout, pas seulement en vue globale :
-           dans un dossier, taper « friteuse » doit ramener son contenu — c'est
-           même le premier réflexe une fois qu'on s'est mis à ranger. */
-        const sous = sansAccents(d.proc.sous_categorie || '')
-        return termesCat.some(t =>
-          titre.includes(t) || (cat && cat.includes(t)) || (sous && sous.includes(t)))
-      })
+    ? chercherProcedures(dansLaVue.map(d => d.proc), currentCategoryQuery, p => cachedEtapesByProc[p.id])
+        .map((p, i) => { rangRecherche.set(p.id, i); return dansLaVue.find(d => d.proc.id === p.id) })
     : dansLaVue
 
   /* ═══ LE COMPTE DE LA LIGNE DE CONTEXTE ═══
@@ -18920,7 +19065,9 @@ function renderCategoryProceduresListInterne() {
 
        Dans un SOUS-dossier il n'y a que des procédures : le premier morceau
        tombe alors de lui-même. */
-    const sousDossiers = sousDossierCourant ? new Set() : new Set(
+    /* En recherche, la liste ne montre que des procédures : on ne compte
+       donc qu'elles. */
+    const sousDossiers = (sousDossierCourant || currentCategoryQuery) ? new Set() : new Set(
       (filtered || []).map(d => (d && d.proc && d.proc.sous_categorie || '').trim()).filter(Boolean))
     const nbP = (filtered || []).length
     const morceaux = []
@@ -18947,6 +19094,7 @@ function renderCategoryProceduresListInterne() {
 
   const parTitre = (a, b) => (a.proc.titre || '').localeCompare(b.proc.titre || '', 'fr', { sensitivity: 'base' })
   const sorted = [...filtered].sort((a, b) => {
+    if (currentCategoryQuery) return rangRecherche.get(a.proc.id) - rangRecherche.get(b.proc.id)
     if (currentCategorySort === 'new') return (b.createdAt - a.createdAt) || parTitre(a, b)
     if (currentCategorySort === 'old') return (a.createdAt - b.createdAt) || parTitre(a, b)
     return parTitre(a, b)
@@ -31399,9 +31547,9 @@ function renderEquipeCategories() {
        n'avait plus qu'une branche — autant nommer ce qu'on garde. */
     const source = allEquipeProcedures.filter(p => favorisEquipe.has(p.id))
 
-    for (const p of source) {
+    const retenues = q ? chercherProcedures(source, q, p => equipeEtapesByProc[p.id]) : source
+    for (const p of retenues) {
       if (vus.has(p.id)) continue
-      if (termes.length && !termes.some(t => sansAccents(p.titre || '').includes(t))) continue
       vus.add(p.id)
       liste.push({ proc: p, dossier: p.categorie || tLang('Sans dossier') })
     }
@@ -31420,6 +31568,27 @@ function renderEquipeCategories() {
 
     liste.forEach(({ proc, dossier }, rang) =>
       grille.appendChild(ficheEquipe(proc, rang, dossier)))
+    return
+  }
+
+  /* ═══ UNE RECHERCHE REND DES PROCÉDURES, JAMAIS DES DOSSIERS ═══
+
+   ⚠ DEMANDE D'EM (24 octobre 2026, capture de l'espace équipe) : taper dans
+     « Rechercher une procédure » affichait encore des cartes de dossier. On
+     fait comme côté gestion : une liste de procédures, la meilleure en
+     haut — voir `chercherProcedures`. */
+  if (q) {
+    const trouvees = chercherProcedures(allEquipeProcedures, q, p => equipeEtapesByProc[p.id])
+    if (nbEl) {
+      nbEl.textContent = trouvees.length ? (trouvees.length > 1 ? tLang('{length} procédures', { length: trouvees.length }) : tLang('{length} procédure', { length: trouvees.length })) : tLang('Aucun résultat')
+    }
+    poserIconeRang(true)
+    if (!trouvees.length) {
+      grille.innerHTML = '<div class="cl-rien">' +
+        tLang('Aucune procédure ne correspond à « {q} ».', { q: escapeHtml(q) }) + '</div>'
+      return
+    }
+    trouvees.forEach((p, rang) => grille.appendChild(ficheEquipe(p, rang, p.categorie || tLang('Sans dossier'))))
     return
   }
 
@@ -31635,14 +31804,8 @@ function renderEquipeCatListe() {
    ⚠ ON REPREND LA MEME FONCTION, pas une seconde version. Deux filtres
      paralleles finiraient par comprendre des mots differents. */
   const q = equipeCatQuery
-  const termesQ = q ? termesRecherche(sansAccents(q)) : []
-  const vues = q
-    ? dansCat.filter(p => {
-        const titre = sansAccents(p.titre || '')
-        const sous = sansAccents(p.sous_categorie || '')
-        return termesQ.some(t => titre.includes(t) || (sous && sous.includes(t)))
-      })
-    : dansCat
+  /* La procédure seule, plus son sous-dossier — voir `chercherProcedures`. */
+  const vues = q ? chercherProcedures(dansCat, q, p => equipeEtapesByProc[p.id]) : dansCat
 
   /* ⚠ LE SOUS-TITRE A ETE VIDE.
 
@@ -31670,7 +31833,7 @@ function renderEquipeCatListe() {
        affichees, or elles portent toutes celui qu'on regarde.
 
        Quand `equipeSousDossier` est pose, il n'y a plus de niveau en dessous. */
-    if (equipeSousDossier) {
+    if (equipeSousDossier || q) {
       nbEl.textContent = vues.length ? (vues.length > 1 ? tLang('{length} procédures', { length: vues.length }) : tLang('{length} procédure', { length: vues.length })) : tLang('Aucune procédure')
       poserIconeCat(true)
     } else {

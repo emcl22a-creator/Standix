@@ -191,7 +191,15 @@
   setTimeout(function filet() {
     /* Le script est peut-être encore en route sur un réseau lent : on lui
        laisse vingt secondes en tout avant de parler d'échec. */
-    if (!window.__appJsLance) { setTimeout(echecChargement, 14000); return }
+    /* ⚠ ET LE FILET SE RÉARME (relecture du 25 octobre 2026). Un script
+       arrivé à huit secondes, qui s'arrêtait avant d'afficher quoi que ce
+       soit, laissait un écran noir pour de bon : plus personne ne
+       repassait. On revient voir toutes les deux secondes. */
+    if (!window.__appJsLance) {
+      if (performance.now() < 20000) setTimeout(filet, 2000)
+      else echecChargement()
+      return
+    }
     /* ⚠ UNE SESSION RANGÉE SUR L'APPAREIL = QUELQU'UN DE CONNECTÉ (audit du
        24 octobre 2026). Sur un réseau lent, l'app n'avait pas encore posé
        son drapeau : « Bienvenue » s'affichait à une personne connectée, ses

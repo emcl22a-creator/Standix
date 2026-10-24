@@ -2955,6 +2955,10 @@
   "en": "Unreadable photo: {name}",
   "de": "Foto nicht lesbar: {name}"
  },
+ "Photo trop lourde : 40 Mo maximum.": {
+  "en": "Photo too large: 40 MB at most.",
+  "de": "Foto zu groß: höchstens 40 MB."
+ },
  "Photo trop lourde : 6 Mo maximum.": {
   "en": "Photo too large: 6 MB at most.",
   "de": "Foto zu groß: höchstens 6 MB."
@@ -3910,6 +3914,10 @@
  "Une seule vidéo de <b>{size}</b>, à partir de {n} prises. Regardez-la avant de la garder : c’est le seul moyen de vérifier que l’ordre est le bon.": {
   "en": "One video of <b>{size}</b>, from {n} takes. Watch it before keeping it: it is the only way to check the order is right.",
   "de": "Ein Video mit <b>{size}</b> aus {n} Aufnahmen. Sehen Sie es sich vor dem Behalten an: Nur so prüfen Sie, ob die Reihenfolge stimmt."
+ },
+ "Une vidéo est en cours d’envoi. Attendez la fin de l’envoi.": {
+  "en": "A video is being uploaded. Please wait until the upload is finished.",
+  "de": "Ein Video wird hochgeladen. Bitte warten Sie, bis das Hochladen abgeschlossen ist."
  },
  "Une vidéo est en cours d’envoi. Patientez quelques secondes.": {
   "en": "A video is being uploaded. Please wait a few seconds.",

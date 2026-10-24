@@ -383,6 +383,7 @@ const DICO = {
     "Basculer": "Switch",
     "Basculer vers « {v} » ? L'app va se recharger avec ses procédures.": "Switch to “{v}”? The app will reload with its procedures.",
     "Bienvenue": "Welcome",
+    "Bienvenue chez {nom}. Vous y êtes gestionnaire.": "Welcome to {nom}. You are a manager there.",
     "Bienvenue chez {nom}. Vous y êtes membre d'équipe.": "Welcome to {nom}. You are a team member here.",
     "Bienvenue · {choisi}": "Welcome · {choisi}",
     "Bonjour": "Hello",
@@ -1351,6 +1352,8 @@ const DICO = {
     "Vous gérez déjà {ETABLISSEMENTS_MAX} entreprises, le maximum par compte. Retirez-en une pour en créer une autre, ou écrivez-nous si vous gérez un groupe.": "You already manage {ETABLISSEMENTS_MAX} companies, the maximum per account. Remove one to create another, or write to us if you run a group.",
     "Vous gérez {ETABLISSEMENTS_MAX} entreprises, le maximum par compte.": "You manage {ETABLISSEMENTS_MAX} companies, the maximum per account.",
     "Vous n'appartenez à aucune entreprise.": "You do not belong to any company.",
+    "Vous ne faites plus partie de cette entreprise.": "You are no longer part of this company.",
+    "Vous ne faites plus partie de {nom}.": "You are no longer part of {nom}.",
     "Vous ne le voyez pas ? Glissez une seconde fois pour ouvrir la liste complète.": "Can't see it? Swipe a second time to open the full list.",
     "Vous n’avez pas les droits pour supprimer cette procédure.": "You are not allowed to delete this procedure.",
     "Vous passez en espace Gestion": "You are moving to the Management area",
@@ -1716,6 +1719,7 @@ const DICO = {
     "Basculer": "Wechseln",
     "Basculer vers « {v} » ? L'app va se recharger avec ses procédures.": "Zu „{v}“ wechseln? Die App lädt dann mit deren Anleitungen neu.",
     "Bienvenue": "Willkommen",
+    "Bienvenue chez {nom}. Vous y êtes gestionnaire.": "Willkommen bei {nom}. Sie sind dort Verwalter.",
     "Bienvenue chez {nom}. Vous y êtes membre d'équipe.": "Willkommen bei {nom}. Sie sind hier Teammitglied.",
     "Bienvenue · {choisi}": "Willkommen · {choisi}",
     "Bonjour": "Hallo",
@@ -2684,6 +2688,8 @@ const DICO = {
     "Vous gérez déjà {ETABLISSEMENTS_MAX} entreprises, le maximum par compte. Retirez-en une pour en créer une autre, ou écrivez-nous si vous gérez un groupe.": "Sie verwalten bereits {ETABLISSEMENTS_MAX} Unternehmen, das Maximum pro Konto. Entfernen Sie eines, um ein neues anzulegen, oder schreiben Sie uns, wenn Sie eine Gruppe führen.",
     "Vous gérez {ETABLISSEMENTS_MAX} entreprises, le maximum par compte.": "Sie verwalten {ETABLISSEMENTS_MAX} Unternehmen, das Maximum pro Konto.",
     "Vous n'appartenez à aucune entreprise.": "Sie gehören zu keinem Unternehmen.",
+    "Vous ne faites plus partie de cette entreprise.": "Sie gehören nicht mehr zu diesem Unternehmen.",
+    "Vous ne faites plus partie de {nom}.": "Sie gehören nicht mehr zu {nom}.",
     "Vous ne le voyez pas ? Glissez une seconde fois pour ouvrir la liste complète.": "Nicht zu sehen? Wischen Sie ein zweites Mal, um die ganze Liste zu öffnen.",
     "Vous n’avez pas les droits pour supprimer cette procédure.": "Sie dürfen diese Anleitung nicht löschen.",
     "Vous passez en espace Gestion": "Sie wechseln in den Verwaltungsbereich",
@@ -6677,14 +6683,21 @@ async function proposerEntrepriseDuQR(code) {
     /* La place est-elle libre ? Si l'entreprise est complète, la demande est
        déposée et l'on s'arrête ici. */
     if (!(await verifierPlaceLibre(ent.id, ent.nom))) return
-    const { data, error } = await supabase.from('membres').insert({
+    /* ⚠ ON ÉCRIT, PUIS ON RELIT — en deux temps. Demander la ligne en retour
+       dans la même écriture (`.select()`) échouait : la règle de lecture de
+       `membres` ne la voit pas encore à cet instant (même cause que la
+       fenêtre « Aucune entreprise », 24 octobre 2026). */
+    const { error } = await supabase.from('membres').insert({
       user_id: user.id,
       nom: currentMembre?.nom || '',
       role: 'visiteur',
       entreprise_id: ent.id,
       procedure_visitee: cibleQR.proc,
-    }).select().single()
+    })
     if (error) { toast(tLang('Accès impossible : {message}', { message: error.message })); return false }
+    const { data } = await supabase.from('membres').select('*')
+      .eq('user_id', user.id).eq('entreprise_id', ent.id).maybeSingle()
+    if (!data) { toast(tLang('Accès impossible : {message}', { message: tLang("La base a refus\u00e9 l'adh\u00e9sion.") })); return false }
     membre = data
   }
 
@@ -7624,7 +7637,7 @@ function ouvrirContact() {
      de résiliation. Deux occurrences, aucune constante : c'est peu, mais si un
      troisième point d'écriture apparaît, il faudra une variable plutôt qu'une
      recherche-remplacement de plus. */
-  window.location.href = `mailto:Standix.app@gmail.com?subject=${sujet}&body=${corps}`
+  window.location.href = `mailto:contact@standix.app?subject=${sujet}&body=${corps}`
 }
 /* Les avatars de l'accueil ouvrent la MÊME fenêtre que la carte « Écrivez-nous »
    des réglages. Ils avaient chacun leur texte, plus court et différent : deux
@@ -11690,6 +11703,7 @@ function majBarreHaute(id) {
 
 window.showGestionScreen = function(id, btn) {
   majBarreHaute(id)
+  verifierFicheToujoursLa()
   /* ⚠ LA PAGE EST FERMEE ICI, EN TETE, AVANT TOUT LE RESTE.
 
      Quatre endroits l'ouvrent — un bandeau d'essai, une alerte de quota, la
@@ -11939,6 +11953,7 @@ const ONGLET_EQUIPE_PAR_ECRAN = {
 
 window.showEquipeScreen = function(id, btn) {
   majBarreHaute(id)
+  verifierFicheToujoursLa()
   // Même raison que côté gestion : la page Langue se remplit à l'ouverture.
   if (id === 'e-reg-langue') rendreChoixLangueApp()
   /* ⚠ MEME REMISE A ZERO QUE DANS L'ESPACE GESTION. Les deux espaces ont leur
@@ -23316,6 +23331,38 @@ async function entrepriseParCode(code) {
   return data[0]
 }
 
+/* ═══ REJOINDRE AVEC UN CODE PASSE TOUJOURS PAR LA BASE ═══
+
+   ⚠ L'ÉCRITURE DIRECTE DANS `membres` ÉCHOUAIT. « new row violates row-level
+     security policy » (capture d'Em, 24 octobre 2026) : l'app demandait la
+     ligne créée en retour (`.select()`), et la règle de lecture de `membres`
+     ne la voit pas encore à cet instant-là. L'inscription était refusée.
+
+   ⚠ ET ELLE CONTOURNAIT TOUT. Ni le rôle du code (invitation → équipe, code
+     de gestion → gestion), ni son expiration, ni le nombre de places.
+
+   `rejoindre_entreprise` fait tout cela d'un coup, côté serveur — c'est déjà
+   ce qu'utilise l'inscription. Rend la fiche créée, ou lève une erreur
+   lisible (CODE_INCONNU, PLACES_COMPLETES). */
+async function rejoindreParCode(code) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error(tLang('Session expir\u00e9e. Reconnectez-vous.'))
+  const md = user.user_metadata || {}
+  const { data: fiche, error } = await supabase.rpc('rejoindre_entreprise', {
+    p_code: code,
+    p_nom: currentMembre?.nom || nomDuMembreRetire || md.nom || md.full_name || '',
+    p_email: user.email || '',
+  })
+  if (error) {
+    const m = String(error.message || '')
+    if (m.includes('CODE_INCONNU')) throw new Error(tLang("Aucune entreprise ne correspond \u00e0 ce code."))
+    if (m.includes('PLACES_COMPLETES')) throw new Error(tLang('Cette entreprise est complète'))
+    throw new Error(m || tLang("La base a refus\u00e9 l'adh\u00e9sion."))
+  }
+  if (!fiche || !fiche.id) throw new Error(tLang("La base a refus\u00e9 l'adh\u00e9sion."))
+  return fiche
+}
+
 async function placesRestantes(entrepriseId) {
   const { data, error } = await supabase
     .rpc('places_restantes', { p_entreprise: entrepriseId })
@@ -34492,7 +34539,7 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
          ecrire. Il faut lui dire pourquoi le paiement n'est pas encore
          possible avant d'ouvrir sa messagerie. */
     if (o.prix === null) {
-      window.location.href = 'mailto:Standix.app@gmail.com?subject=' +
+      window.location.href = 'mailto:contact@standix.app?subject=' +
         encodeURIComponent(tLang('Offre Entreprise')) + '&body=' +
         encodeURIComponent(tLang('Bonjour,\n\nJe souhaite en savoir plus sur l\u2019offre Entreprise.\n\n'))
       return
@@ -34504,7 +34551,7 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
       confirmer: tLang('Nous écrire'),
       annuler: tLang('Fermer'),
     })
-    if (ok) window.location.href = 'mailto:Standix.app@gmail.com?subject=' +
+    if (ok) window.location.href = 'mailto:contact@standix.app?subject=' +
       encodeURIComponent(tLang('Offre {nom}', { nom: o.nom }))
     return
   }
@@ -35971,12 +36018,17 @@ document.getElementById('es-rejoindre')?.addEventListener('click', async () => {
     return
   }
 
-  const { data: { user } } = await supabase.auth.getUser()
-  const { error } = await supabase.from('membres').insert({
-    user_id: user.id, nom: currentMembre?.nom || '', role: 'equipe', entreprise_id: ent.id,
-  })
+  /* ⚠ PAR LA BASE — voir `rejoindreParCode`. L'écriture directe ignorait les
+     places et l'expiration du code. */
+  if (!(await verifierPlaceLibre(ent.id, ent.nom))) { setButtonLoading(btn, false); return }
+  try {
+    await rejoindreParCode(code)
+  } catch (ex) {
+    setButtonLoading(btn, false)
+    err.textContent = tLang('Erreur : {message}', { message: ex?.message || String(ex) })
+    return
+  }
   setButtonLoading(btn, false)
-  if (error) { err.textContent = tLang('Erreur : {message}', { message: error.message }); return }
 
   document.getElementById('es-code').value = ''
   err.style.color = 'var(--green)'
@@ -36086,6 +36138,83 @@ document.getElementById('es-quitter')?.addEventListener('click', async () => {
 
 /* ── Un compte sans entreprise ───────────────────────────────── */
 
+/* ═══ RETIRÉ D'UNE ENTREPRISE PENDANT QUE L'APP EST OUVERTE ═══
+
+   ⚠ L'APP NE LE REMARQUAIT PAS (signalé par Em, 24 octobre 2026). La fiche
+     était lue une fois, à l'ouverture. Retiré de son entreprise, un gérant
+     gardait toutes les pages de gestion ; seules les procédures avaient
+     disparu, puisque la base, elle, ne les lui rendait plus. Il fallait
+     recharger la page pour voir « Aucune entreprise ».
+
+   On revérifie donc que la fiche existe toujours :
+     · à chaque changement de page (au plus une fois par 30 secondes) ;
+     · quand l'app revient au premier plan ;
+     · toutes les minutes tant qu'elle est affichée.
+
+   Si elle a disparu : une autre fiche (autre entreprise) prend le relais ;
+   sinon l'app se masque et la fenêtre « Aucune entreprise » s'impose — elle
+   n'a que deux sorties, rejoindre avec un code ou se déconnecter.
+
+ ⚠ UNE ERREUR RÉSEAU NE PROUVE RIEN. On ne conclut qu'à une réponse nette de
+   la base : « cette fiche n'existe plus ». */
+let dernierControleFiche = 0
+let controleFicheEnCours = false
+/* Le nom que portait la fiche disparue : la base l'inscrit tel quel dans la
+   prochaine entreprise rejointe. Sans lui, on y entrait sans nom. */
+let nomDuMembreRetire = ''
+
+async function verifierFicheToujoursLa(force) {
+  if (!currentMembre?.id || suppressionEnCours || controleFicheEnCours) return
+  if (!force && Date.now() - dernierControleFiche < 30000) return
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return
+  dernierControleFiche = Date.now()
+  controleFicheEnCours = true
+  try {
+    const idAvant = currentMembre.id
+    const { data, error } = await supabase.from('membres')
+      .select('id').eq('id', idAvant).maybeSingle()
+    if (error || data) return
+    if (currentMembre?.id !== idAvant) return   // on a changé d'entreprise entre-temps
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { fiches, erreur } = await lireFichesMembre(user.id)
+    if (erreur) return
+
+    const nomAvant = cachedEntreprise?.nom || ''
+    const autre = choisirFicheMembre(fiches)
+    if (autre) {
+      await enterApp(autre)
+      toast(nomAvant
+        ? tLang('Vous ne faites plus partie de {nom}.', { nom: nomAvant })
+        : tLang('Vous ne faites plus partie de cette entreprise.'))
+      return
+    }
+
+    /* Plus aucune entreprise : rien ne doit rester accessible derrière la
+       fenêtre. */
+    for (const idApp of ['gestion-app', 'equipe-app']) {
+      const el = document.getElementById(idApp)
+      if (el) el.style.display = 'none'
+    }
+    afficherBarre(false)
+    nomDuMembreRetire = currentMembre?.nom || ''
+    currentMembre = null
+    montrerOrphelin()
+  } catch (e) {
+    console.warn('[fiche] contrôle impossible :', e?.message || e)
+  } finally {
+    controleFicheEnCours = false
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') verifierFicheToujoursLa(true)
+})
+setInterval(() => {
+  if (document.visibilityState === 'visible') verifierFicheToujoursLa(true)
+}, 60000)
+
 /* La même fenêtre sert à deux moments : un compte sans entreprise, et quelqu'un
    qui veut en rejoindre une de plus. Le besoin est le même — un code à saisir —
    seule la sortie diffère : se déconnecter dans un cas, annuler dans l'autre. */
@@ -36172,19 +36301,18 @@ document.getElementById('orph-entrer')?.addEventListener('click', async () => {
     /* La place est-elle libre ? Si l'entreprise est complète, la demande est
        déposée et l'on s'arrête ici. */
     if (!(await verifierPlaceLibre(ent.id, ent.nom))) return
-    const { data: cree, error } = await supabase.from('membres')
-      .insert({ user_id: user.id, entreprise_id: ent.id, nom: '', role: 'equipe' })
-      .select('*').maybeSingle()
-    if (error) throw new Error(error.message)
-    if (!cree) throw new Error(tLang("La base a refus\u00e9 l'adh\u00e9sion."))
+
+    /* ⚠ PAR LA BASE, PLUS PAR UNE ÉCRITURE DIRECTE — voir `rejoindreParCode`.
+       Le rôle vient du code : une invitation fait entrer en équipe, un code de
+       gestion en gestion. Être gestionnaire ailleurs ne donne aucun droit
+       ici. */
+    const cree = await rejoindreParCode(code)
 
     fermerOrphelin()
-
-    /* On entre dans la nouvelle entreprise comme MEMBRE D'ÉQUIPE, quel que soit
-       le rang qu'on occupe ailleurs. Être gestionnaire chez l'un ne donne aucun
-       droit chez l'autre — c'est à son responsable de promouvoir, s'il le veut. */
     await enterApp(cree)
-    toast(tLang('Bienvenue chez {nom}. Vous y êtes membre d\'équipe.', { nom: ent.nom }))
+    toast(cree.role === 'gestion'
+      ? tLang('Bienvenue chez {nom}. Vous y êtes gestionnaire.', { nom: ent.nom })
+      : tLang('Bienvenue chez {nom}. Vous y êtes membre d\'équipe.', { nom: ent.nom }))
   } catch (ex) {
     err.textContent = ex instanceof Error ? ex.message : String(ex)
   } finally {
@@ -40156,6 +40284,29 @@ function brancherTiroirDossiers(prefixe) {
   const tSous = champSous ? fabriquer(champSous, 'sous') : null
   /* Changer de dossier change les sous-dossiers proposés. */
   champCat.addEventListener('input', () => { if (document.activeElement === champSous) tSous?.peindre() })
+
+  /* ⚠ CHANGER DE DOSSIER EFFACE LE SOUS-DOSSIER CHOISI (demande d'Em,
+     24 octobre 2026). On choisissait « Accueil », puis son sous-dossier
+     « Réception », puis on revenait mettre « Cuisine » : « Réception » restait
+     écrit, et la procédure partait dans un sous-dossier qui n'appartient pas
+     au nouveau dossier.
+
+     On compare au dossier noté quand on est entré dans le champ (ou au
+     dernier changement) : retaper le même nom n'efface rien. Les pages qui
+     pré-remplissent ces champs écrivent `value` sans événement, donc une
+     procédure ouverte en modification garde bien son sous-dossier. */
+  if (champSous) {
+    let catNote = cleDossier(champCat.value)
+    champCat.addEventListener('focus', () => { catNote = cleDossier(champCat.value) })
+    champCat.addEventListener('input', () => {
+      const k = cleDossier(champCat.value)
+      if (k === catNote) return
+      catNote = k
+      if (!champSous.value) return
+      champSous.value = ''
+      champSous.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+  }
 }
 
 TIROIR_DOSSIERS_ECRANS.forEach(brancherTiroirDossiers)

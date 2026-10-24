@@ -1446,7 +1446,9 @@
   .man-plus{
     position:relative; display:flex; align-items:center; gap:0;
     background:none; border:none; padding:0; width:100%; text-align:left;
-    color:var(--label-2); font-family:inherit; font-size:14.5px; font-weight:600;
+    /* En noir, comme le texte des étapes (demande d'Em, 24 octobre 2026) ;
+       il était gris (--label-2). */
+    color:var(--label); font-family:inherit; font-size:14.5px; font-weight:600;
   }
   .man-plus .d{ position:absolute; left:-44px; top:-5px; width:33px; height:33px; }
   .man-plus .d svg{ width:33px; height:33px; display:block; }
@@ -26645,4 +26647,28 @@ html::-webkit-scrollbar-thumb:hover{
     background:var(--bg);
     pointer-events:none;
   }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE LOGO DE BIENVENUE A LA TAILLE DE CELUI DE LA BARRE DU HAUT
+
+ ⚠ DEMANDE D'EM (24 octobre 2026) : sur la page « Votre savoir-faire transmis
+   simplement », le logo et le mot « Standix » doivent être exactement ceux de
+   la barre de l'app. Mesuré : 20 × 29 px et 20 px de texte ici, contre
+   24 × 34 px et 25,5 px dans la barre.
+
+   On reprend donc les quatre valeurs de la barre — taille du dessin, taille
+   du mot, son interlettrage (−0,02 em) et l'écart de 9 px entre les deux.
+
+ ⚠ SUR GRAND ÉCRAN, LA BARRE GRANDIT AVEC `--ech` (1,05 sur PC) : le logo de
+   bienvenue suit le même coefficient, pour rester identique là aussi. */
+#login-screen .bv-haut{ gap:9px; }
+#login-screen .bv-logo{
+  width:calc(24px * var(--ech, 1));
+  height:calc(34px * var(--ech, 1));
+}
+#login-screen .bv-marque{
+  font-size:calc(25.5px * var(--ech, 1));
+  letter-spacing:-0.02em;
 }

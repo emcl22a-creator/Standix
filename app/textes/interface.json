@@ -183,6 +183,10 @@
   "en": "<b>{v}</b> moved to Management",
   "de": "<b>{v}</b> ist jetzt in der Verwaltung"
  },
+ "<b>{v}</b> est repassé·e en équipe": {
+  "en": "<b>{v}</b> moved back to the team",
+  "de": "<b>{v}</b> ist wieder im Team"
+ },
  "<b>{v}</b> n’a pas pu vous rejoindre": {
   "en": "<b>{v}</b> could not join you",
   "de": "<b>{v}</b> konnte nicht beitreten"
@@ -262,6 +266,10 @@
  "Abonnement annuel": {
   "en": "Yearly subscription",
   "de": "Jahresabo"
+ },
+ "Abonnement en cours": {
+  "en": "Active subscription",
+  "de": "Laufendes Abonnement"
  },
  "Abonnement mensuel": {
   "en": "Monthly subscription",
@@ -839,6 +847,10 @@
   "en": "This browser cannot record: {v}",
   "de": "Dieser Browser kann nicht aufnehmen: {v}"
  },
+ "Ce navigateur ne sait pas lire cette vidéo. Essayez depuis un autre navigateur, ou enregistrez-la en MP4.": {
+  "en": "This browser can’t play this video. Try another browser, or save it as MP4.",
+  "de": "Dieser Browser kann das Video nicht abspielen. Versuchen Sie einen anderen Browser oder speichern Sie es als MP4."
+ },
  "Ce poste existe déjà.": {
   "en": "This role already exists.",
   "de": "Diese Position gibt es schon."
@@ -890,6 +902,10 @@
  "Cette procédure": {
   "en": "This procedure",
   "de": "Diese Anleitung"
+ },
+ "Cette procédure a été supprimée entre-temps.": {
+  "en": "This procedure was deleted in the meantime.",
+  "de": "Dieses Verfahren wurde inzwischen gelöscht."
  },
  "Cette procédure appartient à « {nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?": {
   "en": "This procedure belongs to “{nom}”, where you already have access. Switch to that company to open it?",
@@ -1034,6 +1050,10 @@
  "Choisissez un mot de passe d’au moins 6 caractères.": {
   "en": "Choose a password with at least 6 characters.",
   "de": "Wählen Sie ein Passwort mit mindestens 6 Zeichen."
+ },
+ "Choisissez un mot de passe d’au moins {MDP_MIN} caractères.": {
+  "en": "Choose a password of at least {MDP_MIN} characters.",
+  "de": "Wählen Sie ein Passwort mit mindestens {MDP_MIN} Zeichen."
  },
  "Choisissez votre enregistrement avec « Importer une vidéo »": {
   "en": "Pick your recording with “Import a video”",
@@ -2899,6 +2919,10 @@
   "en": "No one else can join your team. Choose a bigger plan to welcome more people.",
   "de": "Niemand kann Ihrem Team mehr beitreten. Wählen Sie einen größeren Tarif für mehr Personen."
  },
+ "Personne ne s’est formé ce mois-ci": {
+  "en": "Nobody has trained this month",
+  "de": "Diesen Monat hat sich niemand geschult"
+ },
  "Personne pour l'instant": {
   "en": "No one yet",
   "de": "Noch niemand"
@@ -2914,6 +2938,10 @@
  "Photo": {
   "en": "Photo",
   "de": "Foto"
+ },
+ "Photo HEIC illisible ici : enregistrez-la en JPEG.": {
+  "en": "This HEIC photo can’t be read here: save it as JPEG.",
+  "de": "Dieses HEIC-Foto kann hier nicht gelesen werden: Speichern Sie es als JPEG."
  },
  "Photo de l'étape": {
   "en": "Step photo",
@@ -3295,6 +3323,10 @@
   "en": "Could not remove: {message}",
   "de": "Entfernen nicht möglich: {message}"
  },
+ "Retrait refusé par la base. Rechargez la page.": {
+  "en": "Removal refused by the database. Reload the page.",
+  "de": "Entfernen von der Datenbank abgelehnt. Laden Sie die Seite neu."
+ },
  "Revenez dans {nom} et touchez <b>Réessayer</b>": {
   "en": "Come back to {nom} and tap <b>Try again</b>",
   "de": "Kehren Sie zu {nom} zurück und tippen Sie auf <b>Erneut versuchen</b>"
@@ -3342,6 +3374,30 @@
  "Réseau : {v}": {
   "en": "Network: {v}",
   "de": "Netzwerk: {v}"
+ },
+ "Réseau indisponible": {
+  "en": "Network unavailable",
+  "de": "Netzwerk nicht verfügbar"
+ },
+ "Réseau indisponible : rechargez la page pour réessayer.": {
+  "en": "Network unavailable: reload the page to try again.",
+  "de": "Netzwerk nicht verfügbar: Laden Sie die Seite neu, um es erneut zu versuchen."
+ },
+ "Réseau indisponible : revenez en arrière et rouvrez la procédure.": {
+  "en": "Network unavailable: go back and open the procedure again.",
+  "de": "Netzwerk nicht verfügbar: Gehen Sie zurück und öffnen Sie das Verfahren erneut."
+ },
+ "Réseau indisponible : réessayez dans un instant.": {
+  "en": "Network unavailable: try again in a moment.",
+  "de": "Netzwerk nicht verfügbar: Versuchen Sie es gleich noch einmal."
+ },
+ "Résiliez d’abord l’abonnement de cet établissement (Réglages › Abonnement › Gérer), puis supprimez-le.": {
+  "en": "First cancel this location’s subscription (Settings › Subscription › Manage), then delete it.",
+  "de": "Kündigen Sie zuerst das Abonnement dieses Standorts (Einstellungen › Abonnement › Verwalten) und löschen Sie ihn dann."
+ },
+ "Résiliez d’abord votre abonnement (Réglages › Abonnement › Gérer), puis supprimez l’entreprise.": {
+  "en": "First cancel your subscription (Settings › Subscription › Manage), then delete the company.",
+  "de": "Kündigen Sie zuerst Ihr Abonnement (Einstellungen › Abonnement › Verwalten) und löschen Sie dann das Unternehmen."
  },
  "Résultat": {
   "en": "Result",
@@ -3683,6 +3739,10 @@
   "en": "Tap “Screen recorder”, turn on the mic, then start.",
   "de": "Tippen Sie auf „Bildschirmaufnahme“, schalten Sie das Mikrofon ein und starten Sie."
  },
+ "Toujours pas de réseau. Standix reprendra dès que la connexion revient.": {
+  "en": "Still no network. Standix will resume as soon as the connection is back.",
+  "de": "Immer noch kein Netzwerk. Standix macht weiter, sobald die Verbindung zurück ist."
+ },
  "Tout effacer": {
   "en": "Erase all",
   "de": "Alles löschen"
@@ -3743,6 +3803,10 @@
   "en": "Too many devices",
   "de": "Zu viele Geräte"
  },
+ "Trop de demandes : réessayez dans une minute.": {
+  "en": "Too many requests: try again in a minute.",
+  "de": "Zu viele Anfragen: Versuchen Sie es in einer Minute erneut."
+ },
  "Trou de {v} s avant l'étape {v2}": {
   "en": "Gap of {v} s before step {v2}",
   "de": "Lücke von {v} s vor Schritt {v2}"
@@ -3767,6 +3831,10 @@
   "en": "A <b>QR code</b> for each procedure",
   "de": "Ein <b>QR-Code</b> pro Anleitung"
  },
+ "Un autre gestionnaire la modifie en ce moment. Réessayez quand il aura terminé.": {
+  "en": "Another manager is editing it right now. Try again when they’re done.",
+  "de": "Ein anderer Manager bearbeitet es gerade. Versuchen Sie es erneut, wenn er fertig ist."
+ },
  "Un code est actif": {
   "en": "A code is active",
   "de": "Ein Code ist aktiv"
@@ -3778,6 +3846,10 @@
  "Un compte est utilisé sur {max} appareils.": {
   "en": "An account is in use on {max} devices.",
   "de": "Ein Konto wird auf {max} Geräten genutzt."
+ },
+ "Un compte existe déjà avec cet e-mail. Fermez cette fenêtre et connectez-vous.": {
+  "en": "An account already exists with this email. Close this window and log in.",
+  "de": "Mit dieser E-Mail existiert bereits ein Konto. Schließen Sie dieses Fenster und melden Sie sich an."
  },
  "Un compte existe déjà avec cet e-mail. Utilisez plutôt l'onglet Se connecter.": {
   "en": "An account already exists with this email. Use Log in instead.",
@@ -3819,6 +3891,10 @@
   "en": "A small Standix bar opens and stays on top of your programs.",
   "de": "Eine kleine Standix-Leiste öffnet sich und bleibt über Ihren Programmen."
  },
+ "Une photo n’a pas pu être envoyée : ajoutez-la depuis « Modifier ».": {
+  "en": "One photo couldn’t be uploaded: add it from “Edit”.",
+  "de": "Ein Foto konnte nicht hochgeladen werden: Fügen Sie es über „Bearbeiten“ hinzu."
+ },
  "Une procédure vous attend": {
   "en": "A procedure is waiting for you",
   "de": "Eine Anleitung wartet auf Sie"
@@ -3834,6 +3910,10 @@
  "Une seule vidéo de <b>{size}</b>, à partir de {n} prises. Regardez-la avant de la garder : c’est le seul moyen de vérifier que l’ordre est le bon.": {
   "en": "One video of <b>{size}</b>, from {n} takes. Watch it before keeping it: it is the only way to check the order is right.",
   "de": "Ein Video mit <b>{size}</b> aus {n} Aufnahmen. Sehen Sie es sich vor dem Behalten an: Nur so prüfen Sie, ob die Reihenfolge stimmt."
+ },
+ "Une vidéo est en cours d’envoi. Patientez quelques secondes.": {
+  "en": "A video is being uploaded. Please wait a few seconds.",
+  "de": "Ein Video wird hochgeladen. Bitte warten Sie einige Sekunden."
  },
  "Une étape doit durer au moins une seconde.": {
   "en": "A step must last at least one second.",
@@ -4855,9 +4935,17 @@
   "en": "{length} people",
   "de": "{length} Personen"
  },
+ "{length} photo trop lourde (plus de 25 Mo).": {
+  "en": "{length} photo too large (over 25 MB).",
+  "de": "{length} Foto zu groß (über 25 MB)."
+ },
  "{length} photo trop lourde (plus de 4 Mo). Sur iPhone : Réglages → Appareil photo → Formats → Haute efficacité.": {
   "en": "{length} photo too large (over 4 MB). On iPhone: Settings → Camera → Formats → High Efficiency.",
   "de": "{length} Foto zu groß (über 4 MB). Auf dem iPhone: Einstellungen → Kamera → Formate → High Efficiency."
+ },
+ "{length} photos trop lourdes (plus de 25 Mo).": {
+  "en": "{length} photos too large (over 25 MB).",
+  "de": "{length} Fotos zu groß (über 25 MB)."
  },
  "{length} photos trop lourdes (plus de 4 Mo). Sur iPhone : Réglages → Appareil photo → Formats → Haute efficacité.": {
   "en": "{length} photos too large (over 4 MB). On iPhone: Settings → Camera → Formats → High Efficiency.",
@@ -4930,6 +5018,10 @@
  "{ne} établissements": {
   "en": "{ne} sites",
   "de": "{ne} Standorte"
+ },
+ "{nomEnt} a atteint les {places} places de son abonnement. Demandez à votre gérant d'ajouter une place.": {
+  "en": "{nomEnt} has reached the {places} seats of its subscription. Ask your manager to add a seat.",
+  "de": "{nomEnt} hat die {places} Plätze seines Abonnements erreicht. Bitten Sie Ihren Manager, einen Platz hinzuzufügen."
  },
  "{nomEnt} a atteint les {places} places de son abonnement. Votre demande a été transmise — demandez à votre gérant d'ajouter une place.": {
   "en": "{nomEnt} has used all {places} seats in its subscription. Your request has been passed on — ask your owner to add a seat.",
@@ -5034,6 +5126,10 @@
  "{n} personnes": {
   "en": "{n} people",
   "de": "{n} Personen"
+ },
+ "{n} photos n’ont pas pu être envoyées : ajoutez-les depuis « Modifier ».": {
+  "en": "{n} photos couldn’t be uploaded: add them from “Edit”.",
+  "de": "{n} Fotos konnten nicht hochgeladen werden: Fügen Sie sie über „Bearbeiten“ hinzu."
  },
  "{n} procédure": {
   "en": "{n} procedure",
@@ -5170,6 +5266,10 @@
  "« {name} » n’a pas répondu. Retirez-la et réessayez.": {
   "en": "“{name}” did not respond. Remove it and try again.",
   "de": "„{name}“ reagiert nicht. Entfernen Sie sie und versuchen Sie es erneut."
+ },
+ "« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Prévenez la personne qui la gère.": {
+  "en": "“{nomEntreprise}” has reached the member limit of its subscription. Let the person who manages it know.",
+  "de": "„{nomEntreprise}“ hat die Mitgliederzahl seines Abos erreicht. Sagen Sie der verantwortlichen Person Bescheid."
  },
  "« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Votre demande a été transmise à la personne qui la gère. Elle vous ouvrira l'accès dès qu'une place se libère.": {
   "en": "“{nomEntreprise}” has reached the number of members in its subscription. Your request has been passed to the person who manages it. They will let you in as soon as a seat frees up.",

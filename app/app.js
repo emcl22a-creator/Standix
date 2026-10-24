@@ -1,3 +1,7 @@
+/* Le script est arrivé : le filet de `boot.js` n'a plus à parler d'échec. */
+window.__appJsLance = true
+document.getElementById('boot-echec')?.remove()
+
 let createClient
 
 try {
@@ -17,17 +21,22 @@ try {
   if (!createClient) throw new Error('createClient introuvable dans le module Supabase chargé')
 } catch (e) {
   console.error('Échec du chargement de Supabase :', e)
+  /* ⚠ `tLang` NE MARCHE PAS ENCORE ICI (audit du 24 octobre 2026) : la langue
+     et les dictionnaires sont déclarés plus bas dans le fichier. L'appeler
+     levait une seconde erreur, et l'écran « Connexion impossible » ne
+     s'affichait jamais. On retombe sur le texte français. */
+  const T = (t) => { try { return tLang(t) } catch (x) { return t } }
   window.__procedoLoaded = true
   document.body.insertAdjacentHTML('beforeend', `
     <div style="position:fixed; inset:0; z-index:9999; background:#050506; display:flex; align-items:center; justify-content:center; padding:24px;">
       <div style="text-align:center; max-width:320px;">
-        <p style="color:#fff; font-size:15px; font-weight:300; margin-bottom:8px;">${tLang('Connexion impossible')}</p>
-        <p style="color:rgba(235,235,245,0.6); font-size:13px; margin-bottom:14px;">${tLang('Vérifiez votre connexion internet, puis réessayez.')}</p>
+        <p style="color:#fff; font-size:15px; font-weight:300; margin-bottom:8px;">${T('Connexion impossible')}</p>
+        <p style="color:rgba(235,235,245,0.6); font-size:13px; margin-bottom:14px;">${T('Vérifiez votre connexion internet, puis réessayez.')}</p>
         <div style="background:rgba(255,69,58,0.12); border:1px solid rgba(255,69,58,0.4); border-radius:10px; padding:12px; margin-bottom:20px; text-align:left;">
-          <p style="color:#FF6961; font-size:11px; font-weight:700; margin-bottom:4px;">${tLang('DÉTAIL TECHNIQUE (build v3) :')}</p>
-          <p style="color:#FF9B95; font-size:12px; word-break:break-word;">${(e && e.message) ? e.message : tLang('Erreur inconnue (pas de message)')}</p>
+          <p style="color:#FF6961; font-size:11px; font-weight:700; margin-bottom:4px;">${T('DÉTAIL TECHNIQUE (build v3) :')}</p>
+          <p style="color:#FF9B95; font-size:12px; word-break:break-word;">${(e && e.message) ? e.message : T('Erreur inconnue (pas de message)')}</p>
         </div>
-        <button onclick="location.reload()" style="background:#fff; color:#000; padding:11px 24px; border-radius:100px; font-weight:300; font-size:14px; border:none;">${tLang('Réessayer')}</button>
+        <button onclick="location.reload()" style="background:#fff; color:#000; padding:11px 24px; border-radius:100px; font-weight:300; font-size:14px; border:none;">${T('Réessayer')}</button>
       </div>
     </div>
   `)
@@ -66,7 +75,81 @@ async function ensureJsQR() {
 
 const SUPABASE_URL = 'https://tlrtsoahwqhtvtkhssbm.supabase.co'
 const SUPABASE_ANON_KEY = 'sb_publishable_pzGIsj3EE2Sh_OBt21QbGg_4lKfitFw'
+/* ⚠ LE LIEN « MOT DE PASSE OUBLIÉ » SE LIT AVANT LA BIBLIOTHÈQUE (audit du
+   24 octobre 2026). Supabase ouvre la session à partir du lien puis EFFACE
+   l'adresse (`#…type=recovery`). L'app trouvait donc une session ordinaire,
+   entrait directement, et ne demandait jamais le nouveau mot de passe : le
+   lien connectait la personne sans rien changer. On note ici, avant que la
+   bibliothèque ne démarre, qu'on arrive par ce lien. */
+let lienRecuperation = /type=recovery/.test((window.location.hash || '') + (window.location.search || ''))
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+/* ⚠ UNE SESSION FERMÉE AILLEURS SE VOIT ICI (audit du 24 octobre 2026). Si
+   le serveur révoque la session (compte supprimé, mot de passe changé,
+   déconnexion globale), la bibliothèque l'efface… et l'app continuait comme
+   si de rien n'était, avec des listes vides et sans explication. On recharge :
+   l'écran de connexion s'affiche. `__sortieVoulue` distingue nos propres
+   déconnexions, qui savent déjà quoi faire. */
+supabase.auth.onAuthStateChange((evenement) => {
+  if (evenement !== 'SIGNED_OUT' || window.__sortieVoulue) return
+  try { if (currentMembre) location.reload() } catch (e) {}
+})
+
+/* ═══ LIRE TOUTES LES LIGNES, PAS LES 1 000 PREMIÈRES ═══
+
+ ⚠ LA BASE NE RENVOIE JAMAIS PLUS DE 1 000 LIGNES PAR REQUÊTE (audit du
+   24 octobre 2026). Les étapes et les lectures de TOUTES les procédures
+   étaient demandées d'un seul coup : au-delà de 1 000 lignes, la réponse
+   était coupée sans erreur, et ce sont les dernières étapes de chaque
+   procédure qui manquaient. Une entreprise de 300 procédures de 6 étapes
+   aurait vu des procédures amputées, sans aucun message.
+
+   On lit donc par lots de 100 procédures (l'adresse reste courte) et par
+   pages de 1 000 lignes, dans un ordre fixe pour ne rien sauter. La réponse
+   a la même forme qu'une requête ordinaire : `{ data, error }`. */
+/* ⚠ UN NOM DE FICHIER SANS ACCENT NI SIGNE (audit du 24 octobre 2026). Le
+   stockage refuse les accents, les tirets typographiques, les emojis, `#` et
+   `%` : « Procédure caisse – soir.mp4 » donnait « Invalid key », et chaque
+   relance échouait de la même façon. */
+/* Tous les fichiers d'un dossier du stockage, sous-dossiers compris, par
+   pages de 1 000. Une entrée sans `id` est un dossier. */
+async function listerFichiers(bucket, dossier, profondeur = 0) {
+  const tout = []
+  for (let de = 0; ; de += 1000) {
+    const { data, error } = await supabase.storage.from(bucket).list(dossier, { limit: 1000, offset: de })
+    if (error || !data?.length) break
+    for (const f of data) {
+      const chemin = `${dossier}/${f.name}`
+      if (f.id) tout.push(chemin)
+      else if (profondeur < 3) tout.push(...await listerFichiers(bucket, chemin, profondeur + 1))
+    }
+    if (data.length < 1000) break
+  }
+  return tout
+}
+
+function nomFichierSur(nom) {
+  const propre = String(nom || 'video').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Za-z0-9._-]+/g, '_').replace(/_+/g, '_')
+  return propre.slice(-80) || 'video'
+}
+
+async function lireParLots(table, colonne, ids, ordre = null) {
+  const tout = []
+  for (let i = 0; i < ids.length; i += 100) {
+    const lot = ids.slice(i, i + 100)
+    for (let de = 0; ; de += 1000) {
+      let q = supabase.from(table).select('*').in(colonne, lot)
+      if (ordre) q = q.order(ordre)
+      const { data, error } = await q.order('id').range(de, de + 999)
+      if (error) return { data: null, error }
+      tout.push(...(data || []))
+      if (!data || data.length < 1000) break
+    }
+  }
+  if (ordre) tout.sort((a, b) => (a[ordre] ?? 0) - (b[ordre] ?? 0))
+  return { data: tout, error: null }
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    L'EN-TÊTE D'AUTORISATION DES FONCTIONS
@@ -239,6 +322,7 @@ const DICO = {
     "<b>{v} %</b> vs mois dernier": "<b>{v}%</b> vs last month",
     "<b>{v}</b> a rejoint l’équipe": "<b>{v}</b> joined the team",
     "<b>{v}</b> est passé·e en gestion": "<b>{v}</b> moved to Management",
+    "<b>{v}</b> est repassé·e en équipe": "<b>{v}</b> moved back to the team",
     "<b>{v}</b> n’a pas pu vous rejoindre": "<b>{v}</b> could not join you",
     "<b>—</b><i>aucune lecture</i>": "<b>—</b><i>no reads</i>",
     "<em>Aucune procédure créée pour le moment.</em>": "<em>No procedures created yet.</em>",
@@ -260,6 +344,7 @@ const DICO = {
     "Abonnement": "Subscription",
     "Abonnement annuel": "Yearly subscription",
     "abonnement complet": "subscription full",
+    "Abonnement en cours": "Active subscription",
     "Abonnement mensuel": "Monthly subscription",
     "Accès": "Access",
     "Accès au développement des procédures et aux pages Analyse et Gestion des accès.": "Can build procedures and open the Analysis and Access pages.",
@@ -419,6 +504,7 @@ const DICO = {
     "Ce navigateur ne donne pas accès à la caméra.": "This browser does not allow camera access.",
     "ce navigateur ne sait pas enregistrer ({v})": "this browser cannot record ({v})",
     "Ce navigateur ne sait pas enregistrer : {v}": "This browser cannot record: {v}",
+    "Ce navigateur ne sait pas lire cette vidéo. Essayez depuis un autre navigateur, ou enregistrez-la en MP4.": "This browser can’t play this video. Try another browser, or save it as MP4.",
     "ce poste": "this role",
     "Ce poste existe déjà.": "This role already exists.",
     "Ce que l’IA analyse": "What the AI looks at",
@@ -437,6 +523,7 @@ const DICO = {
     "Cette personne": "This person",
     "cette personne": "this person",
     "Cette procédure": "This procedure",
+    "Cette procédure a été supprimée entre-temps.": "This procedure was deleted in the meantime.",
     "Cette procédure appartient à « {nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?": "This procedure belongs to “{nom}”, where you already have access. Switch to that company to open it?",
     "Cette procédure appartient à « {nom} ». Vous pourrez la consulter, mais pas les autres procédures de l'entreprise : il faut pour cela le code de votre responsable.": "This procedure belongs to “{nom}”. You can open it, but not the company's other procedures: for those you need your manager's code.",
     "Cette procédure est ouverte depuis un moment sans que rien ne bouge. Reprenez où vous en étiez, ou revenez-y plus tard.": "This procedure has been open for a while with nothing happening. Pick up where you left off, or come back to it later.",
@@ -475,6 +562,7 @@ const DICO = {
     "Choisissez le poste qui vous correspond.": "Pick the role that fits you.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Choose the screen or window to record…",
     "Choisissez un mot de passe d’au moins 6 caractères.": "Choose a password with at least 6 characters.",
+    "Choisissez un mot de passe d’au moins {MDP_MIN} caractères.": "Choose a password of at least {MDP_MIN} characters.",
     "Choisissez votre enregistrement avec « Importer une vidéo »": "Pick your recording with “Import a video”",
     "Chrome sur Android": "Chrome on Android",
     "Cinq minutes : enregistrement arrêté.": "Five minutes: recording stopped.",
@@ -1005,12 +1093,14 @@ const DICO = {
     "Personne dans l’espace Utilisateur pour le moment.": "No one in the User area yet.",
     "Personne ne correspond à « {filtreEquipe} ».": "No one matches “{filtreEquipe}”.",
     "Personne ne peut plus rejoindre votre équipe. Choisissez une offre supérieure pour en accueillir davantage.": "No one else can join your team. Choose a bigger plan to welcome more people.",
+    "Personne ne s’est formé ce mois-ci": "Nobody has trained this month",
     "Personne pour l'instant": "No one yet",
     "Personne pour l’instant": "No one yet",
     "Personne pour l’instant.": "No one yet.",
     "Photo": "Photo",
     "Photo de l'étape": "Step photo",
     "Photo de l'étape {v}": "Photo of step {v}",
+    "Photo HEIC illisible ici : enregistrez-la en JPEG.": "This HEIC photo can’t be read here: save it as JPEG.",
     "Photo illisible : {name}": "Unreadable photo: {name}",
     "Photo trop lourde : 6 Mo maximum.": "Photo too large: 6 MB at most.",
     "Photographier le texte": "Photograph the text",
@@ -1111,6 +1201,7 @@ const DICO = {
     "Retirée de l’espace équipe": "Removed from the User area",
     "Retour": "Back",
     "Retrait impossible : {message}": "Could not remove: {message}",
+    "Retrait refusé par la base. Rechargez la page.": "Removal refused by the database. Reload the page.",
     "Revenez dans {nom} et touchez <b>Réessayer</b>": "Come back to {nom} and tap <b>Try again</b>",
     "Rien de lu ce mois-ci": "Nothing read this month",
     "Rien de lu pour l’instant": "Nothing read yet",
@@ -1124,6 +1215,12 @@ const DICO = {
     "Réglages": "Settings",
     "Réseau": "Network",
     "Réseau : {v}": "Network: {v}",
+    "Réseau indisponible": "Network unavailable",
+    "Réseau indisponible : rechargez la page pour réessayer.": "Network unavailable: reload the page to try again.",
+    "Réseau indisponible : revenez en arrière et rouvrez la procédure.": "Network unavailable: go back and open the procedure again.",
+    "Réseau indisponible : réessayez dans un instant.": "Network unavailable: try again in a moment.",
+    "Résiliez d’abord l’abonnement de cet établissement (Réglages › Abonnement › Gérer), puis supprimez-le.": "First cancel this location’s subscription (Settings › Subscription › Manage), then delete it.",
+    "Résiliez d’abord votre abonnement (Réglages › Abonnement › Gérer), puis supprimez l’entreprise.": "First cancel your subscription (Settings › Subscription › Manage), then delete the company.",
     "Résultat": "Result",
     "Révoquer": "Revoke",
     "Safari sur iPhone": "Safari on iPhone",
@@ -1217,6 +1314,7 @@ const DICO = {
     "Touchez une étape ci-dessous pour régler son clip": "Tap a step below to set its clip",
     "Touchez une étape pour régler son clip": "Tap a step to set its clip",
     "Touchez « Enregistreur d’écran », activez le micro, puis démarrez.": "Tap “Screen recorder”, turn on the mic, then start.",
+    "Toujours pas de réseau. Standix reprendra dès que la connexion revient.": "Still no network. Standix will resume as soon as the connection is back.",
     "Tout effacer": "Erase all",
     "Tout effacer ?": "Erase everything?",
     "Tout le monde l'a ouverte au moins une fois.": "Everyone has opened it at least once.",
@@ -1232,6 +1330,7 @@ const DICO = {
     "Trier les dossiers": "Sort the folders",
     "Trois gestes, puis revenez ici importer la vidéo.": "Three taps, then come back here to add the video.",
     "Trop d'appareils": "Too many devices",
+    "Trop de demandes : réessayez dans une minute.": "Too many requests: try again in a minute.",
     "trou": "gap",
     "Trou de {v} s avant l'étape {v2}": "Gap of {v} s before step {v2}",
     "Télécharger en PDF": "Download as PDF",
@@ -1239,9 +1338,11 @@ const DICO = {
     "Télécharger le QR code": "Download the QR code",
     "Un <b>PDF</b> par procédure": "A <b>PDF</b> for each procedure",
     "Un <b>QR code</b> par procédure": "A <b>QR code</b> for each procedure",
+    "Un autre gestionnaire la modifie en ce moment. Réessayez quand il aura terminé.": "Another manager is editing it right now. Try again when they’re done.",
     "Un code est actif": "A code is active",
     "Un compte est partagé": "An account is being shared",
     "Un compte est utilisé sur {max} appareils.": "An account is in use on {max} devices.",
+    "Un compte existe déjà avec cet e-mail. Fermez cette fenêtre et connectez-vous.": "An account already exists with this email. Close this window and log in.",
     "Un compte existe déjà avec cet e-mail. Utilisez plutôt l'onglet Se connecter.": "An account already exists with this email. Use Log in instead.",
     "Un dossier « {nouveau} » existe déjà. Les procédures de « {ancien} » la rejoindront, et « {ancien} » disparaîtra.": "A folder “{nouveau}” already exists. The procedures in “{ancien}” will move into it, and “{ancien}” will disappear.",
     "Un gestionnaire": "A manager",
@@ -1252,10 +1353,12 @@ const DICO = {
     "Une erreur est survenue pendant l'analyse.": "Something went wrong during the analysis.",
     "Une lecture est comptée après {DUREE_LECTURE_MIN} secondes passées sur la procédure. Chaque utilisateur est compté une seule fois par procédure.": "A read counts after {DUREE_LECTURE_MIN} seconds on the procedure. Each user counts once per procedure.",
     "Une petite barre Standix s’ouvre et reste au-dessus de vos logiciels.": "A small Standix bar opens and stays on top of your programs.",
+    "Une photo n’a pas pu être envoyée : ajoutez-la depuis « Modifier ».": "One photo couldn’t be uploaded: add it from “Edit”.",
     "Une procédure vous attend": "A procedure is waiting for you",
     "Une seule personne peut encore rejoindre votre équipe.": "Only one more person can join your team.",
     "Une seule vidéo de": "Only one video of",
     "Une seule vidéo de <b>{size}</b>, à partir de {n} prises. Regardez-la avant de la garder : c’est le seul moyen de vérifier que l’ordre est le bon.": "One video of <b>{size}</b>, from {n} takes. Watch it before keeping it: it is the only way to check the order is right.",
+    "Une vidéo est en cours d’envoi. Patientez quelques secondes.": "A video is being uploaded. Please wait a few seconds.",
     "Une étape doit durer au moins une seconde.": "A step must last at least one second.",
     "Utilisateur": "User",
     "Valider": "Confirm",
@@ -1406,7 +1509,9 @@ const DICO = {
     "{length} dossiers": "{length} folders",
     "{length} personne": "{length} person",
     "{length} personnes": "{length} people",
+    "{length} photo trop lourde (plus de 25 Mo).": "{length} photo too large (over 25 MB).",
     "{length} photo trop lourde (plus de 4 Mo). Sur iPhone : Réglages → Appareil photo → Formats → Haute efficacité.": "{length} photo too large (over 4 MB). On iPhone: Settings → Camera → Formats → High Efficiency.",
+    "{length} photos trop lourdes (plus de 25 Mo).": "{length} photos too large (over 25 MB).",
     "{length} photos trop lourdes (plus de 4 Mo). Sur iPhone : Réglages → Appareil photo → Formats → Haute efficacité.": "{length} photos too large (over 4 MB). On iPhone: Settings → Camera → Formats → High Efficiency.",
     "{length} procédure": "{length} procedure",
     "{length} procédure reclassée.": "{length} procedure moved.",
@@ -1426,6 +1531,7 @@ const DICO = {
     "{nbAffiche} procédure": "{nbAffiche} procedure",
     "{nbAffiche} procédures": "{nbAffiche} procedures",
     "{ne} établissements": "{ne} sites",
+    "{nomEnt} a atteint les {places} places de son abonnement. Demandez à votre gérant d'ajouter une place.": "{nomEnt} has reached the {places} seats of its subscription. Ask your manager to add a seat.",
     "{nomEnt} a atteint les {places} places de son abonnement. Votre demande a été transmise — demandez à votre gérant d'ajouter une place.": "{nomEnt} has used all {places} seats in its subscription. Your request has been passed on — ask your owner to add a seat.",
     "{nom} a été supprimé.": "{nom} has been deleted.",
     "{nom} a été supprimé. Vous êtes maintenant dans {entreprise_nom}.": "{nom} has been deleted. You are now in {entreprise_nom}.",
@@ -1452,6 +1558,7 @@ const DICO = {
     "{n} membres": "{n} members",
     "{n} personne": "{n} person",
     "{n} personnes": "{n} people",
+    "{n} photos n’ont pas pu être envoyées : ajoutez-les depuis « Modifier ».": "{n} photos couldn’t be uploaded: add them from “Edit”.",
     "{n} procédure": "{n} procedure",
     "{n} procédures": "{n} procedures",
     "{n} sem.": "{n} wk",
@@ -1486,6 +1593,7 @@ const DICO = {
     "{v} s non couvertes à la fin": "{v} s not covered at the end",
     "« {name} » n’a pas pu être lue.": "“{name}” could not be read.",
     "« {name} » n’a pas répondu. Retirez-la et réessayez.": "“{name}” did not respond. Remove it and try again.",
+    "« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Prévenez la personne qui la gère.": "“{nomEntreprise}” has reached the member limit of its subscription. Let the person who manages it know.",
     "« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Votre demande a été transmise à la personne qui la gère. Elle vous ouvrira l'accès dès qu'une place se libère.": "“{nomEntreprise}” has reached the number of members in its subscription. Your request has been passed to the person who manages it. They will let you in as soon as a seat frees up.",
     "« {nom} » ajoutée. Elle restera dans votre liste.": "“{nom}” added. It will stay in your list.",
     "« {nom} » sera un nouveau dossier.": "“{nom}” will be a new folder.",
@@ -1575,6 +1683,7 @@ const DICO = {
     "<b>{v} %</b> vs mois dernier": "<b>{v} %</b> ggü. Vormonat",
     "<b>{v}</b> a rejoint l’équipe": "<b>{v}</b> ist dem Team beigetreten",
     "<b>{v}</b> est passé·e en gestion": "<b>{v}</b> ist jetzt in der Verwaltung",
+    "<b>{v}</b> est repassé·e en équipe": "<b>{v}</b> ist wieder im Team",
     "<b>{v}</b> n’a pas pu vous rejoindre": "<b>{v}</b> konnte nicht beitreten",
     "<b>—</b><i>aucune lecture</i>": "<b>—</b><i>keine Aufrufe</i>",
     "<em>Aucune procédure créée pour le moment.</em>": "<em>Noch keine Anleitungen erstellt.</em>",
@@ -1596,6 +1705,7 @@ const DICO = {
     "Abonnement": "Abo",
     "Abonnement annuel": "Jahresabo",
     "abonnement complet": "Abo voll",
+    "Abonnement en cours": "Laufendes Abonnement",
     "Abonnement mensuel": "Monatsabo",
     "Accès": "Zugriff",
     "Accès au développement des procédures et aux pages Analyse et Gestion des accès.": "Kann Anleitungen erstellen und die Seiten Auswertung und Zugriffe öffnen.",
@@ -1755,6 +1865,7 @@ const DICO = {
     "Ce navigateur ne donne pas accès à la caméra.": "Dieser Browser erlaubt keinen Kamerazugriff.",
     "ce navigateur ne sait pas enregistrer ({v})": "dieser Browser kann nicht aufnehmen ({v})",
     "Ce navigateur ne sait pas enregistrer : {v}": "Dieser Browser kann nicht aufnehmen: {v}",
+    "Ce navigateur ne sait pas lire cette vidéo. Essayez depuis un autre navigateur, ou enregistrez-la en MP4.": "Dieser Browser kann das Video nicht abspielen. Versuchen Sie einen anderen Browser oder speichern Sie es als MP4.",
     "ce poste": "diese Position",
     "Ce poste existe déjà.": "Diese Position gibt es schon.",
     "Ce que l’IA analyse": "Was die KI auswertet",
@@ -1773,6 +1884,7 @@ const DICO = {
     "Cette personne": "Diese Person",
     "cette personne": "diese Person",
     "Cette procédure": "Diese Anleitung",
+    "Cette procédure a été supprimée entre-temps.": "Dieses Verfahren wurde inzwischen gelöscht.",
     "Cette procédure appartient à « {nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?": "Diese Anleitung gehört zu „{nom}“, wo Sie schon Zugriff haben. Zu diesem Unternehmen wechseln, um sie zu öffnen?",
     "Cette procédure appartient à « {nom} ». Vous pourrez la consulter, mais pas les autres procédures de l'entreprise : il faut pour cela le code de votre responsable.": "Diese Anleitung gehört zu „{nom}“. Sie können sie öffnen, die anderen Anleitungen des Unternehmens aber nicht: Dafür brauchen Sie den Code Ihrer Führungskraft.",
     "Cette procédure est ouverte depuis un moment sans que rien ne bouge. Reprenez où vous en étiez, ou revenez-y plus tard.": "Diese Anleitung ist schon eine Weile offen, ohne dass sich etwas tut. Machen Sie weiter, wo Sie waren, oder kommen Sie später zurück.",
@@ -1811,6 +1923,7 @@ const DICO = {
     "Choisissez le poste qui vous correspond.": "Wählen Sie die passende Position.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Wählen Sie den Bildschirm oder das Fenster für die Aufnahme…",
     "Choisissez un mot de passe d’au moins 6 caractères.": "Wählen Sie ein Passwort mit mindestens 6 Zeichen.",
+    "Choisissez un mot de passe d’au moins {MDP_MIN} caractères.": "Wählen Sie ein Passwort mit mindestens {MDP_MIN} Zeichen.",
     "Choisissez votre enregistrement avec « Importer une vidéo »": "Wählen Sie Ihre Aufnahme über „Video importieren“",
     "Chrome sur Android": "Chrome auf Android",
     "Cinq minutes : enregistrement arrêté.": "Fünf Minuten: Aufnahme gestoppt.",
@@ -2341,12 +2454,14 @@ const DICO = {
     "Personne dans l’espace Utilisateur pour le moment.": "Noch niemand im Nutzerbereich.",
     "Personne ne correspond à « {filtreEquipe} ».": "Niemand passt zu „{filtreEquipe}“.",
     "Personne ne peut plus rejoindre votre équipe. Choisissez une offre supérieure pour en accueillir davantage.": "Niemand kann Ihrem Team mehr beitreten. Wählen Sie einen größeren Tarif für mehr Personen.",
+    "Personne ne s’est formé ce mois-ci": "Diesen Monat hat sich niemand geschult",
     "Personne pour l'instant": "Noch niemand",
     "Personne pour l’instant": "Noch niemand",
     "Personne pour l’instant.": "Noch niemand.",
     "Photo": "Foto",
     "Photo de l'étape": "Foto zum Schritt",
     "Photo de l'étape {v}": "Foto von Schritt {v}",
+    "Photo HEIC illisible ici : enregistrez-la en JPEG.": "Dieses HEIC-Foto kann hier nicht gelesen werden: Speichern Sie es als JPEG.",
     "Photo illisible : {name}": "Foto nicht lesbar: {name}",
     "Photo trop lourde : 6 Mo maximum.": "Foto zu groß: höchstens 6 MB.",
     "Photographier le texte": "Text abfotografieren",
@@ -2447,6 +2562,7 @@ const DICO = {
     "Retirée de l’espace équipe": "Aus dem Nutzerbereich entfernt",
     "Retour": "Zurück",
     "Retrait impossible : {message}": "Entfernen nicht möglich: {message}",
+    "Retrait refusé par la base. Rechargez la page.": "Entfernen von der Datenbank abgelehnt. Laden Sie die Seite neu.",
     "Revenez dans {nom} et touchez <b>Réessayer</b>": "Kehren Sie zu {nom} zurück und tippen Sie auf <b>Erneut versuchen</b>",
     "Rien de lu ce mois-ci": "Diesen Monat nichts gelesen",
     "Rien de lu pour l’instant": "Noch nichts gelesen",
@@ -2460,6 +2576,12 @@ const DICO = {
     "Réglages": "Einstellungen",
     "Réseau": "Network",
     "Réseau : {v}": "Netzwerk: {v}",
+    "Réseau indisponible": "Netzwerk nicht verfügbar",
+    "Réseau indisponible : rechargez la page pour réessayer.": "Netzwerk nicht verfügbar: Laden Sie die Seite neu, um es erneut zu versuchen.",
+    "Réseau indisponible : revenez en arrière et rouvrez la procédure.": "Netzwerk nicht verfügbar: Gehen Sie zurück und öffnen Sie das Verfahren erneut.",
+    "Réseau indisponible : réessayez dans un instant.": "Netzwerk nicht verfügbar: Versuchen Sie es gleich noch einmal.",
+    "Résiliez d’abord l’abonnement de cet établissement (Réglages › Abonnement › Gérer), puis supprimez-le.": "Kündigen Sie zuerst das Abonnement dieses Standorts (Einstellungen › Abonnement › Verwalten) und löschen Sie ihn dann.",
+    "Résiliez d’abord votre abonnement (Réglages › Abonnement › Gérer), puis supprimez l’entreprise.": "Kündigen Sie zuerst Ihr Abonnement (Einstellungen › Abonnement › Verwalten) und löschen Sie dann das Unternehmen.",
     "Résultat": "Ergebnis",
     "Révoquer": "Widerrufen",
     "Safari sur iPhone": "Safari auf dem iPhone",
@@ -2553,6 +2675,7 @@ const DICO = {
     "Touchez une étape ci-dessous pour régler son clip": "Tippen Sie unten auf einen Schritt, um seinen Ausschnitt zu setzen",
     "Touchez une étape pour régler son clip": "Tippen Sie auf einen Schritt, um seinen Ausschnitt zu setzen",
     "Touchez « Enregistreur d’écran », activez le micro, puis démarrez.": "Tippen Sie auf „Bildschirmaufnahme“, schalten Sie das Mikrofon ein und starten Sie.",
+    "Toujours pas de réseau. Standix reprendra dès que la connexion revient.": "Immer noch kein Netzwerk. Standix macht weiter, sobald die Verbindung zurück ist.",
     "Tout effacer": "Alles löschen",
     "Tout effacer ?": "Alles löschen?",
     "Tout le monde l'a ouverte au moins une fois.": "Alle haben sie mindestens einmal geöffnet.",
@@ -2568,6 +2691,7 @@ const DICO = {
     "Trier les dossiers": "Ordner sortieren",
     "Trois gestes, puis revenez ici importer la vidéo.": "Drei Schritte, dann kommen Sie hierher zurück und fügen das Video hinzu.",
     "Trop d'appareils": "Zu viele Geräte",
+    "Trop de demandes : réessayez dans une minute.": "Zu viele Anfragen: Versuchen Sie es in einer Minute erneut.",
     "trou": "Lücke",
     "Trou de {v} s avant l'étape {v2}": "Lücke von {v} s vor Schritt {v2}",
     "Télécharger en PDF": "Als PDF herunterladen",
@@ -2575,9 +2699,11 @@ const DICO = {
     "Télécharger le QR code": "QR-Code herunterladen",
     "Un <b>PDF</b> par procédure": "Ein <b>PDF</b> pro Anleitung",
     "Un <b>QR code</b> par procédure": "Ein <b>QR-Code</b> pro Anleitung",
+    "Un autre gestionnaire la modifie en ce moment. Réessayez quand il aura terminé.": "Ein anderer Manager bearbeitet es gerade. Versuchen Sie es erneut, wenn er fertig ist.",
     "Un code est actif": "Ein Code ist aktiv",
     "Un compte est partagé": "Ein Konto wird geteilt",
     "Un compte est utilisé sur {max} appareils.": "Ein Konto wird auf {max} Geräten genutzt.",
+    "Un compte existe déjà avec cet e-mail. Fermez cette fenêtre et connectez-vous.": "Mit dieser E-Mail existiert bereits ein Konto. Schließen Sie dieses Fenster und melden Sie sich an.",
     "Un compte existe déjà avec cet e-mail. Utilisez plutôt l'onglet Se connecter.": "Mit dieser E-Mail gibt es bereits ein Konto. Nutzen Sie stattdessen Anmelden.",
     "Un dossier « {nouveau} » existe déjà. Les procédures de « {ancien} » la rejoindront, et « {ancien} » disparaîtra.": "Es gibt schon einen Ordner „{nouveau}“. Die Anleitungen aus „{ancien}“ kommen dorthin, und „{ancien}“ verschwindet.",
     "Un gestionnaire": "Ein Verwalter",
@@ -2588,10 +2714,12 @@ const DICO = {
     "Une erreur est survenue pendant l'analyse.": "Bei der Auswertung ist ein Fehler aufgetreten.",
     "Une lecture est comptée après {DUREE_LECTURE_MIN} secondes passées sur la procédure. Chaque utilisateur est compté une seule fois par procédure.": "Ein Aufruf zählt nach {DUREE_LECTURE_MIN} Sekunden in der Anleitung. Jeder Nutzer zählt einmal pro Anleitung.",
     "Une petite barre Standix s’ouvre et reste au-dessus de vos logiciels.": "Eine kleine Standix-Leiste öffnet sich und bleibt über Ihren Programmen.",
+    "Une photo n’a pas pu être envoyée : ajoutez-la depuis « Modifier ».": "Ein Foto konnte nicht hochgeladen werden: Fügen Sie es über „Bearbeiten“ hinzu.",
     "Une procédure vous attend": "Eine Anleitung wartet auf Sie",
     "Une seule personne peut encore rejoindre votre équipe.": "Nur noch eine Person kann Ihrem Team beitreten.",
     "Une seule vidéo de": "Nur ein Video mit",
     "Une seule vidéo de <b>{size}</b>, à partir de {n} prises. Regardez-la avant de la garder : c’est le seul moyen de vérifier que l’ordre est le bon.": "Ein Video mit <b>{size}</b> aus {n} Aufnahmen. Sehen Sie es sich vor dem Behalten an: Nur so prüfen Sie, ob die Reihenfolge stimmt.",
+    "Une vidéo est en cours d’envoi. Patientez quelques secondes.": "Ein Video wird hochgeladen. Bitte warten Sie einige Sekunden.",
     "Une étape doit durer au moins une seconde.": "Ein Schritt muss mindestens eine Sekunde dauern.",
     "Utilisateur": "Nutzer",
     "Valider": "Bestätigen",
@@ -2742,7 +2870,9 @@ const DICO = {
     "{length} dossiers": "{length} Ordner",
     "{length} personne": "{length} Person",
     "{length} personnes": "{length} Personen",
+    "{length} photo trop lourde (plus de 25 Mo).": "{length} Foto zu groß (über 25 MB).",
     "{length} photo trop lourde (plus de 4 Mo). Sur iPhone : Réglages → Appareil photo → Formats → Haute efficacité.": "{length} Foto zu groß (über 4 MB). Auf dem iPhone: Einstellungen → Kamera → Formate → High Efficiency.",
+    "{length} photos trop lourdes (plus de 25 Mo).": "{length} Fotos zu groß (über 25 MB).",
     "{length} photos trop lourdes (plus de 4 Mo). Sur iPhone : Réglages → Appareil photo → Formats → Haute efficacité.": "{length} Fotos zu groß (über 4 MB). Auf dem iPhone: Einstellungen → Kamera → Formate → High Efficiency.",
     "{length} procédure": "{length} Anleitung",
     "{length} procédure reclassée.": "{length} Anleitung verschoben.",
@@ -2762,6 +2892,7 @@ const DICO = {
     "{nbAffiche} procédure": "{nbAffiche} Anleitung",
     "{nbAffiche} procédures": "{nbAffiche} Anleitungen",
     "{ne} établissements": "{ne} Standorte",
+    "{nomEnt} a atteint les {places} places de son abonnement. Demandez à votre gérant d'ajouter une place.": "{nomEnt} hat die {places} Plätze seines Abonnements erreicht. Bitten Sie Ihren Manager, einen Platz hinzuzufügen.",
     "{nomEnt} a atteint les {places} places de son abonnement. Votre demande a été transmise — demandez à votre gérant d'ajouter une place.": "{nomEnt} hat alle {places} Plätze seines Abos belegt. Ihre Anfrage wurde weitergeleitet — bitten Sie den Inhaber, einen Platz hinzuzufügen.",
     "{nom} a été supprimé.": "{nom} wurde gelöscht.",
     "{nom} a été supprimé. Vous êtes maintenant dans {entreprise_nom}.": "{nom} wurde gelöscht. Sie sind jetzt in {entreprise_nom}.",
@@ -2788,6 +2919,7 @@ const DICO = {
     "{n} membres": "{n} Mitglieder",
     "{n} personne": "{n} Person",
     "{n} personnes": "{n} Personen",
+    "{n} photos n’ont pas pu être envoyées : ajoutez-les depuis « Modifier ».": "{n} Fotos konnten nicht hochgeladen werden: Fügen Sie sie über „Bearbeiten“ hinzu.",
     "{n} procédure": "{n} Anleitung",
     "{n} procédures": "{n} Anleitungen",
     "{n} sem.": "{n} Wo.",
@@ -2822,6 +2954,7 @@ const DICO = {
     "{v} s non couvertes à la fin": "{v} s am Ende nicht abgedeckt",
     "« {name} » n’a pas pu être lue.": "„{name}“ konnte nicht gelesen werden.",
     "« {name} » n’a pas répondu. Retirez-la et réessayez.": "„{name}“ reagiert nicht. Entfernen Sie sie und versuchen Sie es erneut.",
+    "« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Prévenez la personne qui la gère.": "„{nomEntreprise}“ hat die Mitgliederzahl seines Abos erreicht. Sagen Sie der verantwortlichen Person Bescheid.",
     "« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Votre demande a été transmise à la personne qui la gère. Elle vous ouvrira l'accès dès qu'une place se libère.": "„{nomEntreprise}“ hat die Mitgliederzahl seines Abos erreicht. Ihre Anfrage wurde an die zuständige Person weitergeleitet. Sie gibt Ihnen Zugriff, sobald ein Platz frei wird.",
     "« {nom} » ajoutée. Elle restera dans votre liste.": "„{nom}“ hinzugefügt. Sie bleibt in Ihrer Liste.",
     "« {nom} » sera un nouveau dossier.": "„{nom}“ wird ein neuer Ordner.",
@@ -4106,7 +4239,11 @@ window.onNavigate = function (index) {
     /* DEUX AIGUILLAGES, UN PAR ESPACE. Il n'y en avait qu'un, celui de la
        gestion : depuis l'espace Équipe, les onglets activaient des écrans
        invisibles et l'app paraissait ne pas répondre. */
-    if (currentMembre?.role === 'equipe') {
+    /* ⚠ LE VISITEUR (arrivé par QR code) EST DANS L'ESPACE ÉQUIPE (audit du
+       24 octobre 2026). Seul `equipe` était reconnu : un visiteur partait
+       dans l'aiguillage de la gestion, ses onglets ouvraient des écrans
+       invisibles, et il ne pouvait même plus se déconnecter. */
+    if (currentMembre && currentMembre.role !== 'gestion') {
       /* ⚠ QUATRE ONGLETS DESORMAIS : les reglages passent de 2 a 3. Une seule
          valeur oubliee ici ouvrirait le mauvais ecran, sans rien signaler. */
       if (index === 0) showEquipeScreen('e-list')
@@ -4291,7 +4428,7 @@ function afficherEcranChoix() {
   /* Quelqu'un qui scanne un QR est forcément un membre d'équipe : on lui
      épargne le choix entre les deux espaces et on l'emmène directement à
      l'inscription, avec le code déjà rempli. */
-  if (cibleQR) { chooseSpace('equipe'); preparerArriveeQR(); return }
+  if (cibleQR && !cibleQR.traitee) { chooseSpace('equipe'); preparerArriveeQR(); return }
   /* ⚠ ON OUVRE DIRECTEMENT « BIENVENUE ». L'ecran de choix reste affiche
      DERRIERE — il porte le fond sur lequel la feuille se pose — mais on ne
      s'y arrete plus. */
@@ -4686,6 +4823,18 @@ window.chooseSpace = function(space) {
   if (err) err.textContent = ''
 
   demarrerScenes()
+  /* ⚠ LA CARTE DOIT DEVENIR VISIBLE ICI AUSSI (audit du 24 octobre 2026). La
+     feuille ne se montre qu'avec la classe `prete` (style.css), et seule
+     `ouvrirBienvenue` la posait. Quelqu'un sans compte qui scanne un QR code
+     arrive directement ici : il voyait une page vide, sans inscription ni
+     connexion. */
+  revelerCarteConnexion(ecranC)
+}
+
+function revelerCarteConnexion(ecran) {
+  const carte = ecran?.querySelector('.login-card')
+  if (!carte || carte.classList.contains('prete')) return
+  attendreScenes().then(() => carte.classList.add('prete'))
 }
 /* ═══ ALLER DIRECTEMENT À LA CONNEXION ═══
 
@@ -4818,6 +4967,18 @@ async function demanderReinitialisation(email, zoneErreur, bouton) {
        indisponible. Une adresse inconnue ne doit pas se distinguer. */
     if (error && !/user|not found|invalid/i.test(error.message || '')) {
       console.warn('[mot de passe]', error.message)
+      /* ⚠ UNE ERREUR TECHNIQUE SE DIT (audit du 24 octobre 2026). On
+         annonçait « un lien vient d'être envoyé » même quand rien n'était
+         parti : limite d'envoi atteinte, réseau coupé. La discrétion sur
+         l'existence du compte reste entière — Supabase ne signale pas une
+         adresse inconnue. */
+      if (err) {
+        err.style.color = 'var(--red)'
+        err.textContent = error.status === 429
+          ? tLang('Trop de demandes : réessayez dans une minute.')
+          : tLang('Envoi impossible : {v}', { v: error.message })
+      }
+      return
     }
     if (err) {
       err.style.color = 'var(--label-2)'
@@ -5009,11 +5170,15 @@ async function verifierRetourMotDePasse() {
      de rien et fermait la porte. */
   const brut = (window.location.hash || '') + (window.location.search || '')
   const parCode = new URLSearchParams(window.location.search).get('code')
-  if (!/type=recovery/.test(brut) && !parCode) return false
+  if (!lienRecuperation && !/type=recovery/.test(brut) && !parCode) return false
+  // Une seule demande par lien, quoi qu'il arrive ensuite.
+  lienRecuperation = false
 
   const nouveau = await demanderTexte({
     titre: tLang('Nouveau mot de passe'),
-    message: tLang('Choisissez un mot de passe d\u2019au moins 6 caract\u00e8res.'),
+    /* Le minimum réel est MDP_MIN (8) : l'ancien texte annonçait 6, et un mot
+       de passe de 6 ou 7 signes était refusé sans qu'on comprenne pourquoi. */
+    message: tLang('Choisissez un mot de passe d’au moins {MDP_MIN} caractères.', { MDP_MIN }),
     placeholder: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022',
     confirmer: tLang('Enregistrer'),
   })
@@ -5024,7 +5189,11 @@ async function verifierRetourMotDePasse() {
     toast(tLang('Mot de passe inchangé'))
     return false
   }
-  if (nouveau.length < MDP_MIN) { toast(tLang('{MDP_MIN} caractères minimum', { MDP_MIN })); return await verifierRetourMotDePasse() }
+  if (nouveau.length < MDP_MIN) {
+    toast(tLang('{MDP_MIN} caractères minimum', { MDP_MIN }))
+    lienRecuperation = true            // on redemande
+    return await verifierRetourMotDePasse()
+  }
 
   const { error } = await supabase.auth.updateUser({ password: nouveau })
   if (error) { toast(tLang('Échec : {message}', { message: error.message })); return false }
@@ -5354,6 +5523,10 @@ document.getElementById(idBouton)?.addEventListener('click', async () => {
     ? document.getElementById('bv-err')
     : (document.getElementById('connexion-error') || document.getElementById('login-error'))
   const btn = document.getElementById(idBouton)
+  /* ⚠ UN DOUBLE APPUI NE RELANCE RIEN (audit du 24 octobre 2026). Le second
+     appui gardait la roue comme « texte d'origine » : après un échec, le
+     bouton tournait pour toujours. */
+  if (btn?.dataset.loading === 'true') return
   errorEl.textContent = ''
   setButtonLoading(btn, true)
 
@@ -5373,6 +5546,8 @@ document.getElementById(idBouton)?.addEventListener('click', async () => {
        de connexion, c'est une étape qui manque. On ouvre le champ du code plutôt
        que d'afficher un refus. */
     await fermerBienvenue()
+    const reprise = await reprendreInscription(data.user)
+    if (reprise) { enterApp(reprise); return }
     montrerOrphelin()
     return
   }
@@ -5425,6 +5600,8 @@ document.addEventListener('click', (e) => {
 
 // ═══ CRÉATION DE COMPTE ═══
 document.getElementById('signup-btn')?.addEventListener('click', async () => {
+  /* Même garde que la connexion : un double appui créait deux fois la suite. */
+  if (document.getElementById('signup-btn')?.dataset.loading === 'true') return
   const prenom = document.getElementById('signup-prenom').value.trim()
   const nom = document.getElementById('signup-nom').value.trim()
   const email = document.getElementById('signup-email').value.trim()
@@ -5480,27 +5657,51 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
      d'inscription. */
   let targetEntrepriseId = null
   let roleAccorde = null
+  const signupBtn = document.getElementById('signup-btn')
+  setButtonLoading(signupBtn, true)
   if (selectedSpace === 'equipe') {
     const { data: trouve, error: errCode } = await supabase
       .rpc('verifier_code', { p_code: codeAcces })
     const ligne = Array.isArray(trouve) ? trouve[0] : trouve
-    if (errCode || !ligne) {
+    /* ⚠ UN RÉSEAU COUPÉ N'EST PAS UN MAUVAIS CODE (audit du 24 octobre 2026) :
+       on disait « ce code n'existe pas » à quelqu'un qui avait le bon. */
+    if (errCode) {
+      errorEl.textContent = tLang('Réseau indisponible : réessayez dans un instant.')
+      setButtonLoading(signupBtn, false)
+      return
+    }
+    if (!ligne) {
       errorEl.textContent = tLang('Ce code n\'existe pas, ou il a expiré. Vérifiez-le auprès de votre gestionnaire.')
+      setButtonLoading(signupBtn, false)
       return
     }
     targetEntrepriseId = ligne.entreprise_id
     roleAccorde = ligne.role
   }
 
-  const signupBtn = document.getElementById('signup-btn')
-  setButtonLoading(signupBtn, true)
+  /* ⚠ L'INSCRIPTION SE SOUVIENT DE CE QU'ELLE DEVAIT FAIRE (audit du
+     24 octobre 2026). Si le compte était créé mais que l'entreprise (ou
+     l'adhésion) échouait — réseau coupé à ce moment-là —, le gérant ne
+     pouvait plus jamais créer son entreprise : un second essai répondait
+     « compte existant », et la connexion n'offrait qu'un champ de code.
+     Le nom de l'entreprise, ou le code, part donc avec le compte ; la
+     connexion suivante termine le travail (`reprendreInscription`).
 
-  const { data, error } = await supabase.auth.signUp({ email, password })
+   ⚠ ET UN SECOND APPUI NE RECRÉE PAS LE COMPTE : la session ouverte par le
+     premier essai sert telle quelle. */
+  const { data: { session: dejaOuverte } } = await supabase.auth.getSession()
+  const { data, error } = (dejaOuverte?.user?.email || '').toLowerCase() === email.toLowerCase()
+    ? { data: { session: dejaOuverte, user: dejaOuverte.user }, error: null }
+    : await supabase.auth.signUp({ email, password, options: { data: {
+        nom: `${prenom} ${nom}`,
+        entreprise_a_creer: selectedSpace === 'gestion' ? entrepriseNom : null,
+        code_attente: selectedSpace === 'gestion' ? null : codeAcces,
+      } } })
 
   if (error) {
     const m = (error.message || '').toLowerCase()
     if (m.includes('already registered') || m.includes('already exists')) {
-      errorEl.textContent = tLang('Un compte existe déjà avec cet e-mail. Utilisez plutôt l\'onglet Se connecter.')
+      errorEl.textContent = tLang('Un compte existe déjà avec cet e-mail. Fermez cette fenêtre et connectez-vous.')
     /* ⚠ « Prevent use of leaked passwords » EST ACTIVÉ dans Supabase : un mot
        de passe déjà vu dans une fuite connue est refusé, quelle que soit sa
        longueur. Le message d'origine arrive en anglais, précédé d'un code
@@ -5517,6 +5718,14 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
   }
 
   if (!data.session) {
+    /* ⚠ Une adresse DÉJÀ inscrite reçoit de Supabase un faux compte, sans
+       identité, et aucun e-mail ne part : on ne dit donc pas « vérifiez vos
+       e-mails » (audit du 24 octobre 2026). */
+    if (Array.isArray(data.user?.identities) && data.user.identities.length === 0) {
+      errorEl.textContent = tLang('Un compte existe déjà avec cet e-mail. Fermez cette fenêtre et connectez-vous.')
+      setButtonLoading(signupBtn, false)
+      return
+    }
     // Confirmation par e-mail requise avant de pouvoir se connecter
     errorEl.textContent = ''
     errorEl.style.color = 'var(--green)'
@@ -5605,8 +5814,21 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
         const bouts = m.split('PLACES_COMPLETES:')[1].split(':')
         const places = bouts.pop().trim()
         const nomEnt = bouts.join(':').trim()
-        errorEl.textContent =
-          tLang('{nomEnt} a atteint les {places} places de son abonnement. Votre demande a été transmise — demandez à votre gérant d\'ajouter une place.', { nomEnt: nomEnt || tLang('Cette entreprise'), places })
+        /* ⚠ LA DEMANDE EST ÉCRITE ICI (audit du 24 octobre 2026). La base
+           annule tout ce que fait `rejoindre_entreprise` quand elle refuse —
+           y compris la demande qu'elle aurait voulu garder. Le message
+           annonçait « transmise » ; le gérant ne voyait rien. */
+        let transmise = false
+        if (targetEntrepriseId && data?.user?.id) {
+          const { error: eD } = await supabase.from('demandes_acces').upsert({
+            entreprise_id: targetEntrepriseId, user_id: data.user.id,
+            nom: `${prenom} ${nom}`, email,
+          }, { onConflict: 'entreprise_id,user_id' })
+          transmise = !eD
+        }
+        errorEl.textContent = transmise
+          ? tLang('{nomEnt} a atteint les {places} places de son abonnement. Votre demande a été transmise — demandez à votre gérant d\'ajouter une place.', { nomEnt: nomEnt || tLang('Cette entreprise'), places })
+          : tLang('{nomEnt} a atteint les {places} places de son abonnement. Demandez à votre gérant d\'ajouter une place.', { nomEnt: nomEnt || tLang('Cette entreprise'), places })
       } else if (m.includes('CODE_INCONNU')) {
         errorEl.textContent = tLang('Ce code entreprise n\'existe pas. Vérifiez-le auprès de votre gestionnaire.')
       } else if (m.includes('28000')) {
@@ -5621,9 +5843,40 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
     membre = fiche
   }
 
+  // Le travail est fait : la connexion suivante n'a plus rien à reprendre.
+  supabase.auth.updateUser({ data: { entreprise_a_creer: null, code_attente: null } }).catch(() => {})
   setButtonLoading(signupBtn, false)
   enterApp(membre)
 })
+
+/* Une inscription interrompue se termine à la connexion suivante — voir le
+   commentaire de `signUp`. Rend la fiche créée, ou `null`. */
+async function reprendreInscription(user) {
+  const md = user?.user_metadata || {}
+  if (!md.entreprise_a_creer && !md.code_attente) return null
+  /* Un réseau coupé n'est pas un refus : on garde alors la tâche pour la
+     prochaine connexion. */
+  const reseau = (e) => !e?.code && /fetch|network|load failed|timeout/i.test(String(e?.message || e || ''))
+  try {
+    let fiche = null, coupure = false
+    if (md.entreprise_a_creer) {
+      const { data, error } = await supabase.rpc('creer_entreprise_et_fondateur', {
+        p_nom_entreprise: md.entreprise_a_creer, p_nom_membre: md.nom || '',
+      })
+      if (!error && data?.id) fiche = data
+      else if (reseau(error)) coupure = true
+    } else if (md.code_attente) {
+      fiche = await rejoindreParCode(md.code_attente).catch((e) => { if (reseau(e)) coupure = true; return null })
+    }
+    // Réussi ou refusé, on ne retente pas indéfiniment : la fenêtre « Aucune
+    // entreprise » prend le relais.
+    if (!coupure) supabase.auth.updateUser({ data: { entreprise_a_creer: null, code_attente: null } }).catch(() => {})
+    return fiche
+  } catch (e) {
+    console.warn('[inscription] reprise impossible :', e?.message || e)
+    return null
+  }
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SURVEILLANCE DU CHARGEMENT
@@ -5829,7 +6082,10 @@ document.getElementById('alerte-classer')?.addEventListener('click', async () =>
   })
   if (!ok) return
   const ids = alertesPartage.map(a => a.id)
-  await supabase.from('alertes_partage').update({ vue: true }).in('id', ids)
+  const { error: eVue } = await supabase.from('alertes_partage').update({ vue: true }).in('id', ids)
+  /* Un refus laissait l'alerte disparaître ici et revenir au chargement
+     suivant, sans explication. */
+  if (eVue) { toast(tLang('Échec : {message}', { message: eVue.message })); return }
   alertesPartage = []
   peindreAlertePartage()
 })
@@ -5862,7 +6118,11 @@ function lancerSuiviPresence(membre) {
     const ok = await signalerPresence(membre)
     if (!ok) {
       arreterSuiviPresence()
-      await supabase.auth.signOut()
+      /* ⚠ `local` : CET APPAREIL SEULEMENT (audit du 24 octobre 2026). Sans
+         option, la déconnexion est GLOBALE — elle fermait aussi les autres
+         appareils du compte, y compris celui qui venait d'obtenir la place. */
+      window.__sortieVoulue = true
+      try { await supabase.auth.signOut({ scope: 'local' }) } catch (e) {}
       location.reload()
     }
   }, RYTHME_PRESENCE)
@@ -6149,8 +6409,37 @@ function requetesGestion(entrepriseId) {
     supabase.from('procedures').select('*, etapes(count)').eq('entreprise_id', entrepriseId)
       .order('created_at', { ascending: false }),
     supabase.from('membres').select('*').eq('entreprise_id', entrepriseId),
-    supabase.from('entreprises').select('*').eq('id', entrepriseId).maybeSingle(),
+    lireEntreprise(entrepriseId),
   ])
+}
+
+/* ═══ L'ENTREPRISE, SANS SES CODES ═══
+
+ ⚠ LES CODES NE SONT PLUS LISIBLES PAR TOUS (audit du 24 octobre 2026). Tout
+   membre, même un visiteur arrivé par QR code, lisait la ligne entière — code
+   de gestion compris — et pouvait entrer comme gérant avec un second compte.
+   La base ne laisse plus lire que les colonnes ci-dessous ; les codes passent
+   par `codes_entreprise`, qui ne répond qu'à la gestion.
+
+   Repli : tant que cette fonction n'existe pas en base (PGRST202), on lit les
+   deux colonnes du code d'invitation comme avant. */
+const COLONNES_ENTREPRISE = 'id, nom, logo_url, created_at, plan, essai_debut, abonnement_statut, ' +
+  'abonnement_palier, abonnement_rythme, membres_max, stripe_client_id, stripe_abonnement_id'
+
+async function lireEntreprise(id) {
+  const r = await supabase.from('entreprises').select(COLONNES_ENTREPRISE).eq('id', id).maybeSingle()
+  if (r.error || !r.data) return r
+  try {
+    const c = await supabase.rpc('codes_entreprise', { p: id })
+    if (!c.error) {
+      const ligne = Array.isArray(c.data) ? c.data[0] : c.data
+      if (ligne) Object.assign(r.data, ligne)
+    } else if (c.error.code === 'PGRST202' || /codes_entreprise/.test(c.error.message || '')) {
+      const v = await supabase.from('entreprises').select('code_invite, code_invite_expire').eq('id', id).maybeSingle()
+      if (!v.error && v.data) Object.assign(r.data, v.data)
+    }
+  } catch (e) { /* sans les codes, la page des codes en redemandera un */ }
+  return r
 }
 
 /* Côté équipe : les procédures publiées, mes lectures et mes favoris ne
@@ -6186,7 +6475,7 @@ function lancerPrelecture(membre) {
          identifiants, dans le même ordre. */
       const validations = promesse.then(([rp]) => {
         const ids = (rp?.data || []).map(p => p.id)
-        return ids.length ? supabase.from('validations').select('*').in('procedure_id', ids) : null
+        return ids.length ? lireParLots('validations', 'procedure_id', ids) : null
       })
       validations.catch(() => {})
       prelecture = { cle: 'gestion:' + membre.entreprise_id, t: Date.now(), promesse, validations }
@@ -6197,7 +6486,7 @@ function lancerPrelecture(membre) {
          (voir `loadEquipeProcedures`). */
       const etapes = promesse.then(([rp]) => {
         const ids = (rp?.data || []).filter(p => p.statut !== 'traitement').map(p => p.id)
-        return supabase.from('etapes').select('*').in('procedure_id', ids).order('ordre')
+        return lireParLots('etapes', 'procedure_id', ids, 'ordre')
           .then(r => ({ ids: ids.join(','), r }))
       })
       etapes.catch(() => {})
@@ -6258,6 +6547,9 @@ async function enterApp(membre) {
     equipeSousDossier = null
     etatAbo = null
     dejaEntre = new Set()
+    /* Le reste d'analyses IA et les scans de QR code étaient ceux de
+       l'entreprise d'avant (audit du 24 octobre 2026). */
+    try { quotaConnu = null; for (const k in anScansCache) delete anScansCache[k] } catch (e) {}
     try { renderCategoryGrid?.(); renderEquipeCategories?.() } catch (e) {}
   }
 
@@ -6305,10 +6597,15 @@ async function enterApp(membre) {
   /* Avant tout : cet appareil a-t-il le droit d'entrer ? On le demande au
      serveur, ici plutôt qu'à la connexion, pour couvrir aussi la reprise de
      session. */
-  const autorise = await presenceEnCours
-  if (!autorise) {
+  /* ⚠ PAS PLUS DE SIX SECONDES (audit du 24 octobre 2026). Sur un réseau qui
+     ne répond pas sans couper, l'entrée attendait la réponse indéfiniment,
+     devant un écran vide. Sans réponse, on entre — comme le fait déjà
+     `signalerPresence` en cas d'erreur. */
+  const autorise = await avecDelai(presenceEnCours, 6000)
+  if (autorise === false) {
     prelecture = null
-    await supabase.auth.signOut()
+    window.__sortieVoulue = true
+    try { await supabase.auth.signOut({ scope: 'local' }) } catch (e) {}
     currentMembre = null
     document.getElementById('gestion-app').style.display = 'none'
     document.getElementById('equipe-app').style.display = 'none'
@@ -6316,6 +6613,8 @@ async function enterApp(membre) {
     afficherBarre(false)
     const ecranRejet = document.getElementById('login-screen')
     ecranRejet.style.display = 'flex'
+    // Sans `prete`, la carte reste invisible — voir `chooseSpace`.
+    revelerCarteConnexion(ecranRejet)
     /* Troisième chemin qui montre cet écran : lui aussi doit lever l'inertie,
        sinon la personne verrait un formulaire qu'elle ne peut pas remplir. */
     ecranRejet.removeAttribute('inert')
@@ -6425,7 +6724,7 @@ async function enterApp(membre) {
      ⚠ ON LIT LE ROLE DU MEMBRE, pas la cle memorisee : elle vient d'etre
        ecrite quelques lignes plus haut, mais lire directement la fiche est
        plus sur. */
-    window.poserEtirementBarre?.(membre?.role === 'equipe' ? 1 : 0)
+    window.poserEtirementBarre?.(membre?.role !== 'gestion' ? 1 : 0)
 
     afficherBarre(true)
     mesurerOnglets()
@@ -6525,7 +6824,7 @@ async function enterApp(membre) {
      ⚠ ON LIT LE ROLE DU MEMBRE, pas la cle memorisee : elle vient d'etre
        ecrite quelques lignes plus haut, mais lire directement la fiche est
        plus sur. */
-    window.poserEtirementBarre?.(membre?.role === 'equipe' ? 1 : 0)
+    window.poserEtirementBarre?.(membre?.role !== 'gestion' ? 1 : 0)
 
     afficherBarre(true)
     mesurerOnglets()
@@ -6561,7 +6860,11 @@ async function enterApp(membre) {
 let qrPropositionFaite = false
 
 async function ouvrirCibleQR() {
-  if (!cibleQR) return
+  /* ⚠ UNE SEULE FOIS PAR SCAN (audit du 24 octobre 2026). `cibleQR` est figé
+     au chargement, et `enterApp` appelle cette fonction à chaque entrée :
+     chaque reconnexion ou changement d'entreprise rouvrait la procédure
+     scannée et comptait un scan de plus dans les statistiques. */
+  if (!cibleQR || cibleQR.traitee) return
 
   /* ⚠ LE SCAN SE NOTE ICI, ET NON DANS L'ECRAN D'INSCRIPTION.
 
@@ -6578,7 +6881,7 @@ async function ouvrirCibleQR() {
      `?proc=` est retire de l'URL. `cibleQR` est fige au chargement et n'en
      souffre pas, mais l'ordre reste le bon : on note d'abord, on nettoie
      ensuite. */
-  noterScanQR()
+  if (!cibleQR.compte) { cibleQR.compte = true; noterScanQR() }
 
   /* Cas fréquent en pratique : la personne est connectée, mais dans une autre
      entreprise que celle du QR. Sans rien faire, elle verrait « Procédure
@@ -6590,6 +6893,7 @@ async function ouvrirCibleQR() {
   }
 
   const id = cibleQR.proc
+  cibleQR.traitee = true
   // On efface le paramètre de l'adresse pour qu'un rechargement plus tard ne
   // renvoie pas indéfiniment sur la même procédure.
   try { history.replaceState({}, '', window.location.pathname) } catch (e) {}
@@ -6624,7 +6928,18 @@ async function ouvrirCibleQR() {
   const attente = fenetreBienvenue(titre, categorie, nouveau)
 
   if (promesseTitre) {
-    const { data } = await promesseTitre
+    const { data, error: eTitre } = await promesseTitre
+    /* ⚠ UNE PANNE DE RÉSEAU N'EST PAS UNE PROCÉDURE ABSENTE (audit du
+       24 octobre 2026). Dans une réserve sans signal, on lisait « n'existe
+       pas ou plus », et l'adresse était déjà nettoyée : recharger ne servait
+       à rien. On le dit, et on garde l'adresse pour réessayer. */
+    if (eTitre) {
+      fermerFenetreBienvenue()
+      cibleQR.traitee = false
+      try { history.replaceState({}, '', '?proc=' + encodeURIComponent(id)) } catch (e) {}
+      toast(tLang('Réseau indisponible : rechargez la page pour réessayer.'))
+      return
+    }
     titre = data?.titre; categorie = data?.categorie
     if (!titre) {
       fermerFenetreBienvenue()
@@ -6653,6 +6968,12 @@ async function ouvrirCibleQR() {
 
 /* Renvoie true si l'app a été relancée sur une autre entreprise — dans ce cas
    l'ouverture de la procédure se fera au tour suivant. */
+/* Le QR scanné ne sera pas ouvert : on l'oublie, et on nettoie l'adresse. */
+function renoncerAuQR() {
+  if (cibleQR) cibleQR.traitee = true
+  try { history.replaceState({}, '', window.location.pathname) } catch (e) {}
+}
+
 async function proposerEntrepriseDuQR(code) {
   const ent = await entrepriseParCode(code)
 
@@ -6674,7 +6995,10 @@ async function proposerEntrepriseDuQR(code) {
     annuler: tLang('Annuler'),
     danger: false,
   })
-  if (!ok) return false
+  /* ⚠ ANNULER, C'EST RENONCER À CETTE PROCÉDURE (audit du 24 octobre 2026).
+     On rendait `false`, et l'appelant continuait comme si de rien n'était :
+     « Procédure introuvable » s'affichait juste après « Annuler ». */
+  if (!ok) { renoncerAuQR(); return true }
 
   let membre = dejaMembre
   if (!membre) {
@@ -6682,7 +7006,7 @@ async function proposerEntrepriseDuQR(code) {
        permet de n'afficher que celle-là, sans jamais charger les autres. */
     /* La place est-elle libre ? Si l'entreprise est complète, la demande est
        déposée et l'on s'arrête ici. */
-    if (!(await verifierPlaceLibre(ent.id, ent.nom))) return
+    if (!(await verifierPlaceLibre(ent.id, ent.nom))) { renoncerAuQR(); return true }
     /* ⚠ ON ÉCRIT, PUIS ON RELIT — en deux temps. Demander la ligne en retour
        dans la même écriture (`.select()`) échouait : la règle de lecture de
        `membres` ne la voit pas encore à cet instant (même cause que la
@@ -7117,8 +7441,7 @@ window.openSettings = async function() {
        de compte tombe dans cette branche.
 
        Elles sont retirees, pas redirigees : il n'y a rien a afficher ici. */
-    const { data, error: entrepriseError } = await supabase
-      .from('entreprises').select('*').eq('id', currentMembre.entreprise_id).maybeSingle()
+    const { data, error: entrepriseError } = await lireEntreprise(currentMembre.entreprise_id)
     if (entrepriseError) {
       console.error('Erreur chargement code entreprise :', entrepriseError)
       return
@@ -7483,6 +7806,8 @@ document.getElementById('settings-save-btn')?.addEventListener('click', async ()
   const errorEl = document.getElementById('settings-error')
   const btn = document.getElementById('settings-save-btn')
   errorEl.textContent = ''
+  // Après un « Enregistré. » vert, l'erreur suivante s'affichait en vert.
+  errorEl.style.color = 'var(--red)'
   const nom = document.getElementById('settings-nom').value.trim()
   if (!nom) { errorEl.textContent = tLang('Le nom est obligatoire.'); return }
 
@@ -7537,7 +7862,17 @@ window.signOut = async function() {
      prochain compte connecte sur cet appareil recevrait ses evenements. */
   couperEcouteProcedures()
 
-  await supabase.auth.signOut()
+  /* ⚠ `local` : SE DÉCONNECTER ICI NE DÉCONNECTE PAS LE TÉLÉPHONE (audit du
+     24 octobre 2026). Sans option, la sortie était globale : un employé qui
+     quittait la tablette du magasin était aussi déconnecté de son téléphone.
+
+   ⚠ ET SANS RÉSEAU, LA SESSION EST QUAND MÊME OUBLIÉE. La bibliothèque la
+     garde si le serveur ne répond pas ; sur une tablette partagée, le
+     suivant aurait rouvert le compte de celui qui venait de partir. */
+  window.__sortieVoulue = true
+  let eSortie = null
+  try { ({ error: eSortie } = await supabase.auth.signOut({ scope: 'local' })) } catch (e) { eSortie = e }
+  if (eSortie) { try { localStorage.removeItem(CLE_SESSION_RANGEE) } catch (e) {} }
   currentMembre = null
   // On revient sur les écrans d'accueil des deux espaces, sinon le prochain
   // compte hériterait de la dernière page consultée.
@@ -8659,8 +8994,11 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     el.appendChild(b)
   }
 
+  /* ⚠ `openCategory` N'EXISTAIT PAS (audit du 24 octobre 2026) : toucher une
+     ligne de dossier dans l'analyse levait une erreur et rien ne s'ouvrait.
+     La fonction qui ouvre un dossier s'appelle `openCategoryProcedures`. */
   el.querySelectorAll('[data-cat]').forEach(x => {
-    x.addEventListener('click', () => openCategory(x.dataset.cat))
+    x.addEventListener('click', () => openCategoryProcedures(x.dataset.cat))
   })
 }
 
@@ -8674,7 +9012,7 @@ async function rafraichirAnalyse() {
 
     const [{ data: membres }, { data: validations }] = await Promise.all([
       supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id),
-      supabase.from('validations').select('*').in('procedure_id', procIds),
+      lireParLots('validations', 'procedure_id', procIds),
     ])
     if (!membres || !validations) return
 
@@ -9327,7 +9665,7 @@ function centreAnneauMembre(cle, choix) {
 
   v.textContent = choix.secondes ? String(Math.round(choix.secondes / 60)) : '0'
   u.textContent = choix.secondes ? tLang('minutes') : tLang('jamais ouverte')
-  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || tLang('Autres')) : (choix.proc?.titre || tLang('Sans titre'))) +
+  n.textContent = (choix.estAutres ? (choix.nom || tLang('Autres')) : (choix.proc?.titre || tLang('Sans titre'))) +
     (choix.fois ? ` \u00b7 ${choix.fois} fois` : '')
 }
 
@@ -9685,7 +10023,19 @@ function peindreIntroEquipe(employes, validations) {
      Le mot « équipe » disparaît du titre au profit de « membres » : le
      fondateur ne se compte pas dans son équipe, mais il est bien un membre de
      son entreprise. */
-  t.textContent = actifs > 1 ? tLang('{actifs} sur {length} se sont formés ce mois-ci', { actifs, length: aLire.length }) : tLang('1 sur {length} s\'est formé ce mois-ci', { length: aLire.length })
+  /* ⚠ « CE MOIS-CI » COMPTE CE MOIS-CI (audit du 24 octobre 2026). Le compte
+     portait sur toutes les lectures depuis le début : une équipe qui avait
+     tout lu le mois dernier et rien depuis affichait « 5 sur 5 se sont formés
+     ce mois-ci ». Et « 1 sur N » s'écrivait même quand personne n'avait lu. */
+  const debutMois = new Date(); debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
+  const actifsMois = new Set(validALire
+    .filter(v => Number(v.duree_lecture) && new Date(v.validated_at || v.created_at || 0) >= debutMois)
+    .map(v => v.membre_id)).size
+  t.textContent = actifsMois > 1
+    ? tLang('{actifs} sur {length} se sont formés ce mois-ci', { actifs: actifsMois, length: aLire.length })
+    : actifsMois === 1
+      ? tLang('1 sur {length} s\'est formé ce mois-ci', { length: aLire.length })
+      : tLang('Personne ne s’est formé ce mois-ci')
 
   /* Le compte de ceux qui n'ont rien ouvert a été retiré : le titre le dit déjà
      — « 3 sur 5 », les deux autres se déduisent. Répéter le manque juste en
@@ -9861,7 +10211,7 @@ function centreAnneauEq(cle, choix) {
   }
   v.textContent = String(Math.round(choix.total / 60))
   u.textContent = tLang('minutes')
-  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || tLang('Autres')) : choix.nom)
+  n.textContent = (choix.estAutres ? (choix.nom || tLang('Autres')) : choix.nom)
 }
 
 function peindreClassementEq(cle, animerDes) {
@@ -10149,7 +10499,7 @@ function centreAnneauCat(cle, choix) {
   }
   v.textContent = String(Math.round(choix.total / 60))
   u.textContent = tLang('minutes')
-  n.textContent = escapeHtml(choix.nom)
+  n.textContent = (choix.nom)
 }
 
 function peindreClassementCat(cle, animerDes) {
@@ -10247,7 +10597,8 @@ function peindreClassementCat(cle, animerDes) {
 
     b.addEventListener('pointerdown', () => {
       ouverte = false
-      minuteur = setTimeout(() => { ouverte = true; openCategory(b.dataset.catNom) }, 550)
+      /* `openCategory` n'existait pas — voir `renderTopCategories`. */
+      minuteur = setTimeout(() => { ouverte = true; openCategoryProcedures(b.dataset.catNom) }, 550)
     })
     const annuler = () => { if (minuteur) { clearTimeout(minuteur); minuteur = null } }
     b.addEventListener('pointerup', annuler)
@@ -10459,7 +10810,7 @@ function centreAnneauProc(cle, choix) {
   }
   v.textContent = String(Math.round(choix.total / 60))
   u.textContent = tLang('minutes')
-  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || tLang('Autres')) : (choix.proc?.titre || tLang('Sans titre')))
+  n.textContent = (choix.estAutres ? (choix.nom || tLang('Autres')) : (choix.proc?.titre || tLang('Sans titre')))
 }
 
 /* Le classement. Trois lignes, puis un bouton qui déplie le reste — la forme
@@ -11704,6 +12055,13 @@ function majBarreHaute(id) {
 window.showGestionScreen = function(id, btn) {
   majBarreHaute(id)
   verifierFicheToujoursLa()
+  /* ⚠ LE PARTAGE D'ÉCRAN S'ARRÊTE QUAND ON QUITTE SA PAGE (audit du
+     24 octobre 2026). Choisir l'écran à filmer puis revenir en arrière sans
+     lancer laissait l'écran et le micro partagés, sans fin, avec les
+     voyants du navigateur allumés. Un enregistrement EN COURS continue. */
+  try {
+    if (id !== 'p-ecran' && ecranFlux && !['recording', 'paused'].includes(ecranEnregistreur?.state)) nettoyerEcran()
+  } catch (e) {}
   /* ⚠ LA PAGE EST FERMEE ICI, EN TETE, AVANT TOUT LE RESTE.
 
      Quatre endroits l'ouvrent — un bandeau d'essai, une alerte de quota, la
@@ -11719,6 +12077,11 @@ window.showGestionScreen = function(id, btn) {
     toast(tLang('Seul le gérant de l’entreprise gère l’abonnement.'))
     id = 'p-settings'
   }
+  /* ⚠ LA PAGE DES OFFRES SE DESSINE EN S'OUVRANT (audit du 24 octobre 2026).
+     Plusieurs boutons l'ouvraient sans la dessiner — « Voir les offres » des
+     analyses épuisées, « Plus qu'une place », « Qui attend ? » : on arrivait
+     sur une page vide, ou sur un état périmé. */
+  if (id === 'p-abonnement') { try { window.renderAbonnements?.() } catch (e) { console.warn('[abonnement]', e?.message) } }
 
   /* ⚠ ON REND LE VERROU EN QUITTANT L'EDITION.
 
@@ -12171,9 +12534,14 @@ function memeGrille(a, b) {
 let canalProcedures = null
 
 function ecouterProcedures() {
-  if (canalProcedures) return                       // deja branche
   const ent = currentMembre?.entreprise_id
   if (!ent) return
+  /* ⚠ DÉJÀ BRANCHÉ SUR CETTE ENTREPRISE, PAS SUR UNE AUTRE (audit du
+     24 octobre 2026). On sortait dès qu'un canal existait : après un
+     changement d'entreprise, l'écoute restait sur l'ancienne, et les
+     procédures publiées dans la nouvelle n'apparaissaient pas. */
+  if (canalProcedures && canalProcedures._ent === ent) return
+  couperEcouteProcedures()
 
   canalProcedures = supabase
     .channel('procedures-' + ent)
@@ -12200,6 +12568,7 @@ function ecouterProcedures() {
       }, 700)
     })
     .subscribe()
+  canalProcedures._ent = ent
 }
 
 function couperEcouteProcedures() {
@@ -12292,6 +12661,10 @@ async function loadGestionProcedures() {
     { data: entrepriseRow },
   ] = await (prendrePrelecture('gestion:' + currentMembre.entreprise_id)
     || requetesGestion(currentMembre.entreprise_id))
+  /* ⚠ RÉPONSE D'UNE AUTRE ENTREPRISE (audit du 24 octobre 2026). Si l'on a
+     changé d'entreprise pendant le chargement, cette réponse arrivée en
+     retard écrasait les procédures et les membres de la nouvelle. */
+  if (currentMembre?.entreprise_id !== entrepriseId) return
   const fullMembres = membresFrais
 
   window.jalon?.('procédures + membres reçus')
@@ -12303,7 +12676,11 @@ async function loadGestionProcedures() {
       if (!chargementDiscret) toast(tLang('Liste non actualisée : {message}', { message: error.message }))
       return
     }
-    ecrireSous("Erreur : " + error.message); return
+    /* `#p-list-subhead` n'existe plus : l'erreur ne s'affichait nulle part et
+       la page restait vide sans explication (audit du 24 octobre 2026). */
+    ecrireSous(tLang('Erreur : {message}', { message: error.message }))
+    toast(tLang('Liste non actualisée : {message}', { message: error.message }))
+    return
   }
   allGestionProcedures = procedures
   cachedMembres = fullMembres || []
@@ -12398,8 +12775,9 @@ async function loadGestionProcedures() {
      (voir `lancerPrelecture`) ; sinon, la requête habituelle. */
   const prelues = validationsPrelues
   validationsPrelues = null
-  const { data: fullValidations } = (prelues && await prelues) || await supabase
-    .from('validations').select('*').in('procedure_id', procIds)
+  const { data: fullValidations } = (prelues && await prelues) ||
+    await lireParLots('validations', 'procedure_id', procIds)
+  if (currentMembre?.entreprise_id !== entrepriseId) return   // voir plus haut
 
   // Les étapes sont de loin la plus grosse table et l'écran d'accueil n'en a
   // pas besoin : on les charge en arrière-plan pendant que l'app s'affiche.
@@ -12410,7 +12788,7 @@ async function loadGestionProcedures() {
      changement). Si le plus ancien répondait en dernier, il remettait en
      mémoire des étapes déjà remplacées. */
   const tourEtapes = ++tourPrechargeEtapes
-  preloadEtapes = supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre')
+  preloadEtapes = lireParLots('etapes', 'procedure_id', procIds, 'ordre')
     .then(({ data, error }) => {
       if (tourEtapes !== tourPrechargeEtapes || error) return
       cachedEtapesByProc = {}
@@ -12572,8 +12950,12 @@ async function collecterActivites() {
     faits.push({
       quand: Date.parse(m.promu_le), genre: 'promotion',
       nom: m.nom || '',
-      texte: `${tLang('<b>{v}</b> est passé·e en gestion', { v: escapeHtml(m.nom || tLang('Quelqu’un')) })}`,
-      detail: m.promu_par ? 'par ' + escapeHtml(nomDe(m.promu_par)) : '',
+      /* Une rétrogradation remplit aussi `promu_le` : elle s'affichait comme
+         une promotion (audit du 24 octobre 2026). */
+      texte: m.role === 'gestion'
+        ? `${tLang('<b>{v}</b> est passé·e en gestion', { v: escapeHtml(m.nom || tLang('Quelqu’un')) })}`
+        : `${tLang('<b>{v}</b> est repassé·e en équipe', { v: escapeHtml(m.nom || tLang('Quelqu’un')) })}`,
+      detail: m.role === 'gestion' && m.promu_par ? 'par ' + escapeHtml(nomDe(m.promu_par)) : '',
     })
   })
 
@@ -13039,6 +13421,24 @@ window.ouvrirHisto = function ouvrirHisto(quoi) {
     vues: remplirHistoVues,
     temps: remplirHistoTemps,
   }[quoi]
+  /* ⚠ LE SEGMENT DU VOLET SUIT LA PÉRIODE DE LA PAGE (audit du 24 octobre
+     2026). Ouvert depuis une page réglée sur « 30 jours », le volet listait
+     30 jours mais allumait « 7 jours » — et toucher « 7 jours » ne faisait
+     rien, le bouton étant déjà marqué. */
+  const segm = document.getElementById({ equipe: 'eq-segm', vues: 'vues-segm', temps: 'temps-segm' }[quoi])
+  const boutons = segm ? [...segm.querySelectorAll('.p-seg')] : []
+  const voulu = boutons.find(x => Number(x.dataset.eqJours || x.dataset.vuesJours || x.dataset.tempsJours) === anJours)
+  if (voulu) {
+    boutons.forEach(x => x.classList.toggle('on', x === voulu))
+    requestAnimationFrame(() => {
+      const lens = document.getElementById(segm.id + '-lens')
+      const p = segm.getBoundingClientRect(), r = voulu.getBoundingClientRect()
+      if (lens && r.width) {
+        lens.style.width = r.width + 'px'
+        lens.style.transform = `translateX(${r.left - p.left - 3}px)`
+      }
+    })
+  }
   remplir?.()
 }
 
@@ -13495,7 +13895,9 @@ function chargerScansQR() {
 
 function anDureeLisible(sec) {
   if (!sec) return '0 min'
-  const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60)
+  /* On arrondit le TOTAL en minutes avant de séparer heures et minutes :
+     7 190 s donnaient « 1 h 60 », et 3 590 s « 60 min ». */
+  const tm = Math.round(sec / 60), h = Math.floor(tm / 60), m = tm % 60
   if (h && m) return `${h} h ${String(m).padStart(2, '0')}`
   if (h) return `${h} h`
   return `${m} min`
@@ -18844,9 +19246,16 @@ async function renommerDossier(ancien, { depuisListe = false } = {}) {
   })
   if (!nouveau || nouveau === ancien) return
 
-  // Une dossier de ce nom existe déjà : on le dit, on ne l'empêche pas.
-  const existe = allGestionProcedures.some(p =>
-    (p.categorie || '').toLowerCase() === nouveau.toLowerCase())
+  /* Une dossier de ce nom existe déjà : on le dit, on ne l'empêche pas.
+
+   ⚠ LE NOM EXACT DU DOSSIER EXISTANT (audit du 24 octobre 2026). Le test
+     ignorait les majuscules, mais l'écriture prenait le nom tapé : renommer
+     « Plats » en « cuisine » annonçait une fusion avec « Cuisine »… et
+     créait deux dossiers. Et « cuisine » → « Cuisine » proposait de
+     fusionner le dossier avec lui-même. */
+  const cible = allGestionProcedures.find(p => p.categorie && p.categorie !== ancien &&
+    p.categorie.toLowerCase() === nouveau.toLowerCase())?.categorie
+  const existe = !!cible
   if (existe) {
     const ok = await confirmDialog({
       titre: tLang('Fusionner avec {nouveau} ?', { nouveau }),
@@ -18857,7 +19266,7 @@ async function renommerDossier(ancien, { depuisListe = false } = {}) {
   }
 
   const { data, error } = await supabase.from('procedures')
-    .update({ categorie: nouveau })
+    .update({ categorie: cible || nouveau })
     .eq('entreprise_id', currentMembre.entreprise_id)
     .eq('categorie', ancien)
     .select('id')
@@ -18868,7 +19277,7 @@ async function renommerDossier(ancien, { depuisListe = false } = {}) {
   /* ⚠ ON DIT À L'ANIMATION QUE C'EST LE MÊME DOSSIER. Sa clé est son nom : sans
      cette ligne, la carte renommée passe pour une nouvelle venue, rejoue son
      arrivée, et les voisines glissent autour d'elle. */
-  signalerRenommage(ancien, nouveau)
+  signalerRenommage(ancien, cible || nouveau)
 
   /* On recharge : les regroupements par dossier sont construits au chargement,
      et c'est le seul endroit qui les construit. */
@@ -18895,18 +19304,22 @@ async function renommerDossier(ancien, { depuisListe = false } = {}) {
      part ailleurs, comme le rappelle le commentaire du bouton `cat-renommer`. */
   const titreEl = document.getElementById('category-titre')
   const dansLeDossier = document.getElementById('p-category')?.classList.contains('active')
-  const ouvertIci = (titreEl?.textContent || '').trim() === ancien
+  /* ⚠ LE NOM VRAI, PAS LE TITRE AFFICHÉ (audit du 24 octobre 2026). En anglais
+     ou en allemand, le titre montre la TRADUCTION du dossier (« Kitchen »
+     pour « Cuisine ») : s'en servir comme nom cherchait un dossier qui
+     n'existe pas en base. `dossierCourantNom` garde le nom enregistré. */
+  const ouvertIci = !toutesProcedures && dossierCourantNom === ancien
 
   if (dansLeDossier && ouvertIci) {
     /* On est dans le dossier qu'on vient de renommer : on met le titre à jour
        et on rouvre sous son nouveau nom. La grille se refera d'elle-même au
        retour, avec des mesures qui auront un sens. */
-    titreEl.textContent = nouveau
-    ouvrirCategorie(nouveau)
+    titreEl.textContent = cible || nouveau
+    ouvrirCategorie(cible || nouveau)
   } else if (dansLeDossier) {
     /* On est dans un AUTRE dossier — on a renommé un sous-dossier ou un
        voisin. On rafraîchit ce qu'on regarde, sans toucher au titre. */
-    ouvrirCategorie((titreEl?.textContent || '').trim())
+    ouvrirCategorie(toutesProcedures ? null : dossierCourantNom)
   } else {
     renderCategoryGrid()
   }
@@ -18919,7 +19332,10 @@ document.getElementById('cat-renommer')?.addEventListener('click', () => {
   if (sousDossierCourant) { renommerSousDossier(sousDossierCourant); return }
   /* Le nom courant se lit dans le titre : c'est la seule source de verite, la
      page ne le garde nulle part ailleurs. */
-  renommerDossier((document.getElementById('category-titre')?.textContent || '').trim())
+  /* Le nom enregistré, pas le titre affiché (traduit hors français) — voir
+     `renommerDossier`. */
+  if (toutesProcedures || !dossierCourantNom) return
+  renommerDossier(dossierCourantNom)
 })
 function renommerDossierDepuisListe(nom) {
   renommerDossier(nom, { depuisListe: true })
@@ -19320,6 +19736,14 @@ function resetCreateForm() {
   document.getElementById('create-error-video').textContent = ''
   manualSteps = []
   videoSteps = []
+  /* ⚠ UNE CRÉATION N'HÉRITE PLUS D'UNE MODIFICATION ABANDONNÉE (audit du
+     24 octobre 2026). `manEdition` et `dvEdition` n'étaient remis à zéro
+     qu'après un enregistrement réussi. Ouvrir une procédure en modification,
+     revenir sans enregistrer, puis créer une nouvelle procédure : la
+     publication RÉÉCRIVAIT l'ancienne (titre, dossier, toutes ses étapes) au
+     lieu d'en créer une. */
+  manEdition = null
+  dvEdition = null
   currentVideoFile = null
   reinitialiserCouverture(null)
   renderManualSteps()
@@ -19372,6 +19796,12 @@ window.ouvrirEtapesManuelles = async function(procId) {
      afficherait deux fenêtres l'une sur l'autre. */
   if (procId && await bloqueSiEssaiFini()) return
   manEdition = procId || null
+  /* ⚠ L'AUTRE ÉDITEUR EST OUBLIÉ (audit du 24 octobre 2026). La publication
+     prend `manEdition || dvEdition` et réunit `manualSteps` + `videoSteps` :
+     un montage vidéo ouvert puis abandonné faisait enregistrer CETTE
+     procédure-ci… sur l'autre, avec les étapes des deux. */
+  dvEdition = null
+  if (manEdition) videoSteps = []
   showGestionScreen('p-create-manual')
 
   const el = (i) => document.getElementById(i)
@@ -19402,11 +19832,22 @@ window.ouvrirEtapesManuelles = async function(procId) {
   manualSteps = []
   renderManualSteps()
 
-  const [{ data: proc }, { data: etapes }] = await Promise.all([
+  const [{ data: proc, error: errProc }, { data: etapes, error: errEtapes }] = await Promise.all([
     supabase.from('procedures').select('*').eq('id', procId).single(),
     supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre'),
   ])
-  if (!proc) { el('create-error-manual').textContent = tLang('Procédure introuvable.'); return }
+  /* Entre-temps, on a ouvert une autre procédure : cette réponse est périmée. */
+  if (manEdition !== procId) return
+  /* ⚠ SANS SES ÉTAPES, ON N'OUVRE PAS (audit du 24 octobre 2026). Une coupure
+     réseau rendait une liste vide : l'éditeur montrait une étape blanche, et
+     « Enregistrer » effaçait en base toutes les vraies étapes. */
+  if (!proc || errProc || errEtapes) {
+    manEdition = null
+    el('create-error-manual').textContent = ''
+    toast(tLang('Procédure introuvable.'))
+    showGestionScreen('p-analyse')
+    return
+  }
 
   el('man-titre').value = proc.titre || ''
   el('man-categorie').value = proc.categorie || ''
@@ -19949,8 +20390,9 @@ async function renommerSousDossier(ancien) {
   /* ⚠ LE DOSSIER PARENT, PAS LE TITRE. Depuis l'interieur d'un sous-dossier,
      le titre de la page porte le nom du SOUS-dossier : le lire ici aurait
      cherche des procedures dans un dossier qui n'existe pas. */
-  const dossier = (sousDossierCourant ? dossierCourantNom
-    : (document.getElementById('category-titre')?.textContent || '')).trim()
+  /* Le nom enregistré du dossier ouvert, jamais le titre affiché (traduit
+     hors français) — voir `renommerDossier`. */
+  const dossier = (dossierCourantNom || '').trim()
   if (!dossier) return
 
   /* ⚠ PLUS DE MENU AVANT LA SAISIE.
@@ -20095,14 +20537,20 @@ function peindrePostes() {
         confirmer: tLang('Retirer'), annuler: tLang('Annuler'), danger: true,
       })
       if (!ok) return
-      await supabase.from('postes').delete().eq('id', b.dataset.poste)
+      const { error: eRetrait } = await supabase.from('postes').delete().eq('id', b.dataset.poste)
+      if (eRetrait) toast(tLang('Échec : {message}', { message: eRetrait.message }))
       await chargerPostes()
       peindrePostes()
     })
   })
 }
 
+/* ⚠ UN SEUL AJOUT À LA FOIS (audit du 24 octobre 2026) : un double appui
+   créait deux postes identiques — le contrôle de doublon lisait la liste
+   avant que la première écriture ne revienne. */
+let posteAjoutEnCours = false
 document.getElementById('poste-ajouter')?.addEventListener('click', async () => {
+  if (posteAjoutEnCours) return
   const champ = document.getElementById('poste-nouveau')
   const err = document.getElementById('poste-erreur')
   const nom = champ.value.trim()
@@ -20111,13 +20559,16 @@ document.getElementById('poste-ajouter')?.addEventListener('click', async () => 
   if (postesEntreprise.some(p => p.nom.toLowerCase() === nom.toLowerCase())) {
     err.textContent = tLang('Ce poste existe déjà.'); return
   }
-  const { error } = await supabase.from('postes').insert({
-    entreprise_id: currentMembre.entreprise_id, nom, ordre: postesEntreprise.length,
-  })
-  if (error) { err.textContent = tLang('Enregistrement impossible : {message}', { message: error.message }); return }
-  champ.value = ''
-  await chargerPostes()
-  peindrePostes()
+  posteAjoutEnCours = true
+  try {
+    const { error } = await supabase.from('postes').insert({
+      entreprise_id: currentMembre.entreprise_id, nom, ordre: postesEntreprise.length,
+    })
+    if (error) { err.textContent = tLang('Enregistrement impossible : {message}', { message: error.message }); return }
+    champ.value = ''
+    await chargerPostes()
+    peindrePostes()
+  } finally { posteAjoutEnCours = false }
 })
 
 /* ─── Le choix du membre ─── */
@@ -20158,12 +20609,19 @@ function peindreMonPoste() {
       const nom = b.dataset.choix
       /* On écrit d'abord à l'écran, on enregistre ensuite : le choix doit
          paraître immédiat, même sur un réseau lent. */
+      const avant = currentMembre.poste
       currentMembre.poste = currentMembre.poste === nom ? null : nom
       peindreMonPoste()
       majLignePoste()
       const { error } = await supabase.from('membres')
         .update({ poste: currentMembre.poste }).eq('id', currentMembre.id)
-      if (error) toast(tLang('Enregistrement impossible : {message}', { message: error.message }))
+      if (error) {
+        /* La coche restait sur un poste qui n'était pas enregistré. */
+        currentMembre.poste = avant
+        peindreMonPoste()
+        majLignePoste()
+        toast(tLang('Enregistrement impossible : {message}', { message: error.message }))
+      }
     })
   })
 }
@@ -20848,6 +21306,14 @@ document.getElementById('edit-defaire')?.addEventListener('click', () => {
    toujours analysée, c'est `ai-start` qui le décide désormais. */
 
 function goToCreateMode(mode) {
+  /* ⚠ PAS DE NOUVELLE ANALYSE PENDANT L'ENVOI DE LA PRÉCÉDENTE (audit du
+     24 octobre 2026). `resetAiScreen` remet à zéro la procédure et la vidéo
+     en cours ; l'envoi encore en route perdait alors sa procédure, et la
+     vidéo partait dans le vide. L'envoi ne dure que quelques secondes. */
+  if (mode === 'ai' && aiLancementEnCours) {
+    toast(tLang('Une vidéo est en cours d’envoi. Patientez quelques secondes.'))
+    return
+  }
   if (mode === 'ai') resetAiScreen()
   if (mode === 'doc') { resetDocScreen(); showGestionScreen('p-create-doc'); return }
   if (mode === 'manual') { ouvrirEtapesManuelles(null); return }
@@ -21706,7 +22172,15 @@ window.ouvrirCameraStandix = ouvrirCameraStandix
 /* L'ouverture de la caméra, aussi appelée au changement de face. Elle coupe
    toujours le flux précédent d'abord : deux caméras ouvertes en même temps,
    certains téléphones refusent tout simplement la seconde. */
+/* ⚠ CHAQUE OUVERTURE PORTE UN NUMÉRO (audit du 24 octobre 2026). Fermer la
+   caméra pendant « Ouverture… », ou toucher deux fois « Changer de caméra »,
+   laissait arriver un flux que plus personne n'attendait : caméra et micro
+   restaient allumés derrière un voile masqué. Un flux arrivé en retard est
+   maintenant coupé aussitôt. */
+let camOuverture = 0
+
 async function ouvrirFluxCamera() {
+  const tour = ++camOuverture
   couperFluxCamera()
   const badge = document.getElementById('cam-badge')
   badge.textContent = tLang('Ouverture…')
@@ -21720,8 +22194,15 @@ async function ouvrirFluxCamera() {
     },
     audio: { echoCancellation: true, noiseSuppression: true },
   }
+  const perime = (f) => {
+    if (tour === camOuverture && camVoile()?.style.display === 'flex') return false
+    try { f?.getTracks().forEach(t => t.stop()) } catch (x) {}
+    return true
+  }
   try {
-    camFlux = await navigator.mediaDevices.getUserMedia(exigeant)
+    const f = await navigator.mediaDevices.getUserMedia(exigeant)
+    if (perime(f)) return
+    camFlux = f
   } catch (e) {
     /* ═══ UN APPAREIL PEUT REFUSER LA DEMANDE PRÉCISE, PAS LA CAMÉRA ═══
        `max` est une contrainte dure : une caméra qui ne connaît que le 4K la
@@ -21729,10 +22210,12 @@ async function ouvrirFluxCamera() {
        dans la définition de l'appareil que ne pas filmer. */
     if (e?.name === 'OverconstrainedError' || e?.name === 'NotFoundError') {
       try {
-        camFlux = await navigator.mediaDevices.getUserMedia({
+        const f = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { ideal: camFace } }, audio: true,
         })
-      } catch (e2) { echecCamera(e2); return }
+        if (perime(f)) return
+        camFlux = f
+      } catch (e2) { if (tour === camOuverture) echecCamera(e2); return }
     } else { echecCamera(e); return }
   }
 
@@ -22207,6 +22690,7 @@ window.addEventListener('pageshow', camRevenir)
 function fermerCamera() {
   clearInterval(camMinuteur); camMinuteur = 0
   camReveil++
+  camOuverture++                       // un flux encore en route sera coupé
   camFilme = false
   camPause = false
   camPauseAuto = false
@@ -22977,7 +23461,11 @@ function dateLisible(iso) {
 function essaiTermine() {
   if (!etatAbo) return false                  // on ne sait pas encore
   if (etatAbo.statut === 'actif') return false
-  if ((mesEtablissements || []).some(e => e.abonnement_statut === 'actif')) return false
+  /* Un abonnement payé ailleurs ne compte que si c'est le SIEN (fondateur de
+     cette autre entreprise) : être simple membre d'une entreprise abonnée
+     ouvrait la gestion de la sienne sans payer (audit du 24 octobre 2026). */
+  if ((mesEtablissements || []).some(e => e.abonnement_statut === 'actif' &&
+      e.role === 'gestion' && !e.promu_par)) return false
 
   /* ⚠ ON NE TESTE PLUS SEULEMENT `expire`.
 
@@ -23528,10 +24016,11 @@ async function verifierPlaceLibre(entrepriseId, nomEntreprise) {
   if (places === null || places > 0) return true
 
   const { data: { user } } = await supabase.auth.getUser()
+  let demandeEnvoyee = false
   if (user) {
     /* `upsert` plutôt qu'`insert` : quelqu'un qui réessaie dix fois ne doit pas
        produire dix lignes rouges chez le gérant. */
-    await supabase.from('demandes_acces').upsert({
+    const { error: eDemande } = await supabase.from('demandes_acces').upsert({
       entreprise_id: entrepriseId,
       user_id: user.id,
       /* Le nom vient du COMPTE de celui qui demande, pas de `currentMembre` —
@@ -23540,11 +24029,17 @@ async function verifierPlaceLibre(entrepriseId, nomEntreprise) {
       nom: user.user_metadata?.nom || user.user_metadata?.full_name || '',
       email: user.email || '',
     }, { onConflict: 'entreprise_id,user_id' })
+    demandeEnvoyee = !eDemande
   }
 
+  /* ⚠ ON N'ANNONCE « TRANSMISE » QUE SI ELLE L'A ÉTÉ (audit du 24 octobre
+     2026) : l'erreur d'écriture était ignorée, et le message promettait une
+     demande que le gérant ne recevrait jamais. */
   await confirmDialog({
     titre: tLang('Cette entreprise est complète'),
-    message: tLang('« {nomEntreprise} » a atteint le nombre de membres de son abonnement.\n\nVotre demande a été transmise à la personne qui la gère. Elle vous ouvrira l\'accès dès qu\'une place se libère.', { nomEntreprise: nomEntreprise || tLang('Cette entreprise') }),
+    message: demandeEnvoyee
+      ? tLang('« {nomEntreprise} » a atteint le nombre de membres de son abonnement.\n\nVotre demande a été transmise à la personne qui la gère. Elle vous ouvrira l\'accès dès qu\'une place se libère.', { nomEntreprise: nomEntreprise || tLang('Cette entreprise') })
+      : tLang('« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Prévenez la personne qui la gère.', { nomEntreprise: nomEntreprise || tLang('Cette entreprise') }),
     confirmer: tLang('J’ai compris'),
     annuler: tLang('Fermer'),
   })
@@ -23619,8 +24114,10 @@ document.addEventListener('click', async (e) => {
     titre: tLang('En attente d’une place'),
     message: (data || []).map(d =>
       `• ${d.nom || d.email || tLang('Quelqu’un')}`).join('\n') || tLang('Personne pour l’instant.'),
-    confirmer: tLang('Fermer'),
-    annuler: tLang('Voir les offres'),
+    /* « Voir les offres » est le choix POSITIF (audit du 24 octobre 2026) :
+       placé en « annuler », toucher le fond ou Échap ouvrait les offres. */
+    confirmer: tLang('Voir les offres'),
+    annuler: tLang('Fermer'),
   /* ⚠ LE POINT-VIRGULE SÉPARAIT DEUX INSTRUCTIONS. Écrit
        `|| showGestionScreen(...); marquerAboNeuf()`, le second appel
        s'exécutait TOUJOURS — même quand la personne fermait la boîte sans
@@ -23628,7 +24125,7 @@ document.addEventListener('click', async (e) => {
        n'ouvre pas, et la cascade ratait sa vraie ouverture.
 
        Les deux appels tiennent maintenant dans la même branche. */
-  }) || (showGestionScreen('p-abonnement'), marquerAboNeuf())
+  }) && (showGestionScreen('p-abonnement'), marquerAboNeuf())
 })
 
 function ouvrirVoieDoc(voie) {
@@ -23657,7 +24154,12 @@ document.addEventListener('click', (e) => {
   if (b) ouvrirVoieDoc(b.dataset.voie)
 })
 
+/* Le numéro de la génération en cours : une réponse arrivée après qu'on a
+   quitté l'écran (jusqu'à 60 s d'attente) ne doit plus rien faire. */
+let docTour = 0
+
 function resetDocScreen() {
+  docTour++
   docTexteExtrait = ''
   docNomFichier = ''
   const t = document.getElementById('doc-texte'); if (t) t.value = ''
@@ -23692,7 +24194,10 @@ function texteDocCourant() {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const DOC_PAGES_MAX = 8
-const DOC_PAGE_POIDS_MAX = 4 * 1024 * 1024
+/* ⚠ 25 Mo, PLUS 4 (audit du 24 octobre 2026). Une photo d'iPhone récent
+   pèse 6 à 9 Mo et était refusée ; elle est maintenant réduite avant l'envoi
+   (`reduireImage`), ce qui la ramène sous le Mo et sous les limites de l'IA. */
+const DOC_PAGE_POIDS_MAX = 25 * 1024 * 1024
 let docPages = []   // { fichier, apercu }
 
 document.getElementById('doc-photo-input')?.addEventListener('change', (e) => {
@@ -23717,7 +24222,7 @@ function ajouterPages(fichiers) {
 
   if (trop.length) {
     err.style.color = 'var(--orange)'
-    err.textContent = (trop.length > 1 ? tLang('{length} photos trop lourdes (plus de 4 Mo). Sur iPhone : Réglages → Appareil photo → Formats → Haute efficacité.', { length: trop.length }) : tLang('{length} photo trop lourde (plus de 4 Mo). Sur iPhone : Réglages → Appareil photo → Formats → Haute efficacité.', { length: trop.length }))
+    err.textContent = (trop.length > 1 ? tLang('{length} photos trop lourdes (plus de 25 Mo).', { length: trop.length }) : tLang('{length} photo trop lourde (plus de 25 Mo).', { length: trop.length }))
   } else if (err.style.color === 'var(--orange)') {
     err.textContent = ''
   }
@@ -23774,15 +24279,39 @@ function peindrePages() {
 /* Les images partent en base64. C'est plus lourd qu'un envoi binaire, mais ça
    traverse la fonction serveur sans manipulation particulière — et à huit pages
    de quatre mégaoctets, on reste très en dessous des limites. */
+/* Réduit une photo à 2 000 px de côté, en JPEG : l'IA lit aussi bien le
+   texte, et l'envoi reste sous ses limites (5 Mo par image). Une image que le
+   navigateur ne sait pas lire repart telle quelle. */
+async function reduireImage(fichier, cote = 2000, qualite = 0.85) {
+  let url = null
+  try {
+    url = URL.createObjectURL(fichier)
+    const img = await new Promise((ok, non) => { const i = new Image(); i.onload = () => ok(i); i.onerror = non; i.src = url })
+    const r = Math.min(1, cote / Math.max(img.naturalWidth || 1, img.naturalHeight || 1))
+    if (r >= 1 && fichier.size < 3.5 * 1024 * 1024 && /jpe?g|png|webp/i.test(fichier.type || '')) return fichier
+    const c = document.createElement('canvas')
+    c.width = Math.max(1, Math.round(img.naturalWidth * r))
+    c.height = Math.max(1, Math.round(img.naturalHeight * r))
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height)
+    const blob = await new Promise(ok => c.toBlob(ok, 'image/jpeg', qualite))
+    return blob ? new File([blob], 'page.jpg', { type: 'image/jpeg' }) : fichier
+  } catch (e) {
+    return fichier
+  } finally {
+    if (url) URL.revokeObjectURL(url)
+  }
+}
+
 async function pagesEnBase64() {
-  return Promise.all(docPages.map(p => new Promise((resolve, reject) => {
+  const fichiers = await Promise.all(docPages.map(p => reduireImage(p.fichier)))
+  return Promise.all(fichiers.map((f, i) => new Promise((resolve, reject) => {
     const r = new FileReader()
     r.onload = () => resolve({
-      type: p.fichier.type || 'image/jpeg',
+      type: f.type || 'image/jpeg',
       donnees: String(r.result).split(',')[1],
     })
-    r.onerror = () => reject(new Error(tLang('Photo illisible : {name}', { name: p.fichier.name })))
-    r.readAsDataURL(p.fichier)
+    r.onerror = () => reject(new Error(tLang('Photo illisible : {name}', { name: docPages[i]?.fichier?.name || '' })))
+    r.readAsDataURL(f)
   })))
 }
 
@@ -23870,8 +24399,11 @@ async function ensureMammoth() {
 
 async function ensurePdfjs() {
   if (pdfjsLib) return pdfjsLib
-  const m = await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.min.mjs')
-  m.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs'
+  /* ⚠ LA VERSION « legacy » (audit du 24 octobre 2026). L'autre exige
+     `Promise.withResolvers`, absent avant iOS 17.4 : sur un iPhone plus
+     ancien, importer un PDF échouait toujours. Celle-ci apporte ce qui manque. */
+  const m = await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/legacy/build/pdf.min.mjs')
+  m.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/legacy/build/pdf.worker.min.mjs'
   pdfjsLib = m
   return pdfjsLib
 }
@@ -23954,6 +24486,7 @@ document.getElementById('doc-fichier')?.addEventListener('change', async (e) => 
 /* ── Envoi à l'IA, puis relecture dans l'éditeur manuel ────────────── */
 
 document.getElementById('doc-generer')?.addEventListener('click', async () => {
+  const tourDoc = ++docTour
   const err = document.getElementById('doc-erreur')
   err.style.color = 'var(--red)'
   err.textContent = ''
@@ -23992,6 +24525,13 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
         body: JSON.stringify({ titre, categorie, texte, images: await pagesEnBase64(), langue: langueRedaction() }),
     })
     const data = await rep.json()
+    /* ⚠ ON A QUITTÉ L'ÉCRAN ENTRE-TEMPS (audit du 24 octobre 2026) : le
+       résultat sautait par-dessus ce qu'on faisait — une modification en
+       cours était remplacée par les étapes du document. */
+    if (tourDoc !== docTour || !document.getElementById('p-create-doc')?.classList.contains('active')) {
+      clearInterval(docMinuteur)
+      return
+    }
     if (!rep.ok || data.error) throw new Error(data.error || tLang('La g\u00e9n\u00e9ration a \u00e9chou\u00e9.'))
     if (!Array.isArray(data.etapes) || data.etapes.length === 0) {
       throw new Error(tLang("L'IA n'a pas trouv\u00e9 d'\u00e9tapes dans ce document. Il d\u00e9crit peut-\u00eatre une situation plut\u00f4t qu'une marche \u00e0 suivre."))
@@ -24010,7 +24550,13 @@ if (pctDocEl) pctDocEl.textContent = '100%'
 figDoc?.classList.add('fini')
 await new Promise(r => setTimeout(r, 900))
 
-    showGestionScreen('p-create-manual')
+    /* ⚠ PAR `ouvrirEtapesManuelles`, PLUS PAR L'ÉCRAN SEUL (audit du
+       24 octobre 2026). Afficher la page directement gardait un `manEdition`
+       resté d'une modification abandonnée : « Publier » réécrivait alors
+       cette ancienne procédure. La fonction remet l'écran en mode création,
+       reprend le titre et le dossier saisis, et garde les étapes proposées. */
+    videoSteps = []
+    ouvrirEtapesManuelles(null)
     toast((manualSteps.length > 1 ? tLang('{length} étapes proposées · relisez avant de publier', { length: manualSteps.length }) : tLang('{length} étape proposée · relisez avant de publier', { length: manualSteps.length })))
     resetDocScreen()
   } catch (ex) {
@@ -24101,7 +24647,9 @@ async function garderEcranAllume(oui) {
 /* Le navigateur retire le verrou quand on quitte l'app : on le reprend au
    retour si la préparation n'est pas finie. */
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && aiLancementEnCours) garderEcranAllume(true)
+  /* ⚠ ET PENDANT UNE PRISE DE LA CAMÉRA (audit du 24 octobre 2026) : au
+     retour d'une pause automatique, l'écran se verrouillait en pleine prise. */
+  if (document.visibilityState === 'visible' && (aiLancementEnCours || camFilme)) garderEcranAllume(true)
 })
 let aiProcedureId = null
 let aiProgressTimer = null
@@ -24748,6 +25296,17 @@ function chargerVideoPourIA(file) {
        position. `load()` ne suffit pas : le lecteur reste noir. On avance d'un
        dixième de seconde, ce qui force le rendu d'une vraie image. */
     try { player.currentTime = 0.1 } catch (e) {}
+  }, { once: true })
+  /* ⚠ UNE VIDÉO ILLISIBLE ICI LE DIT (audit du 24 octobre 2026). Un format
+     que le navigateur ne sait pas lire (HEVC sous Firefox, par exemple)
+     laissait « Lancer » éteint pour toujours, sans un mot. */
+  player.addEventListener('error', () => {
+    if (player.src !== url) return
+    const errAi = document.getElementById('ai-error')
+    if (errAi) {
+      errAi.style.color = 'var(--red)'
+      errAi.textContent = tLang('Ce navigateur ne sait pas lire cette vidéo. Essayez depuis un autre navigateur, ou enregistrez-la en MP4.')
+    }
   }, { once: true })
 }
 
@@ -25904,9 +26463,16 @@ async function comprimerVideoTempsReel(fichier, surAvancee) {
       let clos = false
       const finir = () => { if (!clos) { clos = true; ok() } }
       lecteur.onended = finir
+      /* ⚠ « EN PAUSE » N'EST PAS « FINI » (audit du 24 octobre 2026). Sur
+         iPhone, un appel ou un passage dans une autre app met la lecture en
+         pause : la capture était alors close à 80 %, envoyée telle quelle,
+         et les dernières étapes manquaient sans aucun message. On relance la
+         lecture au retour ; la fin, c'est la fin de la vidéo. */
       const veille = setInterval(() => {
-        if (lecteur.currentTime >= lecteur.duration - 0.15 || lecteur.paused) {
+        if (lecteur.ended || lecteur.currentTime >= lecteur.duration - 0.15) {
           clearInterval(veille); finir()
+        } else if (lecteur.paused && document.visibilityState === 'visible') {
+          lecteur.play().catch(() => {})
         }
       }, 400)
       setTimeout(() => { clearInterval(veille); finir() },
@@ -25916,6 +26482,13 @@ async function comprimerVideoTempsReel(fichier, surAvancee) {
     arret = true
     clearInterval(minuterie)
     enr.stop()
+
+    /* Une lecture qui n'est pas allée au bout (délai de secours atteint) ne
+       donne qu'une partie de la vidéo : on renvoie l'original. */
+    if (Number.isFinite(lecteur.duration) && lecteur.currentTime < lecteur.duration - 0.5) {
+      return abandon('interrompue',
+        `lecture arr\u00eat\u00e9e \u00e0 ${Math.round(lecteur.currentTime)} s sur ${Math.round(lecteur.duration)} s`)
+    }
 
     /* ═══ LA CAPTURE A-T-ELLE SUIVI ? ═══
 
@@ -26087,7 +26660,19 @@ function verifierDureeVideo() {
   btn.disabled = false
 }
 
+/* ═══ UN SEUL LANCEMENT À LA FOIS (audit du 24 octobre 2026) ═══
+
+   Le bouton n'était désactivé qu'APRÈS la vérification du quota, qui passe
+   par le réseau : un double appui créait deux procédures, envoyait deux fois
+   la vidéo et consommait deux analyses. Le verrou est posé au premier appui. */
+let aiClicVerrou = false
 document.getElementById('ai-launch-btn')?.addEventListener('click', async () => {
+  if (aiClicVerrou || aiLancementEnCours) return
+  aiClicVerrou = true
+  try { await lancerAnalyseIA() } finally { aiClicVerrou = false }
+})
+
+async function lancerAnalyseIA() {
   const errorEl = document.getElementById('ai-error')
   errorEl.textContent = ''
 
@@ -26153,6 +26738,25 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
      nom, et on peut quitter la page sans rien perdre.
 
      L'adresse de la vidéo viendra la compléter plus loin. */
+  /* ⚠ « RELANCER L'ANALYSE » NE MULTIPLIE PLUS LES PROCÉDURES (audit du
+     24 octobre 2026). Chaque relance en créait une nouvelle, et la précédente
+     restait dans la liste avec son point rouge : trois essais, trois
+     procédures du même titre. La procédure en échec de l'essai précédent est
+     retirée, avec sa vidéo. */
+  if (aiProcedureId) {
+    try {
+      const ancien = aiProcedureId
+      const { data: vieux } = await supabase.from('procedures')
+        .select('id, statut, video_url').eq('id', ancien).maybeSingle()
+      if (vieux?.statut === 'echec') {
+        const ch = cheminFichier(vieux.video_url)
+        if (ch) supabase.storage.from('procedo-videos').remove([ch, `${ch}.jpg`]).catch(() => {})
+        await supabase.from('etapes').delete().eq('procedure_id', ancien)
+        await supabase.from('procedures').delete().eq('id', ancien)
+      }
+    } catch (e) { console.warn('[relance] ancienne procédure non retirée :', e?.message || e) }
+  }
+
   try {
     const { data: nouvelle, error: errNouvelle } = await supabase
       .from('procedures')
@@ -26413,7 +27017,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
         tLang('Cette vidéo pèse {v} une fois allégée, au-delà des {v2} acceptés. Filmez une séquence plus courte — deux à trois minutes suffisent pour un geste.', { v: poidsLisible(aiVideoFile.size), v2: poidsLisible(LIMITE_STOCKAGE) }))
     }
 
-    const path = `${base}_${aiVideoFile.name}`
+    const path = `${base}_${nomFichierSur(aiVideoFile.name)}`
     /* ═══ UN ENVOI QUI NE RÉPOND JAMAIS ═══
 
        Sans limite de temps, une requête qui reste en suspens laisse l'anneau
@@ -26795,7 +27399,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     errorEl.appendChild(document.createElement('br'))
     errorEl.appendChild(relance)
   }
-})
+}
 
 /* Affiche la cause exacte, telle que la fonction serveur l'a inscrite sur la
    procédure. Sans ça, il fallait ouvrir Supabase pour la lire — et sans elle on
@@ -27867,6 +28471,9 @@ window.ouvrirMontageVideo = async function(procId) {
      afficherait deux fenêtres l'une sur l'autre. */
   if (procId && await bloqueSiEssaiFini()) return
   dvEdition = procId || null
+  /* L'autre éditeur est oublié — voir `ouvrirEtapesManuelles`. */
+  manEdition = null
+  if (dvEdition) manualSteps = []
   showGestionScreen('p-create-video')
 
   const el = (i) => document.getElementById(i)
@@ -27908,11 +28515,21 @@ window.ouvrirMontageVideo = async function(procId) {
 
   if (!dvEdition) return
 
-  const [{ data: proc }, { data: etapes }] = await Promise.all([
+  const [{ data: proc, error: errProc }, { data: etapes, error: errEtapes }] = await Promise.all([
     supabase.from('procedures').select('*').eq('id', procId).single(),
     supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre'),
   ])
-  if (!proc) { el('create-error-video').textContent = tLang('Procédure introuvable.'); return }
+  /* Réponse périmée, ou étapes illisibles : mêmes gardes que
+     `ouvrirEtapesManuelles` — sans elles, « Enregistrer » effaçait les
+     étapes en base après une coupure réseau. */
+  if (dvEdition !== procId) return
+  if (!proc || errProc || errEtapes) {
+    dvEdition = null
+    el('create-error-video').textContent = ''
+    toast(tLang('Procédure introuvable.'))
+    showGestionScreen('p-analyse')
+    return
+  }
 
 
   el('dv-categorie').value = proc.categorie || ''
@@ -28387,11 +29004,19 @@ async function recadrerCarre(fichier) {
     return new File([blob], (fichier.name || 'photo').replace(/\.\w+$/, '') + '.jpg',
                     { type: 'image/jpeg' })
   } catch {
+    /* Une photo HEIC que ce navigateur ne sait pas lire (Chrome, Android)
+       partait telle quelle, et l'équipe ne la voyait jamais. */
+    if (/hei[cf]/i.test(fichier?.type || '') || /\.hei[cf]$/i.test(fichier?.name || '')) {
+      toast(tLang('Photo HEIC illisible ici : enregistrez-la en JPEG.'))
+      return null
+    }
     return fichier
   }
 }
 
-function renderManualSteps() {
+/* ⚠ POSÉ UNE SEULE FOIS, HORS DU RENDU (audit du 24 octobre 2026). Il était
+   ajouté à chaque appel de `renderManualSteps` : après dix rendus, une croix
+   déclenchait dix retraits et dix redessins, et l'écran ralentissait. */
 /* Retirer la photo d'une étape. Il n'y avait aucun moyen de le faire : une
    photo posée par erreur restait là pour toujours. */
 document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
@@ -28408,6 +29033,7 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
   repeindreSansSauter(renderManualSteps)
   if (navigator.vibrate) navigator.vibrate(6)
 })
+function renderManualSteps() {
 
   const listEl = document.getElementById('manual-steps-list')
   listEl.innerHTML = ''
@@ -28599,7 +29225,9 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
     /* La vignette EST la commande. Sans photo, elle ouvre directement le
        sélecteur — poser une question quand il n'y a qu'une réponse serait un
        geste de trop. Avec une photo, elle propose de remplacer ou de retirer. */
-    const toucherPhoto = async () => {
+    const toucherPhoto = async (e) => {
+      // La croix « retirer » est DANS la vignette : elle a son propre geste.
+      if (e?.target?.closest?.('.img-oter')) return
       if (!(manualSteps[i].image_url || manualSteps[i].imageFichier)) { champFichier.click(); return }
       const choix = await choisirAction({
         titre: tLang('Photo de l\'étape {v}', { v: i + 1 }),
@@ -28621,10 +29249,18 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
     champFichier.addEventListener('change', (e) => {
       const f = e.target.files[0]
       if (!f) return
-      if (f.size > 6 * 1024 * 1024) { toast(tLang('Photo trop lourde : 6 Mo maximum.')); return }
+      /* ⚠ LE POIDS SE JUGE APRÈS LA RÉDUCTION (audit du 24 octobre 2026).
+         Une photo d'iPhone récent pèse 6 à 9 Mo et était refusée, alors que
+         le recadrage la ramène à quelques centaines de Ko. */
+      if (f.size > 40 * 1024 * 1024) { toast(tLang('Photo trop lourde : 6 Mo maximum.')); return }
       /* Le recadrage est asynchrone : on affiche l'etape des qu'il est fait,
          pas avant, sinon la vignette montrerait brievement l'image d'origine. */
       recadrerCarre(f).then(carre => {
+        if (!carre) return
+        if (carre.size > 6 * 1024 * 1024) { toast(tLang('Photo trop lourde : 6 Mo maximum.')); return }
+        /* On garde l'ancienne photo de côté : si la nouvelle ne part pas à
+           l'enregistrement, l'étape la retrouve au lieu de rester vide. */
+        if (manualSteps[i].image_url) manualSteps[i].imageAvant = manualSteps[i].image_url
         manualSteps[i].imageFichier = carre
         manualSteps[i].image_url = null
         renderManualSteps()
@@ -29173,6 +29809,8 @@ function brancherPoignee(poi, i) {
      et on le conserve pendant tout le geste. La poignée ne bouge pas d'un pixel
      tant que le doigt ne bouge pas — exactement comme on tient un objet. */
   let ecartPrise = 0
+  /* Une seule copie par geste — voir `placer`. */
+  let dejaMemorise = false
 
   const placer = (clientX) => {
     const r = f.getBoundingClientRect()
@@ -29185,7 +29823,11 @@ function brancherPoignee(poi, i) {
        début de l'autre. Ne bouger qu'une seule des deux ouvrirait un trou. */
     /* ⚠ ON MEMORISE AVANT DE BOUGER. Une poignee deplacee change deux etapes a
        la fois : sans copie prealable, l'annulation ne saurait pas quoi rendre. */
-    memoriserVideo()
+    /* ⚠ UNE FOIS PAR GESTE, PAS À CHAQUE PIXEL (audit du 24 octobre 2026).
+       Appelée à chaque mouvement, la copie remplissait la pile d'annulation
+       en un seul glissement : « Annuler » ne reculait plus que d'un pixel,
+       et la position d'avant le geste était perdue. */
+    if (!dejaMemorise) { memoriserVideo(); dejaMemorise = true }
     videoSteps[i].fin_video = t
     if (videoSteps[i + 1]) videoSteps[i + 1].timestamp_video = t
 
@@ -29216,6 +29858,11 @@ function brancherPoignee(poi, i) {
     e.preventDefault()
     e.stopPropagation()
     tire = true
+    dejaMemorise = false
+    /* Le relâchement s'écoute sur la fenêtre le temps du geste seulement —
+       voir plus bas. */
+    window.addEventListener('pointerup', relacher)
+    window.addEventListener('pointercancel', relacher)
     jouaitAvant = !v.paused
     v.pause()
     poi.classList.add('tire')
@@ -29249,6 +29896,8 @@ function brancherPoignee(poi, i) {
   })
 
   const relacher = () => {
+    window.removeEventListener('pointerup', relacher)
+    window.removeEventListener('pointercancel', relacher)
     if (!tire) return
     tire = false
 
@@ -29281,9 +29930,13 @@ function brancherPoignee(poi, i) {
      qu'on observait : plus moyen de faire glisser quoi que ce soit, même
      pendant la lecture.
 
-     Sur la fenêtre, l'écouteur survit à la disparition de son élément. */
-  window.addEventListener('pointerup', relacher)
-  window.addEventListener('pointercancel', relacher)
+     Sur la fenêtre, l'écouteur survit à la disparition de son élément.
+
+   ⚠ MAIS SEULEMENT PENDANT LE GESTE (audit du 24 octobre 2026). Posés ici, à
+     chaque création de poignée, ils s'accumulaient sans jamais partir : la
+     frise se redessine à chaque instant de lecture, et des milliers
+     d'écouteurs finissaient par ralentir le téléphone. Ils sont maintenant
+     ajoutés au `pointerdown` et retirés au relâchement. */
   poi.addEventListener('lostpointercapture', relacher)
 }
 
@@ -29750,10 +30403,16 @@ function champManuel(quoi) {
      en commençant par l'écran affiché. */
   /* `dv-` s'ajoute pour la modification d'une procédure vidéo : sans lui, la
      publication reprenait le titre de l'écran de création, resté vide. */
-  const ordre = ['dv-', 'man-', 'new-'].map(pre => document.getElementById(pre + quoi))
-  const visible = ordre.find(e => e && e.offsetParent !== null && e.value.trim())
-  if (visible) return visible
-  return ordre.find(e => e && e.value.trim()) || ordre.find(Boolean)
+  /* ⚠ LE CHAMP DE L'ÉCRAN OUVERT, ET LUI SEUL (audit du 24 octobre 2026).
+     On prenait le premier champ rempli, même caché : un titre « X » recopié
+     dans l'écran manuel, puis corrigé en « Y » sur la page de création,
+     donnait une analyse IA intitulée « X ». Et un sous-dossier vidé en
+     modification reprenait celui d'une autre procédure. Les écrans IA et
+     document lisent la page de création (`new-`). */
+  const actif = document.querySelector('#gestion-app .screen.active')?.id
+  const pre = actif === 'p-create-manual' ? 'man-' : actif === 'p-create-video' ? 'dv-' : 'new-'
+  return document.getElementById(pre + quoi) ||
+    ['dv-', 'man-', 'new-'].map(p => document.getElementById(p + quoi)).find(Boolean)
 }
 
 async function publishProcedure(errorElId, btnId) {
@@ -29786,7 +30445,7 @@ async function publishProcedure(errorElId, btnId) {
   let videoUrl = null
   let apercuEnRoute = null
   if (currentVideoFile) {
-    const path = `${currentMembre.entreprise_id}/${Date.now()}_${currentVideoFile.name}`
+    const path = `${currentMembre.entreprise_id}/${Date.now()}_${nomFichierSur(currentVideoFile.name)}`
     const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, currentVideoFile, { cacheControl: CACHE_LONG })
     if (uploadError) {
       errorEl.textContent = tLang('Erreur d\'upload vidéo : {message}', { message: uploadError.message })
@@ -29826,13 +30485,31 @@ async function publishProcedure(errorElId, btnId) {
   }
 
   /* Les anciennes étapes sont remplacées : c'est plus sûr que de rapprocher
-     ligne à ligne, et l'ordre reste celui de l'écran. */
+     ligne à ligne, et l'ordre reste celui de l'écran.
+
+   ⚠ ON EFFACE APRÈS AVOIR ÉCRIT, PLUS AVANT (audit du 24 octobre 2026). Les
+     étapes étaient supprimées d'abord, puis venaient l'envoi des photos et
+     l'écriture des nouvelles. Une coupure entre les deux laissait une
+     procédure PUBLIÉE sans aucune étape pour toute l'équipe. On note donc les
+     anciennes ici, on écrit les nouvelles, et on ne retire les anciennes
+     qu'une fois les nouvelles en place. */
+  let anciennesEtapes = []
   if (enCours && !procError) {
-    await supabase.from('etapes').delete().eq('procedure_id', enCours)
+    const { data: anciennes, error: eLire } = await supabase.from('etapes')
+      .select('id').eq('procedure_id', enCours)
+    if (eLire) {
+      errorEl.textContent = tLang('Erreur : {message}', { message: eLire.message })
+      setButtonLoading(publishBtn, false)
+      return
+    }
+    anciennesEtapes = (anciennes || []).map(r => r.id)
   }
 
   if (procError) {
-    errorEl.textContent = tLang('Erreur : {message}', { message: procError.message })
+    /* PGRST116 : aucune ligne — un autre gérant l'a supprimée entre-temps. */
+    errorEl.textContent = (enCours && procError.code === 'PGRST116')
+      ? tLang('Cette procédure a été supprimée entre-temps.')
+      : tLang('Erreur : {message}', { message: procError.message })
     setButtonLoading(publishBtn, false)
     return
   }
@@ -29840,12 +30517,21 @@ async function publishProcedure(errorElId, btnId) {
   /* Les photos partent maintenant, une fois la procédure créée : on a besoin de
      son identifiant pour ranger les fichiers proprement. Une photo qui échoue
      n'empêche pas la publication — l'étape sera simplement sans image. */
+  let photosRatees = 0
   for (const s of allSteps) {
     if (!s.imageFichier) continue
     const ext = (s.imageFichier.name.split('.').pop() || 'jpg').toLowerCase()
     const chemin = `${currentMembre.entreprise_id}/${newProc.id}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`
     const { error: envoiErr } = await supabase.storage.from('procedo-videos').upload(chemin, s.imageFichier, { cacheControl: CACHE_LONG })
-    if (envoiErr) { console.warn('Photo non envoyée :', envoiErr.message); continue }
+    /* ⚠ UNE PHOTO QUI NE PART PAS SE SIGNALE (audit du 24 octobre 2026) : on
+       lisait « Publiée » alors que l'étape n'avait plus de photo — et en
+       remplacement, l'ancienne était perdue aussi. */
+    if (envoiErr) {
+      console.warn('Photo non envoyée :', envoiErr.message)
+      s.image_url = s.imageAvant || null
+      photosRatees++
+      continue
+    }
     s.image_url = chemin
   }
 
@@ -29853,10 +30539,14 @@ async function publishProcedure(errorElId, btnId) {
      identifiant pour ranger le fichier. Si la colonne n'existe pas encore, la
      mise à jour échoue en silence et la procédure reste publiée. */
   const urlCouv = await envoyerCouverture(newProc.id)
-  if (urlCouv) {
+  /* ⚠ RETIRER LA PHOTO S'ENREGISTRE AUSSI (audit du 24 octobre 2026).
+     `envoyerCouverture` rend `null` quand on l'a retirée, et ce `null` était
+     ignoré : « Modifications enregistrées », mais la photo restait partout. */
+  if ((urlCouv || null) !== (newProc.image_url || null)) {
     const { error: eCouv } = await supabase.from('procedures')
-      .update({ image_url: urlCouv }).eq('id', newProc.id)
+      .update({ image_url: urlCouv || null }).eq('id', newProc.id)
     if (eCouv) console.warn('Standix \u00b7 image non enregistr\u00e9e :', eCouv.message)
+    else newProc.image_url = urlCouv || null
   }
 
   const etapesToInsert = allSteps.map((s, i) => ({
@@ -29874,11 +30564,34 @@ async function publishProcedure(errorElId, btnId) {
     timestamp_video: s.timestamp_video ?? null, fin_video: s.fin_video ?? null,
     image_url: s.image_url ?? null,
   }))
-  const { error: etapesError } = await insertEtapes(etapesToInsert)
+  /* `insererEtapes` et non `insertEtapes` : la pré-traduction ne doit partir
+     qu'une fois les anciennes étapes retirées, sinon elle les traduirait
+     avec les nouvelles. */
+  const { error: etapesError } = await insererEtapes(etapesToInsert)
+
+  if (!etapesError && anciennesEtapes.length) {
+    const { error: eRetrait } = await supabase.from('etapes').delete().in('id', anciennesEtapes)
+    if (eRetrait) console.warn('Standix · anciennes étapes non retirées :', eRetrait.message)
+  }
 
   setButtonLoading(publishBtn, false)
 
-  if (etapesError) { errorEl.textContent = tLang('Erreur étapes : {message}', { message: etapesError.message }); return }
+  if (etapesError) {
+    /* La procédure existe déjà : un nouvel essai doit la COMPLÉTER, pas en
+       créer une deuxième. */
+    if (!enCours && newProc?.id) {
+      if (btnId === 'publish-btn-manual') manEdition = newProc.id
+      else dvEdition = newProc.id
+    }
+    errorEl.textContent = tLang('Erreur étapes : {message}', { message: etapesError.message })
+    return
+  }
+  pretraduireProcedure(newProc.id, true)
+  if (photosRatees) {
+    setTimeout(() => toast(photosRatees > 1
+      ? tLang('{n} photos n’ont pas pu être envoyées : ajoutez-les depuis « Modifier ».', { n: photosRatees })
+      : tLang('Une photo n’a pas pu être envoyée : ajoutez-la depuis « Modifier ».')), 1800)
+  }
 
   /* Après une modification, on revient sur la fiche : c'est de là qu'on venait,
      et c'est là qu'on veut vérifier le résultat. */
@@ -29905,7 +30618,7 @@ async function publishProcedure(errorElId, btnId) {
     const enMemoire = (allGestionProcedures || []).find(p => p.id === modifiait)
     if (enMemoire && newProc) {
       Object.assign(enMemoire, newProc)
-      if (urlCouv) enMemoire.image_url = urlCouv
+      enMemoire.image_url = newProc.image_url || null
       enMemoire.etapes = [{ count: etapesToInsert.length }]
     }
   }
@@ -29956,6 +30669,21 @@ async function openAnalyse(procId) {
      précédente avant la moindre attente, et on demande son adresse signée
      tout de suite. */
   const procConnue = (allGestionProcedures || []).find(p => p.id === procId)
+
+  /* ⚠ RIEN DE LA FICHE PRÉCÉDENTE NE RESTE BRANCHÉ (audit du 24 octobre
+     2026). Pendant le chargement, « Modifier », « Supprimer » et
+     « Télécharger le QR » visaient encore la procédure d'avant, et son titre,
+     ses étapes et son QR restaient affichés. */
+  for (const id of ['analyse-edit-btn', 'analyse-delete-btn', 'qr-download-btn']) {
+    const b = document.getElementById(id)
+    if (b) b.onclick = null
+  }
+  const titrePrec = document.getElementById('analyse-titre')
+  if (titrePrec) titrePrec.textContent = procConnue?.titre || '…'
+  const listePrec = document.getElementById('analyse-steps-list')
+  if (listePrec) listePrec.innerHTML = ''
+  const qrPrec = document.getElementById('qr-container')
+  if (qrPrec) qrPrec.innerHTML = ''
   /* La gestion ouvre la procédure (souvent juste après l'analyse IA) : on
      demande déjà sa traduction dans les langues de l'équipe. Une fois par
      session ; jamais pendant que l'IA écrit encore les étapes. */
@@ -30043,8 +30771,17 @@ async function openAnalyse(procId) {
   if (!proc) {
     document.getElementById('analyse-titre').textContent = '...'
     document.getElementById('analyse-subhead').textContent = tLang('Chargement...')
-    const res = await supabase.from('procedures').select('*').eq('id', procId).single()
+    const res = await supabase.from('procedures').select('*').eq('id', procId).maybeSingle()
+    if (perime()) return
     proc = res.data
+    /* ⚠ PROCÉDURE SUPPRIMÉE, OU RÉSEAU COUPÉ (audit du 24 octobre 2026) : la
+       suite lisait `proc.titre` sur rien, et la fiche restait figée sur
+       « Chargement… ». On le dit. */
+    if (!proc) {
+      document.getElementById('analyse-titre').textContent = tLang('Procédure introuvable.')
+      document.getElementById('analyse-subhead').textContent = ''
+      return
+    }
     /* La procédure vient d'arriver : on repeint avec sa vraie valeur. */
     peindrePublication(proc)
   }
@@ -30091,9 +30828,44 @@ async function openAnalyse(procId) {
     })
     if (!confirmed) return
     const deleteBtn = document.getElementById('analyse-delete-btn')
+
+    /* ⚠ PAS PENDANT QU'UN AUTRE GÉRANT LA MODIFIE (audit du 24 octobre 2026).
+       Son enregistrement échouait ensuite avec un message incompréhensible,
+       et son travail était perdu. Même règle que le verrou d'édition :
+       quinze minutes sans signe de vie, le verrou ne compte plus. */
+    try {
+      const { data: v } = await supabase.from('procedures')
+        .select('edite_par, edite_depuis').eq('id', procId).maybeSingle()
+      const { data: { user: moi } } = await supabase.auth.getUser()
+      const recent = v?.edite_depuis && (Date.now() - new Date(v.edite_depuis).getTime()) < 15 * 60000
+      if (v?.edite_par && moi && v.edite_par !== moi.id && recent) {
+        await confirmDialog({
+          titre: tLang('Procédure en cours de modification'),
+          message: tLang('Un autre gestionnaire la modifie en ce moment. Réessayez quand il aura terminé.'),
+          confirmer: tLang('Compris'), annuler: tLang('Fermer'), danger: false,
+        })
+        return
+      }
+    } catch (e) {}
+
     setButtonLoading(deleteBtn, true)
     const { error } = await supabase.from('procedures').delete().eq('id', procId)
     setButtonLoading(deleteBtn, false)
+    /* ⚠ LES FICHIERS PARTENT AVEC ELLE (audit du 24 octobre 2026) : la vidéo,
+       son aperçu, la couverture et les photos des étapes restaient dans le
+       stockage pour toujours. */
+    if (!error) {
+      const ent = proc.entreprise_id || currentMembre?.entreprise_id
+      const ch = cheminFichier(proc.video_url)
+      const aRetirer = [ch, ch && `${ch}.jpg`, cheminFichier(proc.apercu_url), cheminFichier(proc.image_url)].filter(Boolean)
+      ;(async () => {
+        try {
+          const dossier = ent ? await listerFichiers('procedo-videos', `${ent}/${procId}`) : []
+          const tout = [...new Set([...aRetirer, ...dossier])]
+          if (tout.length) await supabase.storage.from('procedo-videos').remove(tout)
+        } catch (e) { console.warn('[suppression] fichiers non retirés :', e?.message || e) }
+      })()
+    }
     if (error) {
       await confirmDialog({
         titre: tLang('Suppression impossible'),
@@ -30818,7 +31590,9 @@ const ANALYSE_LIMITE_MIN = 20
 
 function analyseBloquee(proc) {
   if (proc?.statut !== 'traitement' && proc?.statut !== 'redaction') return false
-  const depart = new Date(proc.created_at || 0).getTime()
+  /* Depuis le LANCEMENT de l'analyse, s'il est connu : une relance partait
+     sinon de la création de la procédure, et paraissait bloquée d'emblée. */
+  const depart = new Date(proc.analyse_lancee_le || proc.created_at || 0).getTime()
   if (!depart) return false
   return (Date.now() - depart) / 60000 > ANALYSE_LIMITE_MIN
 }
@@ -30941,9 +31715,14 @@ async function abandonnerAnalyse(proc, dejaConfirme) {
 
   try {
     // La vidéo d'abord : une fois la procédure effacée, on n'aurait plus son adresse.
-    if (proc.video_url) {
-      const chemin = proc.video_url.split('/procedo-videos/')[1]
-      if (chemin) await supabase.storage.from('procedo-videos').remove([decodeURIComponent(chemin)])
+    /* ⚠ `video_url` EST UN CHEMIN, PLUS UNE ADRESSE (audit du 24 octobre
+       2026). Le découpage sur « /procedo-videos/ » rendait toujours
+       `undefined` : la vidéo et son image d'aperçu restaient dans le
+       stockage, alors que la fenêtre promettait de les supprimer.
+       `cheminFichier` comprend les deux formes. */
+    const cheminVideo = cheminFichier(proc.video_url)
+    if (cheminVideo) {
+      await supabase.storage.from('procedo-videos').remove([cheminVideo, `${cheminVideo}.jpg`])
     }
     await supabase.from('etapes').delete().eq('procedure_id', proc.id)
 
@@ -31049,17 +31828,35 @@ async function proposerReprise(proc) {
   if (!ok) { await abandonnerAnalyse(proc) && loadGestionProcedures(); return }
 
   try {
+    /* ⚠ LA VIDÉO EST DANS UN DÉPÔT PRIVÉ (audit du 24 octobre 2026). On
+       envoyait le chemin nu : Azure ne pouvait pas l'ouvrir (« isn't valid
+       URL »), et la relance échouait toujours avec un message faux. On signe
+       l'adresse, comme au premier lancement. */
+    const chemin = cheminFichier(proc.video_url)
+    const { data: sig } = chemin
+      ? await supabase.storage.from('procedo-videos').createSignedUrl(chemin, 6 * 3600)
+      : { data: null }
+    if (!sig?.signedUrl) throw new Error('valid URL')
+
     await supabase.from('etapes').delete().eq('procedure_id', proc.id)
     await supabase.from('procedures')
       .update({ statut: 'traitement', erreur_ia: null, azure_video_id: null }).eq('id', proc.id)
 
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
       method: 'POST',
+      signal: AbortSignal.timeout(40000),
       headers: await enTeteFonction(),
-      body: JSON.stringify({ procedure_id: proc.id, video_url: proc.video_url }),
+      body: JSON.stringify({
+        procedure_id: proc.id, video_url: sig.signedUrl, avec_image: true,
+        langue: langueParlee(), entreprise_id: currentMembre?.entreprise_id || null,
+      }),
     })
     const data = await rep.json()
-    if (!rep.ok || data.error) throw new Error(data.error || tLang("Le démarrage a échoué"))
+    if (!rep.ok || data.error) {
+      // La procédure ne doit pas rester « en traitement » pour rien.
+      await supabase.from('procedures').update({ statut: 'echec', erreur_ia: String(data.error || '').slice(0, 400) || null }).eq('id', proc.id)
+      throw new Error(data.error || tLang("Le démarrage a échoué"))
+    }
 
     toast(tLang('Analyse relancée.'))
     await loadGestionProcedures()
@@ -31131,15 +31928,22 @@ async function renderBlocVisiteur() {
   const grille = document.getElementById('e-bloc-categories')
   if (!bloc) return
 
+  /* ⚠ LA GRILLE RESTE AFFICHÉE POUR LE VISITEUR (audit du 24 octobre 2026).
+     Elle était masquée — or c'est le seul endroit où sa procédure est listée :
+     après « Retour », il ne voyait plus que le cadenas et devait rescanner
+     l'affiche. On ne retire que la recherche et le tri, inutiles pour une
+     seule procédure. */
+  const outils = grille ? [grille.querySelector('.proc-rech-rang'), document.getElementById('e-proc-segm')] : []
   if (!estVisiteur()) {
     bloc.style.display = 'none'
     if (grille) grille.style.display = ''
+    outils.forEach(el => { if (el) el.style.display = '' })
     return
   }
 
   bloc.style.display = 'block'
-  // La grille des dossiers n'a pas de sens avec une seule procédure.
-  if (grille) grille.style.display = 'none'
+  if (grille) grille.style.display = ''
+  outils.forEach(el => { if (el) el.style.display = 'none' })
 
   const { count } = await supabase
     .from('procedures').select('id', { count: 'exact', head: true })
@@ -31157,7 +31961,8 @@ async function renderBlocVisiteur() {
 document.getElementById('e-visiteur-valider')?.addEventListener('click', async () => {
   const btn = document.getElementById('e-visiteur-valider')
   const err = document.getElementById('e-visiteur-erreur')
-  const code = document.getElementById('e-visiteur-champ').value.trim()
+  // Espaces retirés, majuscules : le code s'affiche espacé chez le gérant.
+  const code = document.getElementById('e-visiteur-champ').value.replace(/\s/g, '').toUpperCase()
   err.style.color = 'var(--red)'
   err.textContent = ''
   /* ⚠ LE MOTIF REFUSAIT LES LETTRES. Le nouveau code en contient : la
@@ -31174,10 +31979,29 @@ document.getElementById('e-visiteur-valider')?.addEventListener('click', async (
     return
   }
 
-  const { error } = await supabase.from('membres')
-    .update({ role: 'equipe', procedure_visitee: null }).eq('id', currentMembre.id)
+  /* ⚠ C'EST LA BASE QUI VÉRIFIE LE CODE (audit du 24 octobre 2026). L'app
+     changeait elle-même son rôle après avoir comparé le code ici, dans le
+     navigateur : n'importe qui pouvait sauter cette comparaison. La base
+     refuse désormais qu'on change son propre rôle ; `passer_visiteur_en_equipe`
+     contrôle le code puis fait le changement.
+
+     Repli sur l'ancienne écriture tant que la fonction n'existe pas en base
+     (code PGRST202) — pour ne rien casser pendant la mise à jour. */
+  let { data: rep, error } = await supabase.rpc('passer_visiteur_en_equipe', { p_code: code })
+  if (error && (error.code === 'PGRST202' || /passer_visiteur_en_equipe/.test(error.message || ''))) {
+    const ancien = await supabase.from('membres')
+      .update({ role: 'equipe', procedure_visitee: null }).eq('id', currentMembre.id)
+    error = ancien.error
+    rep = { ok: !ancien.error }
+  }
   setButtonLoading(btn, false)
   if (error) { err.textContent = tLang('Erreur : {message}', { message: error.message }); return }
+  if (!rep?.ok) {
+    err.textContent = rep?.raison === 'complet'
+      ? tLang('Cette entreprise est complète')
+      : tLang('Ce code ne correspond pas à cette entreprise.')
+    return
+  }
 
   currentMembre.role = 'equipe'
   currentMembre.procedure_visitee = null
@@ -31275,7 +32099,17 @@ async function loadEquipeProcedures() {
     mesValidations = rVal.data
     favsPrelus = rFav || { data: null }
   }
-  if (error) { listeEnPanne = true; console.error(error); return }
+  if (error) {
+    listeEnPanne = true; console.error(error)
+    /* L'espace équipe restait muet sur une page « Aucun dossier » ; la
+       gestion, elle, prévient (audit du 24 octobre 2026). */
+    if (!chargementDiscret) {
+      toast(tLang('Liste non actualisée : {message}', { message: error.message }))
+      // Rien à l'écran : on réessaie tout seul, en silence.
+      if (!(allEquipeProcedures || []).length) setTimeout(() => rafraichirAuRetour(0), 3000)
+    }
+    return
+  }
 
   // Une procédure encore en analyse n'a aucune étape : inutile de la proposer.
   const pretes = (procedures || []).filter(p => p.statut !== 'traitement')
@@ -31291,11 +32125,11 @@ async function loadEquipeProcedures() {
        procédures ; sinon, la requête habituelle. */
     const pre = etapesPretes && await etapesPretes.catch(() => null)
     if (pre && pre.ids === procIds.join(',') && !pre.r?.error) toutesEtapes = pre.r.data
-    else ({ data: toutesEtapes } = await supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'))
+    else ({ data: toutesEtapes } = await lireParLots('etapes', 'procedure_id', procIds, 'ordre'))
   } else {
     const [rV, rE] = await Promise.all([
       supabase.from('validations').select('procedure_id, validated_at, duree_lecture').eq('membre_id', currentMembre.id),
-      supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'),
+      lireParLots('etapes', 'procedure_id', procIds, 'ordre'),
     ])
     mesValidations = rV.data; toutesEtapes = rE.data
   }
@@ -31980,8 +32814,20 @@ function animerFavori(bouton, allume) {
   setTimeout(partir, 1000)
 }
 
+/* ⚠ UN ENREGISTREMENT À LA FOIS PAR PROCÉDURE (audit du 24 octobre 2026).
+   Un double appui envoyait un ajout et un retrait qui pouvaient arriver dans
+   le désordre : l'étoile s'éteignait, le favori restait en base, et il
+   réapparaissait au rechargement. */
+const favorisEnVol = new Set()
+
 async function basculerFavori(procId, bouton) {
   if (!currentMembre?.id) return
+  if (favorisEnVol.has(procId)) return
+  favorisEnVol.add(procId)
+  try { await basculerFavoriUneFois(procId, bouton) } finally { favorisEnVol.delete(procId) }
+}
+
+async function basculerFavoriUneFois(procId, bouton) {
   const etait = favorisEquipe.has(procId)
 
   if (etait) favorisEquipe.delete(procId)
@@ -32334,7 +33180,13 @@ async function lireQuota() {
 
        Elle porte quand meme le quota et le reste : les afficher vaut mieux que
        de montrer un tiret, qui laisse croire a un incident. */
-    quotaConnu = { quota: Number(data.quota) || 0, reste: Number(data.reste) || 0 }
+    /* ⚠ `partage` : `verifier_analyse` ne le renvoie pas, et la mention
+       « commun à vos établissements » ne s'affichait jamais (audit du
+       24 octobre 2026). Même règle que la base : plus d'un établissement
+       fondé par la même personne. */
+    const partage = data.partage != null ? !!data.partage
+      : (mesEtablissements || []).filter(e => e.role === 'gestion' && !e.promu_par).length > 1
+    quotaConnu = { quota: Number(data.quota) || 0, reste: Number(data.reste) || 0, partage }
     return quotaConnu
   } catch (e) {
     console.warn('[quota] lecture impossible :', e?.message || e)
@@ -32491,7 +33343,10 @@ window.ouvrirAbonnementDepuisQuota = function() {
 /* Le bandeau du bas dit où l'on en est, et félicite à la dernière case. */
 function majBandeauCoches() {
   const etat = document.getElementById('lecture-etat')
-  if (!etat || !etapesTotal) return
+  if (!etat) return
+  /* Une procédure sans étape n'a pas de bandeau : on cache celui de la fiche
+     d'avant, qui restait affiché (« 8/8 · Procédure terminée »). */
+  if (!etapesTotal) { etat.closest('.confirm-bar')?.classList.remove('visible'); return }
   const n = etapesFaites.size
   const fini = n === etapesTotal
   /* Visible dès l'ouverture, même à 0 sur 8 : c'est ce qui dit à quoi servent les
@@ -32662,6 +33517,37 @@ async function chargerJsPDF() {
   return jsPDFModule
 }
 
+/* ═══ LE PDF NE CONNAÎT QUE L'ALPHABET « OCCIDENTAL » ═══
+
+   Helvetica, dans jsPDF, n'écrit que les caractères de Windows-1252 (accents
+   français et allemands compris). UN SEUL caractère hors de cette liste — un
+   emoji, une flèche « → », un « ≥ », une lettre polonaise — et jsPDF code TOUTE
+   la ligne autrement : elle sort en signes illisibles (« þÿ… »). On remplace
+   donc ces caractères par leur plus proche équivalent, ou on les retire.
+   (audit du 24 octobre 2026) */
+const PDF_CP1252 = '\u20ac\u201a\u0192\u201e\u2026\u2020\u2021\u02c6\u2030\u0160\u2039\u0152\u017d\u2018\u2019\u201c\u201d\u2022\u2013\u2014\u02dc\u2122\u0161\u203a\u0153\u017e\u0178'
+const PDF_EQUIVALENTS = {
+  '\u2192': '->', '\u2190': '<-', '\u21d2': '=>', '\u2194': '<->', '\u2265': '>=', '\u2264': '<=',
+  '\u2260': '!=', '\u2248': '~', '\u2212': '-', '\u2010': '-', '\u2011': '-', '\u2012': '-', '\u2015': '-',
+  '\u2032': "'", '\u2033': '"', '\u2713': 'v', '\u2714': 'v', '\u2705': 'v', '\u2717': 'x', '\u2718': 'x',
+  '\u274c': 'x', '\u25cf': '\u2022', '\u25aa': '\u2022', '\u25e6': '\u2022', '\u2043': '-',
+  '\u0142': 'l', '\u0141': 'L', '\u0111': 'd', '\u0110': 'D', '\u0131': 'i', '\u0127': 'h',
+  '\u2009': ' ', '\u202f': ' ', '\u2007': ' ', '\u2008': ' ', '\u200a': ' ', '\u2002': ' ', '\u2003': ' ',
+  '\u200b': '', '\u200c': '', '\u200d': '', '\ufe0f': '', '\ufeff': '',
+}
+function pdfSur(t) {
+  if (t == null) return ''
+  const s = String(t)
+  const ok = (c) => c.charCodeAt(0) <= 0xff || PDF_CP1252.includes(c)
+  if ([...s].every(ok)) return s
+  return [...s].map(c => {
+    if (ok(c)) return c
+    if (c in PDF_EQUIVALENTS) return PDF_EQUIVALENTS[c]
+    const sansAccent = c.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    return [...sansAccent].every(ok) ? sansAccent : ''
+  }).join('').replace(/ {2,}/g, ' ')
+}
+
 /* « 0:34 », « 1:07 ». Les bornes des étapes, dans le format de la pastille. */
 function bornePdf(s) {
   if (s == null || !isFinite(s)) return ''
@@ -32694,6 +33580,10 @@ async function exporterProcedurePdf(proc, etapes) {
   /* A4 en millimètres : c'est l'unité des imprimeurs, et elle évite de
      convertir des points à chaque ligne. */
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
+  /* Tout texte écrit passe par `pdfSur` (voir plus haut). */
+  const ecrire = doc.text.bind(doc), couper = doc.splitTextToSize.bind(doc)
+  doc.text = (t, ...r) => ecrire(Array.isArray(t) ? t.map(pdfSur) : pdfSur(t), ...r)
+  doc.splitTextToSize = (t, ...r) => couper(pdfSur(t), ...r)
   const L = 210, MARGE = 18, LARGEUR = L - MARGE * 2
   let y = MARGE
 
@@ -33109,24 +33999,44 @@ async function openEquipeDetail(procId) {
   let proc = allEquipeProcedures.find(p => p.id === procId)
   let etapes = equipeEtapesByProc[procId]
 
+  let panneReseau = false
   if (!proc || !etapes || etapes.length === 0) {
-    const [{ data: p }, { data: e }] = await Promise.all([
+    const [{ data: p, error: eP }, { data: e, error: eE }] = await Promise.all([
       proc ? Promise.resolve({ data: proc })
            : supabase.from('procedures').select('*').eq('id', procId).maybeSingle(),
       supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre'),
     ])
+    /* ⚠ UNE PANNE N'EST PAS UNE FICHE VIDE (audit du 24 octobre 2026) : sans
+       réseau, on affichait « Procédure introuvable » ou « Aucune étape ». */
+    panneReseau = !!(eP || eE)
     proc = p || proc
     etapes = e || []
-    equipeEtapesByProc[procId] = etapes
+    if (!eE) equipeEtapesByProc[procId] = etapes
   }
 
   // Une autre procédure a-t-elle été ouverte pendant qu'on attendait la base ?
   // Si oui, ce rendu est périmé : l'écrire écraserait le bon.
   if (perime()) return
 
+  if (panneReseau) {
+    document.getElementById('detail-titre').textContent = proc?.titre || tLang('Réseau indisponible')
+    document.getElementById('detail-steps').innerHTML =
+      `<div class="error-msg">${tLang('Réseau indisponible : revenez en arrière et rouvrez la procédure.')}</div>`
+    equipeProcCourante = null
+    const fav = document.getElementById('detail-fav')
+    if (fav) fav.hidden = true
+    arreterLecture()
+    document.getElementById('lecture-etat')?.closest('.confirm-bar')?.classList.remove('visible')
+    return
+  }
+
   if (!proc) {
     document.getElementById('detail-titre').textContent = tLang('Procédure introuvable')
     document.getElementById('detail-steps').innerHTML = ''
+    /* Le PDF et l'étoile visaient encore la procédure d'avant. */
+    equipeProcCourante = null
+    const fav = document.getElementById('detail-fav')
+    if (fav) fav.hidden = true
     // Sans ça, le bandeau de la procédure précédente restait affiché ici.
     arreterLecture()
     document.getElementById('lecture-etat')?.closest('.confirm-bar')?.classList.remove('visible')
@@ -33141,6 +34051,10 @@ async function openEquipeDetail(procId) {
   if (equipeLues?.has(procId)) {
     const { data: v } = await supabase.from('validations')
       .select('validated_at').eq('procedure_id', procId).eq('membre_id', currentMembre.id).maybeSingle()
+    /* Une autre fiche a été ouverte pendant l'attente : celle-ci ne doit plus
+       rien écrire à l'écran (audit du 24 octobre 2026) — elle remplaçait le
+       titre, les étapes et le minuteur de lecture de la nouvelle. */
+    if (perime()) return
     const quand = v?.validated_at ? new Date(v.validated_at).getTime() : 0
     const fraiche = quand > 0 && (Date.now() - quand) < DELAI_RELECTURE
     dejaConsultee = fraiche ? v.validated_at : false
@@ -34364,7 +35278,14 @@ window.renderAbonnements = function() {
      quand on veut resilier. On vide la zone plutot que de retirer la balise :
      elle sert de repere si vous voulez y remettre autre chose. */
   const gerer = document.getElementById('abo-gerer')
-  if (gerer) gerer.innerHTML = ''
+  /* ⚠ SAUF POUR UNE ANCIENNE OFFRE (audit du 24 octobre 2026). Un abonné à
+     une offre retirée de la grille (« Réseau ») n'a aucune carte « en
+     cours » : il n'avait donc plus aucun moyen de gérer ou de résilier, et
+     toutes les cartes lui proposaient un second achat. Le bouton revient
+     ici pour lui seul. */
+  if (gerer) gerer.innerHTML = (actuel && !OFFRES.some(o => o.cle === actuel))
+    ? `<button type="button" class="abo-cta gerer" data-abo-gerer>${tLang('Gérer ou résilier mon abonnement')}</button>`
+    : ''
 
 
   /* UN SEUL ENFANT DANS LA LISTE. Le repli se fait en passant la hauteur de
@@ -34719,6 +35640,17 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
     return
   }
 
+  /* ⚠ DÉJÀ ABONNÉ : ON CHANGE D'OFFRE DANS STRIPE, ON N'EN OUVRE PAS UNE
+     SECONDE (audit du 24 octobre 2026). Choisir une autre carte ouvrait un
+     nouveau paiement : deux abonnements prélevés chaque mois, et l'ancien
+     écrasait l'état du nouveau à chaque renouvellement. Le portail de
+     Stripe sait changer d'offre proprement. */
+  if (/^sub_/.test(cachedEntreprise?.stripe_abonnement_id || '') &&
+      ['actif', 'impaye'].includes(cachedEntreprise?.abonnement_statut)) {
+    await ouvrirPortailStripe()
+    return
+  }
+
   /* ═══ LE PAIEMENT ═══
      On demande une adresse au serveur, puis on y va. Le montant n'est JAMAIS
      envoyé d'ici : il est écrit dans la fonction Edge. Sinon n'importe qui
@@ -34760,6 +35692,7 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
     })
     const data = await rep.json()
     if (!rep.ok || !data.url) throw new Error(data.error || tLang("Le paiement n'a pas pu s'ouvrir."))
+    paiementEnCours = { b, libelle }
     window.location.href = data.url
   } catch (err) {
     b.disabled = false
@@ -34774,6 +35707,17 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
   }
 })
 
+/* ⚠ RETOUR PAR « PRÉCÉDENT » DEPUIS STRIPE (audit du 24 octobre 2026) :
+   Safari ressort la page telle qu'il l'avait laissée, bouton éteint sur
+   « Ouverture du paiement… ». On le rallume. */
+let paiementEnCours = null
+window.addEventListener('pageshow', (e) => {
+  if (!e.persisted || !paiementEnCours) return
+  paiementEnCours.b.disabled = false
+  paiementEnCours.b.textContent = paiementEnCours.libelle
+  paiementEnCours = null
+})
+
 /* Au retour de Stripe. L'adresse dit « paiement=ok », mais on N'ACTIVE RIEN
    ici : n'importe qui peut taper cette adresse. On relit simplement l'état
    depuis la base, où le webhook l'aura posé. */
@@ -34784,8 +35728,23 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
   if (p === 'annule') return
   /* Le webhook arrive en une seconde ou deux : on laisse le temps, puis on
      relit. Si rien n'a changé, l'écran d'essai reste — ce qui est honnête. */
-  await new Promise(r => setTimeout(r, 2500))
-  await lireEtatAbonnement()
+  /* ⚠ ON ATTEND LE WEBHOOK JUSQU'À TRENTE SECONDES (audit du 24 octobre
+     2026). Une seule relecture à 2,5 s : un webhook un peu lent laissait
+     l'accès « essai terminé » et la page des offres reproposait l'achat —
+     de quoi payer deux fois. On relit aussi la fiche de l'entreprise, qui
+     porte l'offre payée. */
+  for (let i = 0; i < 10; i++) {
+    await new Promise(r => setTimeout(r, i ? 3000 : 2500))
+    if (!currentMembre?.entreprise_id) continue
+    await lireEtatAbonnement()
+    if (etatAbo?.statut === 'actif') break
+  }
+  try {
+    if (currentMembre?.entreprise_id) {
+      const { data: e } = await lireEntreprise(currentMembre.entreprise_id)
+      if (e) cachedEntreprise = e
+    }
+  } catch (e) {}
   dessinerAlerteEssai('essai-reglages')
   appliquerBlocageEssai()
   if (etatAbo?.statut === 'actif') toast(tLang('Votre abonnement est actif. Merci !'))
@@ -35853,23 +36812,46 @@ document.getElementById('etab-supprimer')?.addEventListener('click', async () =>
   btn.textContent = tLang('Suppression…')
 
   try {
-    /* On efface dans l'ordre des dépendances : les étapes tiennent aux
-       procédures, les procédures à l'entreprise. Si la base est configurée en
-       cascade, ces trois appels sont redondants — mais inoffensifs, et ils
-       garantissent le résultat quand elle ne l'est pas. */
-    const { data: procs } = await supabase.from('procedures')
-      .select('id').eq('entreprise_id', etabEdite.id)
-    for (const pr of (procs || [])) {
-      await supabase.from('etapes').delete().eq('procedure_id', pr.id)
-    }
-    await supabase.from('procedures').delete().eq('entreprise_id', etabEdite.id)
-    await supabase.from('membres').delete().eq('entreprise_id', etabEdite.id)
+    /* ═══ LA MÊME SUPPRESSION QUE « SUPPRIMER L'ENTREPRISE » ═══
 
-    const { data, error } = await supabase.from('entreprises')
-      .delete().eq('id', etabEdite.id).select('id')
-    if (error) throw new Error(error.message)
-    if (!data || !data.length) {
-      throw new Error(tLang('La base a refusé la suppression. Exécutez migration-etablissements.sql : il manque la règle d\'accès « delete » sur la table entreprises.'))
+       ⚠ L'APP EFFAÇAIT ELLE-MÊME, TABLE PAR TABLE (audit du 24 octobre 2026).
+       Elle retirait aussi SA PROPRE fiche de membre avant l'entreprise : la
+       base ne la reconnaissait alors plus comme fondatrice et refusait la
+       dernière étape. L'établissement restait, vidé de ses procédures et de
+       son équipe. Les vidéos restaient dans le stockage, et un abonnement en
+       cours continuait d'être prélevé.
+
+       `supprimer_entreprise` fait tout d'un trait, côté base, et refuse tant
+       qu'un abonnement court. Le stockage est vidé juste avant, comme pour
+       l'entreprise principale. */
+    const idEtab = etabEdite.id
+    const { data: infos } = await lireEntreprise(idEtab)
+    if (/^sub_/.test(infos?.stripe_abonnement_id || '') &&
+        ['actif', 'impaye'].includes(infos?.abonnement_statut)) {
+      throw new Error(tLang('Résiliez d’abord l’abonnement de cet établissement (Réglages › Abonnement › Gérer), puis supprimez-le.'))
+    }
+
+    try {
+      const fichiers = await listerFichiers('procedo-videos', idEtab)
+      for (let i = 0; i < fichiers.length; i += 500) {
+        await supabase.storage.from('procedo-videos').remove(fichiers.slice(i, i + 500))
+      }
+      const { data: logos } = await supabase.storage.from('procedo-logos').list(idEtab, { limit: 100 })
+      if (logos?.length) {
+        await supabase.storage.from('procedo-logos').remove(logos.map(f => `${idEtab}/${f.name}`))
+      }
+    } catch (exS) {
+      console.warn('Standix · ménage du stockage (établissement) :', exS)
+    }
+
+    const { data: rep, error } = await supabase.rpc('supprimer_entreprise', { p_entreprise_id: idEtab })
+    if (error) throw new Error(tLang('Suppression impossible : {message}', { message: error.message }))
+    if (!rep?.ok) {
+      const r = rep?.raison
+      throw new Error(
+        r === 'role' ? tLang('Seul le fondateur peut supprimer un établissement.')
+          : r === 'abonnement_actif' ? tLang('Résiliez d’abord l’abonnement de cet établissement (Réglages › Abonnement › Gérer), puis supprimez-le.')
+          : r ? tLang('Suppression refusée : {r}', { r }) : tLang('La suppression a échoué.'))
     }
 
     const partait = etabEdite.id === currentMembre?.entreprise_id
@@ -36335,8 +37317,20 @@ async function verifierFicheToujoursLa(force) {
   try {
     const idAvant = currentMembre.id
     const { data, error } = await supabase.from('membres')
-      .select('id').eq('id', idAvant).maybeSingle()
-    if (error || data) return
+      .select('id, role').eq('id', idAvant).maybeSingle()
+    if (error) return
+    if (data) {
+      /* ⚠ LE RÔLE A CHANGÉ PENDANT QUE L'APP ÉTAIT OUVERTE (audit du
+         24 octobre 2026) : un gérant rétrogradé gardait l'espace gestion (et
+         chaque action échouait), un employé promu ne voyait jamais la
+         gestion. On rentre dans l'espace qui correspond, et l'annonce de
+         promotion passe à cette occasion. */
+      if (data.role !== currentMembre.role) {
+        const { data: fiche } = await supabase.from('membres').select('*').eq('id', idAvant).maybeSingle()
+        if (fiche && currentMembre?.id === idAvant) await enterApp(fiche)
+      }
+      return
+    }
     if (currentMembre?.id !== idAvant) return   // on a changé d'entreprise entre-temps
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -36361,6 +37355,13 @@ async function verifierFicheToujoursLa(force) {
       if (el) el.style.display = 'none'
     }
     afficherBarre(false)
+    /* Rien ne doit continuer derrière la fenêtre : vidéo, caméra du scanner,
+       compteur de lecture, présence, écoute en direct. */
+    try { arreterLecture() } catch (e) {}
+    try { stopScanner() } catch (e) {}
+    try { arreterSuiviPresence() } catch (e) {}
+    try { couperEcouteProcedures() } catch (e) {}
+    document.querySelectorAll('video').forEach(v => { try { v.pause() } catch (e) {} })
     nomDuMembreRetire = currentMembre?.nom || ''
     currentMembre = null
     montrerOrphelin()
@@ -36745,7 +37746,8 @@ document.getElementById(id)?.addEventListener('click', async () => {
   /* ⚠ ON DECONNECTE AVANT DE RECHARGER. Le compte n'existe plus, mais le jeton
      de session reste dans le navigateur : sans cela, l'app tenterait de
      recharger des donnees au nom de quelqu'un qui n'est plus la. */
-  try { await supabase.auth.signOut() } catch {}
+  window.__sortieVoulue = true
+  try { await supabase.auth.signOut({ scope: 'local' }) } catch {}
   setTimeout(() => location.reload(), 900)
 }))
 
@@ -36781,6 +37783,19 @@ document.getElementById(id)?.addEventListener('click', async () => {
 document.getElementById('supprimer-entreprise')?.addEventListener('click', async () => {
   const nom = cachedEntreprise?.nom || tLang('cette entreprise')
 
+  /* ⚠ PAS AVEC UN ABONNEMENT EN COURS (audit du 24 octobre 2026). Stripe
+     continuait de prélever chaque mois une entreprise qui n'existait plus. La
+     base refuse aussi ; on le dit AVANT d'effacer les vidéos du stockage. */
+  if (/^sub_/.test(cachedEntreprise?.stripe_abonnement_id || '') &&
+      ['actif', 'impaye'].includes(cachedEntreprise?.abonnement_statut)) {
+    await confirmDialog({
+      titre: tLang('Abonnement en cours'),
+      message: tLang('Résiliez d’abord votre abonnement (Réglages › Abonnement › Gérer), puis supprimez l’entreprise.'),
+      confirmer: tLang('Compris'), annuler: tLang('Fermer'), danger: false,
+    })
+    return
+  }
+
   /* ⚠ DEUX CONFIRMATIONS, ET LA SECONDE DEMANDE LE NOM.
 
      Une suppression irreversible ne doit pas tenir a un doigt qui glisse.
@@ -36797,8 +37812,14 @@ document.getElementById('supprimer-entreprise')?.addEventListener('click', async
     message: tLang('Tapez « {nom} » pour confirmer.', { nom }),
     placeholder: nom,
     confirmer: tLang('Supprimer définitivement'),
+    /* ⚠ Le champ s'arrêtait à 60 caractères : une entreprise au nom plus long
+       ne pouvait plus être supprimée (audit du 24 octobre 2026). */
+    max: Math.max(60, nom.length + 10),
   })
-  if (!saisi || saisi.trim().toLowerCase() !== nom.trim().toLowerCase()) {
+  /* Espaces et apostrophes comptent pour rien : l'iPhone tape « ’ » là où
+     le nom a été écrit avec « ' ». */
+  const pareil = (t) => String(t || '').replace(/[\u2018\u2019\u02bc`]/g, "'").replace(/\s+/g, ' ').trim().toLowerCase()
+  if (!saisi || pareil(saisi) !== pareil(nom)) {
     if (saisi) toast(tLang('Le nom ne correspond pas. Rien n’a été supprimé.'))
     return
   }
@@ -36838,18 +37859,26 @@ document.getElementById('supprimer-entreprise')?.addEventListener('click', async
   try {
     /* ⚠ LES VIDEOS SONT DANS UN DOSSIER AU NOM DE L'ENTREPRISE — voir
        `${entreprise_id}/${horodatage}` a l'envoi. On liste, puis on efface. */
-    const { data: fichiers } = await supabase.storage
-      .from('procedo-videos').list(idEnt, { limit: 1000 })
-
-    if (fichiers?.length) {
-      await supabase.storage.from('procedo-videos')
-        .remove(fichiers.map(f => `${idEnt}/${f.name}`))
+    /* ⚠ ET LES SOUS-DOSSIERS (audit du 24 octobre 2026). Les photos des
+       étapes et les couvertures sont rangées dans `${id}/${procédure}/` :
+       la liste d'un seul niveau ne les voyait pas, et elles restaient dans
+       le stockage alors que la fenêtre promettait de tout effacer. */
+    const fichiers = await listerFichiers('procedo-videos', idEnt)
+    for (let i = 0; i < fichiers.length; i += 500) {
+      await supabase.storage.from('procedo-videos').remove(fichiers.slice(i, i + 500))
     }
 
     /* ⚠ LE LOGO EST A LA RACINE, pas dans un dossier : il porte l'identifiant
        comme nom de fichier. On tente les extensions employees a l'envoi. */
     await supabase.storage.from('procedo-logos')
       .remove([`${idEnt}.png`, `${idEnt}.jpg`, `${idEnt}.jpeg`, `${idEnt}.webp`])
+    /* ⚠ LES LOGOS ACTUELS SONT DANS UN DOSSIER (`${id}/logo-….webp`, voir
+       l'envoi du logo) : la ligne du dessus ne les atteignait jamais (audit
+       du 24 octobre 2026). */
+    const { data: logos } = await supabase.storage.from('procedo-logos').list(idEnt, { limit: 100 })
+    if (logos?.length) {
+      await supabase.storage.from('procedo-logos').remove(logos.map(f => `${idEnt}/${f.name}`))
+    }
   } catch (ex) {
     console.warn('Standix · menage du stockage :', ex)
   }
@@ -36868,10 +37897,18 @@ document.getElementById('supprimer-entreprise')?.addEventListener('click', async
        endroit ou on le verra, puisque personne n'ouvre la console d'un
        telephone. */
     console.error('Suppression entreprise :', error, data)
+    /* L'entreprise existe toujours : la surveillance de la fiche et la
+       fenêtre « Aucune entreprise » doivent revivre (audit du 24 octobre
+       2026) — la sentinelle restait levée pour toute la session. */
+    suppressionEnCours = false
 
     const r = data?.raison
     toast(
-      r === 'role' ? tLang('Seul le créateur de l’entreprise peut la supprimer.') : error?.message ? tLang('Suppression impossible : {message}', { message: error.message }) : r ? tLang('Suppression refusée : {r}', { r }) : tLang('La suppression a échoué.'))
+      r === 'role' ? tLang('Seul le créateur de l’entreprise peut la supprimer.')
+        /* La base refuse tant qu'un abonnement Stripe court : les
+           prélèvements continuaient après la suppression. */
+        : r === 'abonnement_actif' ? tLang('Résiliez d’abord votre abonnement (Réglages › Abonnement › Gérer), puis supprimez l’entreprise.')
+        : error?.message ? tLang('Suppression impossible : {message}', { message: error.message }) : r ? tLang('Suppression refusée : {r}', { r }) : tLang('La suppression a échoué.'))
     return
   }
 
@@ -37021,7 +38058,10 @@ function peindreEquipe() {
 
    ⚠ LE FONDATEUR EST INTOUCHABLE. Le retirer laisserait une entreprise sans
      proprietaire ; c'est lui qui la supprime, personne d'autre. */
-  const supprimable = !soi && !estFondateur(m)
+  /* ⚠ ET UN GESTIONNAIRE NE SE RETIRE QUE PAR LE FONDATEUR (audit du
+     24 octobre 2026) : c'est la règle de la base et celle du clic. Le bouton
+     s'affichait quand même, et répondait par un refus. */
+  const supprimable = !soi && !estFondateur(m) && (m.role !== 'gestion' || estFondateur(currentMembre))
     const date = m.created_at
       ? new Date(m.created_at).toLocaleDateString(localeApp(), { day: '2-digit', month: 'short', year: 'numeric' })
       : '\u2014'
@@ -37358,27 +38398,30 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
   })
   if (!ok) return
 
-  /* ═══ ON ÉCRIT AVANT D'EFFACER ═══
+  /* ═══ ON EFFACE, PUIS ON CONSIGNE ═══
 
-     La ligne de `membres` va disparaître : après, il ne reste ni le nom, ni la
-     date, ni qui a retiré. Une information qu'on n'écrit pas ne se retrouve
-     pas. On la consigne donc d'abord — si le journal n'existe pas encore en
-     base, on n'empêche pas le retrait pour autant. */
-  await supabase.from('mouvements').insert({
+     ⚠ C'ÉTAIT L'INVERSE (audit du 24 octobre 2026) : le journal disait
+     « retiré » même quand la base refusait le retrait — la personne restait,
+     le journal mentait. Le nom est gardé ici avant d'effacer, donc rien n'est
+     perdu. `.select('id')` : un retrait refusé par les règles de la base ne
+     renvoie pas d'erreur, seulement zéro ligne. */
+  const nomRetire = btn.dataset.nom || cible?.nom || null
+  const { data: retires, error } = await supabase.from('membres').delete().eq('id', btn.dataset.membre).select('id')
+  /* `alert()` ouvre la boîte du navigateur : elle porte le nom du site, ne suit
+     pas le thème sombre, et casse net l'impression d'application. Le toast dit
+     la même chose sans sortir de l'app. */
+  if (error) { toast(tLang('Retrait impossible : {message}', { message: error.message })); return }
+  if (!retires || !retires.length) { toast(tLang('Retrait refusé par la base. Rechargez la page.')); openMembres(); return }
+
+  supabase.from('mouvements').insert({
     entreprise_id: currentMembre.entreprise_id,
     genre: 'retrait',
-    nom: btn.dataset.nom || cible?.nom || null,
+    nom: nomRetire,
     poste: null,   // le poste n'est plus utilisé (demande d'Em)
     par_nom: currentMembre.nom || null,
   }).then(({ error: e }) => {
     if (e) console.warn('[mouvements] non consigné :', e.message)
   })
-
-  const { error } = await supabase.from('membres').delete().eq('id', btn.dataset.membre)
-  /* `alert()` ouvre la boîte du navigateur : elle porte le nom du site, ne suit
-     pas le thème sombre, et casse net l'impression d'application. Le toast dit
-     la même chose sans sortir de l'app. */
-  if (error) { toast(tLang('Retrait impossible : {message}', { message: error.message })); return }
   openMembres()
 })
 
@@ -37563,28 +38606,41 @@ function quitterLecture() {
 }
 
 async function ecrireTempsLecture() {
-  const total = lectureBase + lectureSecondes
+  /* ⚠ ON FIGE LA PROCÉDURE ET LES SECONDES AVANT D'ÉCRIRE (audit du
+     24 octobre 2026). Après l'attente réseau, on remettait le compteur à zéro
+     et on recopiait le total sur `lectureProcId`… qui désignait parfois déjà
+     la procédure suivante : elle héritait du temps de la précédente, et les
+     secondes comptées pendant l'écriture étaient perdues. */
+  const procId = lectureProcId
+  const secs = lectureSecondes
+  const total = lectureBase + secs
+  const faites = [...etapesFaites]
+  if (!procId) return
   try {
     /* Le défaut symétrique de l'autre écriture : sans `etapes_faites`, l'upsert
        remettait les cases cochées à NULL. Les deux écritures envoient désormais
        la ligne complète, quel que soit ce qui les a déclenchées. */
     const ligne = {
-      procedure_id: lectureProcId,
+      procedure_id: procId,
       membre_id: currentMembre.id,
       duree_lecture: total,
       validated_at: new Date().toISOString(),
     }
-    if (!colonneCochesAbsente) ligne.etapes_faites = [...etapesFaites]
-    await supabase.from('validations').upsert(ligne, { onConflict: 'procedure_id,membre_id' })
+    if (!colonneCochesAbsente) ligne.etapes_faites = faites
+    const { error } = await supabase.from('validations').upsert(ligne, { onConflict: 'procedure_id,membre_id' })
+    if (error) throw error
     /* On tient la copie locale à jour : sans ça, rouvrir la fiche dans la foulée
        repartirait de l'ancienne base et perdrait ce qu'on vient d'écrire. */
-    const l = (mesLectures || []).find(v => v.procedure_id === lectureProcId)
+    const l = (mesLectures || []).find(v => v.procedure_id === procId)
     if (l) {
       l.duree_lecture = total
-      if (!colonneCochesAbsente) l.etapes_faites = [...etapesFaites]
+      if (!colonneCochesAbsente) l.etapes_faites = faites
     }
-    lectureBase = total
-    lectureSecondes = 0
+    // Toujours la même procédure : on reporte, sans perdre ce qui a couru depuis.
+    if (lectureProcId === procId) {
+      lectureBase = total
+      lectureSecondes = Math.max(0, lectureSecondes - secs)
+    }
   } catch (e) {
     console.warn('Standix \u00b7 temps de lecture non \u00e9crit :', e?.message || e)
   }
@@ -37762,6 +38818,10 @@ for (const id of ['langue-app', 'langue-app-gestion']) {
     rendreChoixLangueApp()
     peindreReglages()
     peindreReglagesEquipe()
+    /* Les listes sont redessinées dans la nouvelle langue : la carte « Sans
+       dossier » gardait le nom de l'ancienne, et la toucher ne trouvait plus
+       rien (audit du 24 octobre 2026). */
+    try { if (currentMembre?.role === 'gestion') renderCategoryGrid(); else renderEquipeCategories() } catch (e) {}
     toast(LANGUES.find(l => l.code === langueApp)?.nom || '')
   })
 }
@@ -37975,7 +39035,15 @@ async function traduireFicheOuverte(f = ficheOuverte) {
 let scanEspace = 'equipe'
 const scanEl = (nom) => document.getElementById((scanEspace === 'gestion' ? 'g-' : '') + nom)
 
-window.startScanner = async function(espace) {
+/* ⚠ CHAQUE OUVERTURE DU LECTEUR PORTE UN NUMÉRO (audit du 24 octobre 2026).
+   Un `stopScanner` arrivé pendant la demande de caméra (double appui, ou
+   onglet quitté pendant l'ouverture) ne trouvait encore rien à arrêter : le
+   flux arrivait ensuite, restait allumé derrière « Caméra éteinte », et un QR
+   vu plus tard s'ouvrait sur un autre écran. */
+let scanTour = 0
+
+window.startScanner = async function(espace, { garderMessage = false } = {}) {
+  const tour = ++scanTour
   scanEspace = espace === 'gestion' ? 'gestion' : 'equipe'
   const hintEl = scanEl('scan-hint')
   const video = scanEl('scan-video')
@@ -37985,8 +39053,10 @@ window.startScanner = async function(espace) {
 
      `zone.innerHTML = ''` le faisait disparaitre d'un coup — y compris quand
      on touche « Reessayer », le moment ou l'on regarde justement l'ecran. */
-  await retirerEchecScanner(zone)
-  zone.innerHTML = ''
+  if (!garderMessage) {
+    await retirerEchecScanner(zone)
+    zone.innerHTML = ''
+  }
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     echecScanner(hintEl, zone, tLang("Ce navigateur ne donne pas accès à la caméra."),
@@ -38000,15 +39070,19 @@ window.startScanner = async function(espace) {
     // bibliothèque met du temps à arriver. Dans l'autre sens, un réseau lent
     // laissait l'écran bloqué sur « Chargement » sans rien montrer.
     hintEl.textContent = tLang('Ouverture de la caméra...')
-    scanStream = await navigator.mediaDevices.getUserMedia({
+    const flux = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: 'environment' } }, audio: false,
     })
+    if (tour !== scanTour) { flux.getTracks().forEach(t => t.stop()); return }
+    if (scanStream) scanStream.getTracks().forEach(t => t.stop())
+    scanStream = flux
     video.srcObject = scanStream
     brancherLampe(scanStream)
     try { await video.play() } catch (e) { /* l'attribut autoplay prend le relais */ }
 
     hintEl.textContent = tLang('Préparation du lecteur...')
     await ensureJsQR()
+    if (tour !== scanTour) return
 
     /* Le lecteur tourne : on revient au texte d'origine, complet. */
     remettreConsigne(hintEl)
@@ -38042,11 +39116,47 @@ window.startScanner = async function(espace) {
    On détecte donc l'appareil et on donne les touches à suivre, dans l'ordre. */
 /* La consigne sous le titre, dans l'image. Elle sert aussi à dire où en est
    l'ouverture de la caméra — mais elle revient toujours à son texte d'origine. */
-const CONSIGNE = tLang('Visez le QR code')
-
+/* ⚠ RELUE À CHAQUE FOIS (audit du 24 octobre 2026) : figée au chargement,
+   elle restait en français après un passage de l'app en anglais. */
 function remettreConsigne(el) {
-  if (el) el.textContent = CONSIGNE
+  if (el) el.textContent = tLang('Visez le QR code')
 }
+
+/* ═══ LE LECTEUR REPREND TOUT SEUL ═══
+
+   ⚠ Avant (audit du 24 octobre 2026), il restait figé : après un QR qui
+   n'était pas de Standix, après « Ce n'est pas celle-là », après une fiche
+   introuvable, et au retour dans l'app (l'iPhone coupe la caméra d'un onglet
+   caché). Il fallait quitter l'écran et revenir. */
+let scanIgnore = null, scanIgnoreMinuteur = null, scanCoupeParVeille = false
+
+function scannerEnVue() {
+  const ecran = document.getElementById(scanEspace === 'gestion' ? 'p-scan' : 'e-scan')
+  return !!ecran?.classList.contains('active') && document.visibilityState === 'visible' && !camEteinte
+}
+
+/* Le dernier code lu, pour ne pas le relire aussitôt s'il a été écarté. */
+let dernierTexteScan = null
+function ignorerCodeUnMoment(texte) {
+  scanIgnore = texte
+  clearTimeout(scanIgnoreMinuteur)
+  scanIgnoreMinuteur = setTimeout(() => { scanIgnore = null }, 6000)
+}
+
+function relancerScannerSiEnVue(delai = 0, options) {
+  setTimeout(() => {
+    if (scannerEnVue() && !scanLoopActive && !scanStream) startScanner(scanEspace, options)
+  }, delai)
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    if (scanStream) { stopScanner(); scanCoupeParVeille = true }
+  } else if (scanCoupeParVeille) {
+    scanCoupeParVeille = false
+    relancerScannerSiEnVue(200)
+  }
+})
 
 /* ═══════════════════════════════════════════════════════════════════════════
    OÙ RÉTABLIR L'ACCÈS À LA CAMÉRA
@@ -38268,6 +39378,7 @@ document.addEventListener('click', (e) => {
 })
 
 function stopScanner() {
+  scanTour++
   scanLoopActive = false
   if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null }
 }
@@ -38282,7 +39393,8 @@ function scanLoop() {
     scanCtx.drawImage(video, 0, 0, scanCanvas.width, scanCanvas.height)
     const imageData = scanCtx.getImageData(0, 0, scanCanvas.width, scanCanvas.height)
     const code = jsQRLib(imageData.data, imageData.width, imageData.height)
-    if (code) { handleScanResult(code.data); return }
+    /* Un code déjà refusé, encore sous l'objectif, n'est pas relu en boucle. */
+    if (code && code.data !== scanIgnore) { handleScanResult(code.data); return }
   }
   requestAnimationFrame(scanLoop)
 }
@@ -38295,8 +39407,14 @@ async function confirmerOuvertureScan(procId, espace) {
     .find(p => p.id === procId)
   if (enMemoire) { titre = enMemoire.titre; categorie = enMemoire.categorie }
   else {
-    const { data } = await supabase.from('procedures')
+    const { data, error } = await supabase.from('procedures')
       .select('titre, categorie').eq('id', procId).maybeSingle()
+    if (error) {
+      toast(tLang('Réseau indisponible : réessayez dans un instant.'))
+      ignorerCodeUnMoment(dernierTexteScan)
+      relancerScannerSiEnVue(600)
+      return
+    }
     if (data) { titre = data.titre; categorie = data.categorie }
   }
 
@@ -38309,6 +39427,8 @@ async function confirmerOuvertureScan(procId, espace) {
       message: tLang('Ce code correspond à une procédure qui n\'existe pas ou plus.'),
       confirmer: tLang('Compris'), annuler: tLang('Fermer'), danger: false,
     })
+    ignorerCodeUnMoment(dernierTexteScan)
+    relancerScannerSiEnVue(0)
     return
   }
 
@@ -38322,7 +39442,7 @@ async function confirmerOuvertureScan(procId, espace) {
     const nouveau = estNouvelUtilisateur()
     if (nouveau) marquerBienvenueVue()
     const ok = await fenetreBienvenue(titre, categorie, nouveau)
-    if (!ok) return
+    if (!ok) { ignorerCodeUnMoment(dernierTexteScan); relancerScannerSiEnVue(0); return }
   }
 
   if (espace === 'gestion') openAnalyse(procId)
@@ -38402,6 +39522,7 @@ function fenetreBienvenue(titre, categorie, avecAccueil) {
 
 function handleScanResult(text) {
   const espace = scanEspace
+  dernierTexteScan = text
   stopScanner()
   scanEl('scan-hint').textContent = tLang('Code reconnu')
   let procId = null
@@ -38416,6 +39537,8 @@ function handleScanResult(text) {
     setTimeout(() => confirmerOuvertureScan(procId, espace), 400)
   } else {
     resultZone.innerHTML = `<div class="error-msg">${tLang('Ce code ne correspond à aucune procédure Standix.')}</div>`
+    ignorerCodeUnMoment(text)
+    relancerScannerSiEnVue(900, { garderMessage: true })
   }
 }
 
@@ -39101,6 +40224,25 @@ function nettoyerEtapesIA(etapes, duree) {
   return sortie
 }
 
+/* ═══ LES HORODATAGES MARQUENT-ILS LE DÉBUT OU LA FIN DES ÉTAPES ? ═══
+
+ ⚠ CETTE FONCTION MANQUAIT (audit du 24 octobre 2026). `normaliserClips` et
+   `calculerBornes` l'appelaient dès qu'une étape avait un début sans fin :
+   l'écran de la procédure plantait (ReferenceError). Aucune étape n'est dans
+   ce cas aujourd'hui en base, mais une ancienne procédure ou un import le
+   déclencherait.
+
+   Règle simple : si le premier instant colle au début de la vidéo, ce sont
+   des débuts ; si le dernier colle à la fin, ce sont des fins. En cas de
+   doute, des débuts — c'est ce que produit l'analyse. */
+function detecterConvention(temps, duree) {
+  const t = (temps || []).filter(x => Number.isFinite(x)).sort((a, b) => a - b)
+  if (!t.length || !Number.isFinite(duree) || duree <= 0) return 'debut'
+  const avant = t[0]
+  const apres = duree - t[t.length - 1]
+  return (apres < avant && apres <= Math.max(2, duree * 0.05)) ? 'fin' : 'debut'
+}
+
 function normaliserClips(steps, duree) {
   const aDeduire = steps.filter(s => s.timestamp_video != null && s.fin_video == null)
   if (aDeduire.length === 0) return steps
@@ -39185,7 +40327,7 @@ function choisirAction({ titre, options }) {
   })
 }
 
-function demanderTexte({ titre, message, valeur = '', placeholder = '', confirmer = tLang('Valider'), annuler = tLang('Annuler') }) {
+function demanderTexte({ titre, message, valeur = '', placeholder = '', confirmer = tLang('Valider'), annuler = tLang('Annuler'), max = 60 }) {
   return new Promise((resolve) => {
     const backdrop = document.createElement('div')
     backdrop.className = 'ios-alert-backdrop'
@@ -39198,7 +40340,7 @@ function demanderTexte({ titre, message, valeur = '', placeholder = '', confirme
           <div class="fen-t">${escapeHtml(titre)}</div>
           ${message ? `<div class="fen-s">${escapeHtml(message)}</div>` : ''}
           <input type="text" class="fen-champ" value="${escapeHtml(valeur)}"
-                 placeholder="${escapeHtml(placeholder)}" maxlength="60">
+                 placeholder="${escapeHtml(placeholder)}" maxlength="${Math.max(1, Number(max) || 60)}">
         </div>
         <div class="fen-ac">
           <button type="button" class="fen-p ok">${escapeHtml(confirmer)}</button>
@@ -39421,7 +40563,9 @@ function autoResizeTextarea(el) {
   el.style.height = el.scrollHeight + 'px'
 }
 
-function renderEditSteps() {
+/* ⚠ POSÉ UNE SEULE FOIS, HORS DU RENDU (audit du 24 octobre 2026). Il était
+   ajouté à chaque appel de `renderEditSteps` : après dix rendus, une croix
+   déclenchait dix retraits et dix redessins, et l'écran ralentissait. */
 /* Retirer la photo d'une étape. Il n'y avait aucun moyen de le faire : une
    photo posée par erreur restait là pour toujours. */
 document.getElementById('edit-steps-list')?.addEventListener('click', (e) => {
@@ -39438,6 +40582,7 @@ document.getElementById('edit-steps-list')?.addEventListener('click', (e) => {
   repeindreSansSauter(renderEditSteps)
   if (navigator.vibrate) navigator.vibrate(6)
 })
+function renderEditSteps() {
 
   const listEl = document.getElementById('edit-steps-list')
   listEl.innerHTML = ''
@@ -39495,7 +40640,8 @@ document.getElementById('edit-steps-list')?.addEventListener('click', (e) => {
        retirer quand une photo est déjà là. */
     const champFichier = div.querySelector('.fichier')
     if (champFichier) {
-      const toucherPhoto = async () => {
+      const toucherPhoto = async (e) => {
+        if (e?.target?.closest?.('.img-oter')) return
         if (!(editStepsData[i].image_url || editStepsData[i].imageFichier)) { champFichier.click(); return }
         const choix = await choisirAction({
           titre: tLang('Photo de l\'étape {v}', { v: i + 1 }),
@@ -39812,8 +40958,12 @@ async function urlSignee(valeur) {
      ferait sinon quinze allers-retours au serveur à chaque ouverture. On les
      renouvelle une minute avant l'échéance, pour qu'une vidéo commencée ne
      s'interrompe pas en cours de lecture. */
+  /* ⚠ 20 MINUTES DE MARGE POUR UNE VIDÉO, PLUS UNE (audit du 24 octobre 2026) : une vidéo
+     lancée avec une adresse qui expirait deux minutes plus tard s'arrêtait en
+     pleine lecture. Voir aussi le renouvellement plus bas. */
+  const marge = /\.(mp4|mov|m4v|webm|qt|3gp|mkv)$/i.test(chemin) ? 20 * 60000 : 60000
   const connue = signatures.get(chemin)
-  if (connue && connue.expire > Date.now() + 60000) return connue.url
+  if (connue && connue.expire > Date.now() + marge) return connue.url
 
   try {
     const { data, error } = await supabase.storage.from('procedo-videos')
@@ -39827,6 +40977,37 @@ async function urlSignee(valeur) {
     return null
   }
 }
+
+/* ═══ UNE ADRESSE EXPIRÉE SE RENOUVELLE TOUTE SEULE ═══
+
+   Une vidéo mise en pause longtemps, une fiche restée ouverte : l'adresse
+   signée expire et le lecteur tombe en erreur. On en redemande une, et la
+   vidéo reprend au même endroit. Une fois par minute au plus, pour ne pas
+   boucler sur un fichier vraiment disparu. (audit du 24 octobre 2026) */
+document.addEventListener('error', async (e) => {
+  const el = e.target
+  if (!(el instanceof HTMLVideoElement || el instanceof HTMLImageElement)) return
+  const src = el.getAttribute('src') || ''
+  const m = src.match(/\/object\/sign\/procedo-videos\/(.+?)\?/)
+  if (!m) return
+  if (el.__resigneLe && Date.now() - el.__resigneLe < 60000) return
+  el.__resigneLe = Date.now()
+  const chemin = decodeURIComponent(m[1])
+  signatures.delete(chemin)
+  memoriserSignatures()
+  const video = el instanceof HTMLVideoElement
+  const t = video ? (el.currentTime || 0) : 0
+  const enLecture = video && !el.paused
+  const url = await urlSignee(chemin)
+  if (!url || !el.isConnected || (el.getAttribute('src') || '') !== src) return
+  el.src = url
+  if (video) {
+    el.addEventListener('loadedmetadata', () => {
+      try { if (t > 0.2) el.currentTime = t } catch (err) {}
+      if (enLecture) el.play().catch(() => {})
+    }, { once: true })
+  }
+}, true)
 
 /* Les gabarits sont écrits d'un seul tenant et ne peuvent pas attendre. Ils
    posent donc `data-fichier`, et cette fonction remplit les `src` une fois le
@@ -39848,10 +41029,15 @@ async function signerMedias(racine) {
   }))
 }
 
+/* ⚠ LES GUILLEMETS AUSSI (audit du 24 octobre 2026). L'ancienne version
+   passait par `textContent` puis `innerHTML`, qui ne convertit ni `"` ni `'`.
+   Or le résultat est souvent posé DANS un attribut (`value="…"`,
+   `data-nom="…"`) : un titre d'étape « Appuyer sur "Valider" » y était coupé
+   à « Appuyer sur », et un nom de profil piégé (`x" onpointerover="…`)
+   exécutait du code chez le gérant qui touchait sa ligne. */
 function escapeHtml(str) {
-  const div = document.createElement('div')
-  div.textContent = str || ''
-  return div.innerHTML
+  return String(str || '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -39941,7 +41127,26 @@ function montrerAttenteReseau() {
        quand une requête est restée pendue sur une connexion morte : la
        bibliothèque attend toujours sa réponse. Une page neuve repart sur des
        connexions neuves. */
-    f.querySelector('#reseau-essai').addEventListener('click', () => location.reload())
+    /* ⚠ PAS SANS RÉSEAU (audit du 24 octobre 2026) : recharger hors ligne
+       remplaçait l'app par la page d'erreur du navigateur, et il fallait
+       retrouver l'adresse pour revenir. */
+    f.querySelector('#reseau-essai').addEventListener('click', async () => {
+      const toujoursCoupe = () => {
+        const t = f.querySelector('.fen-s')
+        if (t) t.textContent = tLang('Toujours pas de réseau. Standix reprendra dès que la connexion revient.')
+        try { reveilReseau?.() } catch (e) {}
+      }
+      if (navigator.onLine === false) { toujoursCoupe(); return }
+      /* `onLine` peut dire « en ligne » sans rien qui passe : on vérifie que
+         la page elle-même répond avant de la recharger. */
+      try {
+        const ctrl = new AbortController()
+        const minuteur = setTimeout(() => ctrl.abort(), 5000)
+        await fetch(location.pathname, { method: 'HEAD', cache: 'no-store', signal: ctrl.signal })
+        clearTimeout(minuteur)
+        location.reload()
+      } catch (e) { toujoursCoupe() }
+    })
     f.querySelector('#reseau-sortir').addEventListener('click', async () => {
       /* `local` : on efface la session de CET appareil sans rien demander au
          serveur — il ne répond justement pas. */
@@ -39999,7 +41204,8 @@ try {
             // pendant que la base répond, au lieu de laisser l'écran nu.
             let dernierEspace = null
             try { dernierEspace = localStorage.getItem('procedo_espace') } catch (e) {}
-            afficherCoquille(dernierEspace || 'gestion')
+            // Un visiteur est dans l'espace équipe : sa coquille aussi.
+            afficherCoquille(dernierEspace && dernierEspace !== 'gestion' ? 'equipe' : 'gestion')
 
             /* ⚠ LES PREMIÈRES LECTURES PARTENT TOUT DE SUITE, avec la fiche de la
                dernière ouverture (entreprise, rôle). Elles ne seront reprises que
@@ -40061,9 +41267,18 @@ try {
       }
 
       if (session) {
+        /* Arrivée par « Mot de passe oublié » : on demande le nouveau mot de
+           passe AVANT d'ouvrir l'app — voir `lienRecuperation`. */
+        if (lienRecuperation && !new URLSearchParams(window.location.search).get('code')) {
+          document.body.classList.remove('booting')
+          try { await verifierRetourMotDePasse() } catch (e) { console.warn('[mot de passe]', e?.message) }
+        }
         const membre = choisirFicheMembre(fiches)
         if (!membre && (fiches || []).length === 0) {
           window.__procedoLoaded = true
+          // Une inscription interrompue se termine ici — voir `reprendreInscription`.
+          const reprise = await reprendreInscription(session.user)
+          if (reprise) { enterApp(reprise); return }
           montrerOrphelin()
           return
         }

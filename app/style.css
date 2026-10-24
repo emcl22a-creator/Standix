@@ -4256,8 +4256,10 @@
      Aucune carte floutée : ce serait un faux verrou, puisqu'il faudrait
      d'abord charger les données pour les masquer. On dit simplement ce qui
      existe et comment y accéder. */
+  /* margin-bottom : la liste des dossiers reste visible sous ce bloc
+     (audit du 24 octobre 2026), le titre « Procédures » ne doit pas s'y coller. */
   .visiteur{
-    margin-top:16px; padding:16px 18px; border-radius:20px;
+    margin-top:16px; margin-bottom:22px; padding:16px 18px; border-radius:20px;
     background:var(--bg-card); border:0.5px solid var(--border);
   }
   .visiteur-tete{ display:flex; align-items:flex-start; gap:13px; }

@@ -158,7 +158,48 @@
   })
 
 
-  setTimeout(function() {
+  /* ═══ LE SCRIPT DE L'APP N'EST JAMAIS ARRIVÉ ═══
+     Réseau coupé pendant le chargement, fichier bloqué, navigateur trop
+     ancien : avant, on montrait l'écran de choix… dont aucun bouton ne
+     marchait, puisque c'est ce script qui les branche. On dit plutôt ce qui
+     se passe, avec un bouton pour recharger. (audit du 24 octobre 2026) */
+  function echecChargement() {
+    if (window.__appJsLance || document.getElementById('boot-echec')) return
+    var L = 'fr'
+    try { L = localStorage.getItem('procedo_langue') || String(navigator.language || 'fr').slice(0, 2) } catch (e) {}
+    var T = ({
+      fr: ['Le chargement n\u2019aboutit pas', 'V\u00e9rifiez votre connexion internet, puis r\u00e9essayez.', 'R\u00e9essayer'],
+      en: ['Standix could not load', 'Check your internet connection, then try again.', 'Try again'],
+      de: ['Standix konnte nicht geladen werden', 'Pr\u00fcfen Sie Ihre Internetverbindung und versuchen Sie es erneut.', 'Erneut versuchen'],
+    })[L] || ['Le chargement n\u2019aboutit pas', 'V\u00e9rifiez votre connexion internet, puis r\u00e9essayez.', 'R\u00e9essayer']
+    var d = document.createElement('div')
+    d.id = 'boot-echec'
+    d.style.cssText = 'position:fixed; inset:0; z-index:9999; background:#050506; display:flex; align-items:center; justify-content:center; padding:24px; text-align:center;'
+    d.innerHTML = '<div style="max-width:320px;">' +
+      '<p style="color:#fff; font-size:15px; font-weight:300; margin:0 0 8px;">' + T[0] + '</p>' +
+      '<p style="color:rgba(235,235,245,0.6); font-size:13px; margin:0 0 20px;">' + T[1] + '</p>' +
+      '<button type="button" style="background:#fff; color:#000; padding:11px 24px; border-radius:100px; font-weight:300; font-size:14px; border:none;">' + T[2] + '</button></div>'
+    d.querySelector('button').addEventListener('click', function () {
+      if (navigator.onLine === false) return
+      location.reload()
+    })
+    document.body.classList.remove('booting')
+    document.body.appendChild(d)
+  }
+  window.__appJsEchec = echecChargement
+
+  setTimeout(function filet() {
+    /* Le script est peut-être encore en route sur un réseau lent : on lui
+       laisse vingt secondes en tout avant de parler d'échec. */
+    if (!window.__appJsLance) { setTimeout(echecChargement, 14000); return }
+    /* ⚠ UNE SESSION RANGÉE SUR L'APPAREIL = QUELQU'UN DE CONNECTÉ (audit du
+       24 octobre 2026). Sur un réseau lent, l'app n'avait pas encore posé
+       son drapeau : « Bienvenue » s'affichait à une personne connectée, ses
+       boutons ne répondaient pas, puis l'app passait par-dessus. On attend
+       encore, jusqu'à vingt secondes. */
+    var sessionRangee = false
+    try { sessionRangee = Object.keys(localStorage).some(function (k) { return /^sb-.*-auth-token$/.test(k) }) } catch (e) {}
+    if (!window.__procedoLoaded && sessionRangee && performance.now() < 20000) { setTimeout(filet, 2000); return }
     if (!window.__procedoLoaded) {
       var choice = document.getElementById('choice-screen')
       var login = document.getElementById('login-screen')

@@ -15874,6 +15874,9 @@ body.espace-vide .screen.active{ animation:none !important; }
   color:var(--label-2);
 }
 .alerte-essai .ess-tx i b{ font-size:inherit; font-weight:650; color:var(--label); }
+/* L'avertissement de suppression des données (25 octobre 2026) : sur sa
+   propre ligne, sous la phrase, pour qu'on ne le lise pas comme une suite. */
+.alerte-essai .ess-tx i .ess-supp{ display:block; margin-top:6px; }
 
 /* ═══ LE BOUTON « Details » ═══
 

@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#F4F4F6" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#07080B" media="(prefers-color-scheme: dark)">
@@ -84,7 +84,13 @@
 }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+/* ⚠ AUCUN ZOOM (25 octobre 2026). Trois causes, trois parades :
+   ① Safari iOS zoome sur un champ dont le texte fait moins de 16 px → 16 px.
+   ② Le double appui zoome → `touch-action: manipulation`.
+   ③ Le pincement : iOS ignore `user-scalable=no` → bloqué en JS plus bas. */
+html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
+input, select, textarea { font-size: 16px !important; }
+.code-champ { font-size: 26px !important; }
 body {
   margin: 0;
   background: var(--fond);
@@ -616,10 +622,26 @@ async function demanderCode(dejaInscrit) {
     facteurCode = (liste?.totp || []).find((f) => f.status === 'verified') || null
     $('#inscription-code').classList.add('cache')
   } else {
-    /* Un essai d'inscription abandonné laisse un facteur « non vérifié » : on l'efface. */
-    for (const f of tous.filter((f) => f.status !== 'verified')) await sb.auth.mfa.unenroll({ factorId: f.id })
-    const { data, error } = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Standix Dashboard ' + new Date().toISOString().slice(0, 10), issuer: 'Standix' })
-    if (error) { $('#porte-msg').textContent = 'Impossible de créer le code : ' + error.message; return }
+    /* ⚠ LA CLÉ NE DOIT PAS CHANGER PENDANT L'INSCRIPTION (25 octobre 2026).
+       Recharger la page, ouvrir un 2ᵉ onglet ou revenir de l'app « Mots de
+       passe » recréait une nouvelle clé : celle enregistrée sur le téléphone
+       devenait fausse (« code incorrect »). On garde donc la clé en cours sur
+       cet appareil jusqu'à ce qu'elle soit validée, puis on l'oublie. */
+    const { data: { session } } = await sb.auth.getSession()
+    const cle = 'stx_code_' + (session?.user?.id || '')
+    let data = null
+    try { data = JSON.parse(localStorage.getItem(cle) || 'null') } catch (e) {}
+    const enCours = tous.filter((f) => f.status !== 'verified')
+    if (!data || !enCours.some((f) => f.id === data.id)) data = null
+    /* Les essais abandonnés (autres que la clé gardée) sont effacés. */
+    for (const f of enCours.filter((f) => f.id !== data?.id)) await sb.auth.mfa.unenroll({ factorId: f.id })
+    if (!data) {
+      const rep = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Standix Dashboard ' + Date.now().toString(36), issuer: 'Standix' })
+      if (rep.error) { $('#porte-msg').textContent = 'Impossible de créer le code : ' + rep.error.message; return }
+      data = { id: rep.data.id, totp: rep.data.totp }
+      try { localStorage.setItem(cle, JSON.stringify(data)) } catch (e) {}
+    }
+    demanderCode.cle = cle
     facteurCode = data
     $('#qr').src = data.totp.qr_code
     $('#lien-app').href = data.totp.uri
@@ -640,7 +662,18 @@ $('#form-code').addEventListener('submit', async (e) => {
   const btn = $('#c-code-btn'); btn.disabled = true; $('#porte-msg').textContent = ''
   const { error } = await sb.auth.mfa.challengeAndVerify({ factorId: facteurCode.id, code: $('#c-code').value })
   btn.disabled = false
-  if (error) { $('#porte-msg').textContent = 'Code incorrect ou expiré. Réessaie avec le code affiché maintenant.'; $('#c-code').value = ''; $('#c-code').focus(); return }
+  if (error) {
+    $('#c-code').value = ''
+    /* La clé a été effacée entre-temps (autre onglet) : on en recrée une. */
+    if (error.status === 404 || /not found/i.test(error.message || '')) {
+      try { localStorage.removeItem(demanderCode.cle) } catch (e) {}
+      await demanderCode(false)
+      $('#porte-msg').textContent = 'Nouvelle clé : supprime l\u2019ancienne entrée Standix dans ton app et ajoute celle-ci.'
+      return
+    }
+    $('#porte-msg').textContent = 'Code incorrect ou expiré. Réessaie avec le code affiché maintenant.'; $('#c-code').focus(); return
+  }
+  try { localStorage.removeItem(demanderCode.cle) } catch (e) {}
   $('#bloc-code').classList.add('cache'); $('#form-connexion').classList.remove('cache'); $('#porte h1').textContent = 'Dashboard privé'
   entrer()
 })
@@ -1417,6 +1450,9 @@ new ResizeObserver(() => {
   largeurPrecedente = innerWidth
   dessinerGraphiques()
 }).observe(document.body)
+
+/* Pincement sur iOS (le double appui est réglé en CSS). */
+;['gesturestart', 'gesturechange', 'gestureend'].forEach((t) => document.addEventListener(t, (e) => e.preventDefault(), { passive: false }))
 
 sb.auth.onAuthStateChange((evt) => { if (evt === 'SIGNED_OUT') montrerPorte() })
 window.addEventListener('hashchange', () => { const p = location.hash.slice(1); if (S && p !== page && PAGES.some((x) => x.id === p)) aller(p) })

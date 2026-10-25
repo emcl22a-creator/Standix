@@ -441,7 +441,7 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
         <ol class="etapes-code">
           <li>Installe une app d’authentification : <b>Google Authenticator</b>, ou <b>Mots de passe</b> sur iPhone.</li>
           <li>Scanne ce QR code avec cette app, ou touche « Ajouter à mon app » sur ce téléphone.</li>
-          <li>Tape le code à 6 chiffres qu’elle affiche.</li>
+          <li>Tape le code de l’entrée <b id="nom-entree">Standix</b> (supprime les autres entrées Standix de ton app).</li>
         </ol>
         <img class="qr" id="qr" alt="QR code à scanner">
         <a class="lien-app" id="lien-app" href="#">Ajouter à mon app</a>
@@ -453,6 +453,7 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
       </form>
     </div>
     <div class="porte-msg" id="porte-msg"></div>
+    <button class="lien-discret cache" id="nouvelle-cle" type="button" style="margin-top:4px;display:block;margin-left:auto;margin-right:auto">Recommencer avec une nouvelle clé</button>
     <button class="lien-discret cache" id="porte-sortir" style="margin-top:8px">Se déconnecter</button>
   </div>
 </div>
@@ -636,9 +637,13 @@ async function demanderCode(dejaInscrit) {
     /* Les essais abandonnés (autres que la clé gardée) sont effacés. */
     for (const f of enCours.filter((f) => f.id !== data?.id)) await sb.auth.mfa.unenroll({ factorId: f.id })
     if (!data) {
-      const rep = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Standix Dashboard ' + Date.now().toString(36), issuer: 'Standix' })
+      /* Un nom UNIQUE par clé (« Standix K7F2 ») : après plusieurs essais,
+         l'app du téléphone contient plusieurs entrées, et c'est le seul moyen
+         de savoir laquelle est la bonne. */
+      const nom = 'Standix ' + Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('')
+      const rep = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: nom, issuer: nom })
       if (rep.error) { $('#porte-msg').textContent = 'Impossible de créer le code : ' + rep.error.message; return }
-      data = { id: rep.data.id, totp: rep.data.totp }
+      data = { id: rep.data.id, totp: rep.data.totp, nom }
       try { localStorage.setItem(cle, JSON.stringify(data)) } catch (e) {}
     }
     demanderCode.cle = cle
@@ -648,9 +653,16 @@ async function demanderCode(dejaInscrit) {
     $('#secret').textContent = data.totp.secret
     $('#copier-secret').innerHTML = ico('copie')
     $('#copier-secret').onclick = () => navigator.clipboard?.writeText(data.totp.secret).then(() => toast('Clé copiée'))
+    $('#nom-entree').textContent = data.nom || 'Standix'
     $('#inscription-code').classList.remove('cache')
   }
   setTimeout(() => $('#c-code').focus(), 50)
+}
+$('#nouvelle-cle').onclick = async () => {
+  try { localStorage.removeItem(demanderCode.cle) } catch (e) {}
+  $('#nouvelle-cle').classList.add('cache')
+  await demanderCode(false)
+  $('#porte-msg').textContent = 'Nouvelle clé créée : ajoute-la dans ton app.'
 }
 $('#c-code').addEventListener('input', (e) => {
   e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6)
@@ -671,7 +683,9 @@ $('#form-code').addEventListener('submit', async (e) => {
       $('#porte-msg').textContent = 'Nouvelle clé : supprime l\u2019ancienne entrée Standix dans ton app et ajoute celle-ci.'
       return
     }
-    $('#porte-msg').textContent = 'Code incorrect ou expiré. Réessaie avec le code affiché maintenant.'; $('#c-code').focus(); return
+    $('#porte-msg').textContent = 'Code incorrect. Vérifie que tu utilises l\u2019entrée « ' + (facteurCode?.nom || 'Standix') + ' » et tape le code affiché maintenant.'
+    $('#nouvelle-cle').classList.toggle('cache', !facteurCode?.totp)
+    $('#c-code').focus(); return
   }
   try { localStorage.removeItem(demanderCode.cle) } catch (e) {}
   $('#bloc-code').classList.add('cache'); $('#form-connexion').classList.remove('cache'); $('#porte h1').textContent = 'Dashboard privé'

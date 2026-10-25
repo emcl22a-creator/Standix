@@ -190,6 +190,13 @@ button { cursor: pointer; }
 /* Barre du haut + onglets (téléphone) */
 .haut-mobile, .tabbar, .tirer, .poignee, .cartes-clients, .couts-m { display: none; }
 .replie { display: none !important; }
+.ico-suspect { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+.ico-suspect svg { width: 16px; height: 16px; }
+.ico-suspect.grave { background: var(--grave-doux); color: var(--grave); }
+.ico-suspect.surveiller { background: var(--alerte-doux); color: var(--alerte); }
+.niveau { display: inline !important; font-weight: 600; }
+.niveau.grave { color: var(--grave); } .niveau.surveiller { color: var(--alerte); }
+.btn-petit { height: 30px; padding: 0 11px; font-size: 12.5px; flex: none; }
 .seul-mobile { display: none; }
 .coque.cache ~ .tabbar, .coque.cache ~ .tirer { display: none !important; }
 .voir-tout { display: block; width: 100%; margin-top: 6px; padding: 12px 0 2px; border: 0; border-top: 1px solid var(--bord); background: none; color: var(--accent); font-weight: 600; font-size: 14px; }
@@ -468,6 +475,8 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
   .entete { flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 18px; }
   .entete h1 { font-size: 34px; letter-spacing: -.025em; line-height: 1.1; }
   .entete p { font-size: 15px; }
+  .section > h2 { flex-wrap: wrap; row-gap: 2px; }
+  .section > h2 small { flex-basis: 100%; }
   .entete [data-action="actualiser"] { display: none; }
   .entete .actions:empty { display: none; }
 
@@ -690,6 +699,8 @@ const PAGES = [
    ═══════════════════════════════════════════════════════════════════════ */
 let S = null          // admin_stats()
 let ST = null         // admin-stripe (ou { erreur })
+let SU = { alertes: [], acces: [] }   // admin_suspects()
+let filtreSuspects = 'nouvelles'
 let page = (location.hash.slice(1) || 'vue')
 if (!PAGES.some((p) => p.id === page)) page = 'vue'
 let filtreErreurs = 'nouveau'
@@ -721,6 +732,7 @@ async function entrer() {
      écran ne donne accès à rien. */
   const { data: niveau } = await sb.auth.mfa.getAuthenticatorAssuranceLevel()
   if (niveau?.currentLevel !== 'aal2') return demanderCode(niveau?.nextLevel === 'aal2')
+  noterAcces()
   $('#porte').classList.add('cache')
   $('#coque').classList.remove('cache')
   construireNav()
@@ -728,6 +740,18 @@ async function entrer() {
   brancherDirect()
   clearInterval(minuteur)
   minuteur = setInterval(() => { if (document.visibilityState === 'visible') charger() }, 60000)
+}
+
+/* Chaque ouverture du Dashboard est notée (page Sécurité) ; un appareil
+   jamais vu déclenche une alerte. Une fois par onglet. */
+function noterAcces() {
+  try { if (sessionStorage.getItem('stx_acces')) return; sessionStorage.setItem('stx_acces', '1') } catch (e) {}
+  const ua = navigator.userAgent
+  const appareil = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'tablette' : /Mobi|iPhone|Android/.test(ua) ? 'téléphone' : 'ordinateur'
+  const m = ua.match(/(?:iPhone OS|CPU OS) (\d+)/) || ua.match(/Android (\d+)/)
+  const systeme = /iPhone|iPad/.test(ua) ? 'iOS ' + (m?.[1] || '') : /Android/.test(ua) ? 'Android ' + (m?.[1] || '') : /Windows/.test(ua) ? 'Windows' : /Mac OS X/.test(ua) ? 'macOS' : 'autre'
+  const navigateur = /Edg\//.test(ua) ? 'Edge' : /CriOS|Chrome\//.test(ua) ? 'Chrome' : /FxiOS|Firefox/.test(ua) ? 'Firefox' : /Safari/.test(ua) ? 'Safari' : 'autre'
+  sb.rpc('noter_acces_admin', { p: { appareil, systeme: systeme.trim(), navigateur, ecran: screen.width + '×' + screen.height } }).then(() => {}, () => {})
 }
 
 let facteurCode = null
@@ -838,7 +862,10 @@ async function charger(premier = false) {
   const stats = sb.rpc('admin_stats').then((r) => { mesures.base = Math.round(performance.now() - t0); return r })
   const t1 = performance.now()
   const stripe = sb.functions.invoke('admin-stripe', { body: {} }).then((r) => { mesures.fonctions = Math.round(performance.now() - t1); return r })
-  const [rs, rst] = await Promise.allSettled([stats, stripe])
+  const suspects = sb.rpc('admin_suspects')
+  const [rs, rst, rsu] = await Promise.allSettled([stats, stripe, suspects])
+  if (rsu.status === 'fulfilled' && !rsu.value.error && rsu.value.data) SU = rsu.value.data
+  else SU = { alertes: [], acces: [], erreur: rsu.reason?.message || rsu.value?.error?.message || 'inconnue' }
 
   if (rs.status === 'fulfilled' && !rs.value.error) { S = rs.value.data; mesures.baseOk = true }
   else { mesures.baseOk = false; if (!S) { $('#principal').innerHTML = `<div class="encart">Impossible de lire les chiffres : ${echap(rs.reason?.message || rs.value?.error?.message)}</div>`; return } }
@@ -889,7 +916,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 function construireNav() {
   $('#nav').innerHTML = PAGES.map((p) => `<button data-page="${p.id}">${ico(p.icone)}<span>${p.nom}</span><span class="pastille cache" data-pastille="${p.id}"></span></button>`).join('')
   $('#tabbar').innerHTML = ONGLETS.map((id) => {
-    if (id === 'plus') return `<button data-plus>${ico('plus3')}<span>Plus</span></button>`
+    if (id === 'plus') return `<button data-plus>${ico('plus3')}<span>Plus</span><span class="pastille cache" data-pastille="plus"></span></button>`
     const p = PAGES.find((x) => x.id === id)
     return `<button data-page="${id}">${ico(p.icone)}<span>${p.court || p.nom}</span><span class="pastille cache" data-pastille="${id}"></span></button>`
   }).join('')
@@ -966,7 +993,8 @@ document.addEventListener('touchend', async () => {
   toast('Chiffres à jour')
 })
 function majPastilles() {
-  const nb = { erreurs: S?.kpi?.erreurs_ouvertes || 0, clients: S?.kpi?.impayes || 0 }
+  const suspects = (SU.alertes || []).filter((a) => !a.vue).length
+  const nb = { erreurs: S?.kpi?.erreurs_ouvertes || 0, clients: S?.kpi?.impayes || 0, securite: suspects, plus: suspects }
   $$('[data-pastille]').forEach((el) => {
     const v = nb[el.dataset.pastille] || 0
     el.textContent = v > 99 ? '99+' : v
@@ -1064,6 +1092,11 @@ function pageVue() {
   const echecsRecents = (S.echecs_ia || []).filter((e) => new Date(e.date) > Date.now() - 7 * 86400e3)
   if (echecsRecents.length) alertes.push({ ton: 'alerte', ico: 'usage', t: `<b>${echecsRecents.length} génération${echecsRecents.length > 1 ? 's' : ''} IA en échec</b> <span>· 7 derniers jours</span>`, va: 'erreurs' })
   if (!S.securite.mfa_admin) alertes.push({ ton: 'alerte', ico: 'securite', t: `<b>Double authentification non activée</b> <span>· sur le compte admin</span>`, va: 'securite' })
+  const suspects = (SU.alertes || []).filter((x) => !x.vue)
+  if (suspects.length) {
+    const graves = suspects.filter((x) => x.niveau === 'grave').length
+    alertes.splice(graves ? 0 : alertes.length, 0, { ton: graves ? 'grave' : 'alerte', ico: 'securite', t: `<b>${suspects.length} activité${suspects.length > 1 ? 's' : ''} suspecte${suspects.length > 1 ? 's' : ''}</b> <span>· ${graves ? graves + ' grave' + (graves > 1 ? 's' : '') : 'à vérifier'}</span>`, va: 'securite' })
+  }
   if (!a.stripeOk) alertes.push({ ton: 'alerte', ico: 'argent', t: `<b>Stripe ne répond pas</b> <span>· revenus estimés</span>`, va: 'argent' })
   if (!alertes.length) alertes.push({ ton: 'ok', ico: 'ok', t: '<b>Tout va bien</b> <span>· rien à traiter</span>' })
 
@@ -1521,9 +1554,29 @@ function pageSite() {
 function pageSecurite() {
   const s = S.securite
   const ligne = (ok, titre, detail) => `<div class="sante"><span class="badge ${ok === true ? 'ok' : ok === false ? 'grave' : 'alerte'}">${ok === true ? 'OK' : ok === false ? 'Risque' : 'À voir'}</span><div class="t"><b>${titre}</b><span>${detail}</span></div></div>`
-  const MV = { promotion: 'Promotion', retrogradation: 'Rétrogradation', depart: 'Départ', arrivee: 'Arrivée', exclusion: 'Exclusion' }
-  return entete('Sécurité', 'Comptes, connexions et accès') + `
-  <div class="grille g4">
+  const MV = { promotion: 'Promotion', vers_gestion: 'Promu en gestion', retrogradation: 'Rétrogradation', depart: 'Départ', arrivee: 'Arrivée', exclusion: 'Exclusion' }
+  const toutes = SU.alertes || []
+  const nouvelles = toutes.filter((x) => !x.vue)
+  const liste = toutes.filter((x) => filtreSuspects === 'toutes' || (filtreSuspects === 'nouvelles' ? !x.vue : x.vue))
+  const ICO_FAMILLE = { connexion: 'securite', compte: 'clients', dashboard: 'vue', essai: 'horloge', cout: 'argent', site: 'site', role: 'clients' }
+  return entete('Sécurité', 'Comptes, connexions et activités suspectes') + `
+  <div class="section" style="margin-top:0">
+    <h2>Activités suspectes <small>30 derniers jours · mises à jour en continu</small></h2>
+    ${SU.erreur ? `<div class="encart">Détection indisponible : ${echap(SU.erreur)}</div>` : ''}
+    ${SU.hooks_actifs === false ? '<div class="encart info">La surveillance des mots de passe et des codes n\u2019est pas encore active : il reste à activer les 2 « hooks » dans Supabase.</div>' : ''}
+    <div class="filtres">
+      ${[['nouvelles', 'À vérifier', nouvelles.length], ['vues', 'Vues', toutes.length - nouvelles.length], ['toutes', 'Toutes', toutes.length]].map(([v, t, c]) => `<button class="filtre" data-fs="${v}" aria-pressed="${filtreSuspects === v}">${t} ${c}</button>`).join('')}
+      ${nouvelles.length > 1 && filtreSuspects === 'nouvelles' ? '<button class="filtre" data-action="tout-vu">Tout marquer comme vu</button>' : ''}
+    </div>
+    <div class="carte">${liste.length ? `<div class="liste">${liste.map((x) => `
+      <div class="ligne">
+        <span class="ico-suspect ${x.niveau}">${ico(ICO_FAMILLE[x.famille] || 'securite')}</span>
+        <div class="t"><b style="white-space:normal">${echap(x.titre)}</b><span style="white-space:normal"><span class="niveau ${x.niveau}">${x.niveau === 'grave' ? 'Grave' : 'À surveiller'}</span> · ${echap(x.detail || '')} · ${ilya(x.quand)}</span></div>
+        <button class="btn btn-petit" data-vu="${echap(x.cle)}" data-etat="${x.vue ? '1' : '0'}">${x.vue ? 'Rouvrir' : 'Vu'}</button>
+      </div>`).join('')}</div>` : `<div class="vide">${filtreSuspects === 'nouvelles' ? 'Rien de suspect à vérifier.' : 'Rien ici.'}</div>`}</div>
+  </div>
+
+  <div class="section grille g4">
     ${tuile('Comptes', n(s.comptes), n(s.comptes_30j) + ' créés en 30 jours')}
     ${tuile('Connexions 24 h', n(s.connexions_24h), n(s.connexions_7j) + ' sur 7 jours')}
     ${tuile('Sessions ouvertes', n(s.sessions_actives), 'appareils connectés')}
@@ -1540,6 +1593,9 @@ function pageSecurite() {
     <div class="carte"><h3>Derniers comptes créés</h3>
       <div class="liste">${s.derniers_comptes.map((c) => `<div class="ligne"><div class="t"><b>Créé ${ilya(c.created_at)}</b><span>${c.last_sign_in_at ? 'Dernière connexion ' + ilya(c.last_sign_in_at) : 'Jamais connecté'}</span></div>${c.confirme ? '<span class="badge ok">Confirmé</span>' : '<span class="badge alerte">Non confirmé</span>'}</div>`).join('')}</div>
     </div>
+  </div>
+  <div class="section carte"><h3>Connexions au Dashboard <small>15 dernières</small></h3>
+    ${(SU.acces || []).length ? `<div class="liste">${SU.acces.map((c) => `<div class="ligne"><div class="t"><b>${echap(c.email || '—')}</b><span>${echap([c.appareil, c.systeme, c.navigateur].filter(Boolean).join(' · '))} · ${ilya(c.cree_le)}</span></div>${c.nouvel_appareil ? '<span class="badge alerte">Nouvel appareil</span>' : ''}</div>`).join('')}</div>` : '<div class="vide">Aucune connexion notée pour l\u2019instant</div>'}
   </div>
   <div class="section carte"><h3>Changements de rôle récents</h3>
     ${s.mouvements.length ? `<div class="liste">${s.mouvements.map((m) => `<div class="ligne"><div class="t"><b>${echap(MV[m.type] || m.type)}</b><span>${echap(m.entreprise || '—')}${m.role_avant || m.role_apres ? ' · ' + echap(m.role_avant || '—') + ' → ' + echap(m.role_apres || '—') : ''}</span></div><span class="n" style="font-weight:400;color:var(--texte-3)">${ilya(m.cree_le)}</span></div>`).join('')}</div>` : '<div class="vide">Aucun</div>'}
@@ -1568,6 +1624,24 @@ function brancherPage() {
     brancherTri()
   }
   if (page === 'argent') brancherCouts()
+  if (page === 'securite') {
+    $$('[data-fs]', P).forEach((b) => b.onclick = () => { filtreSuspects = b.dataset.fs; afficher() })
+    $$('[data-vu]', P).forEach((b) => b.onclick = async () => {
+      const cle = b.dataset.vu, vue = b.dataset.etat === '1'
+      b.disabled = true
+      const { error } = vue ? await sb.from('alertes_vues').delete().eq('cle', cle) : await sb.from('alertes_vues').upsert({ cle })
+      if (error) { b.disabled = false; return toast('Échec : ' + error.message) }
+      const a = SU.alertes.find((x) => x.cle === cle); if (a) a.vue = !vue
+      majPastilles(); const y = scrollY; afficher(); scrollTo(0, y)
+    })
+    const tout = $('[data-action="tout-vu"]', P)
+    if (tout) tout.onclick = async () => {
+      const cles = SU.alertes.filter((x) => !x.vue).map((x) => ({ cle: x.cle }))
+      const { error } = await sb.from('alertes_vues').upsert(cles)
+      if (error) return toast('Échec : ' + error.message)
+      SU.alertes.forEach((x) => x.vue = true); majPastilles(); afficher(); toast('Tout est marqué comme vu')
+    }
+  }
   if (mobile()) limiterListes()
 }
 /* Sur téléphone, une longue liste montre 5 lignes et un « Voir tout ». */

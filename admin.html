@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F4F4F6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07080B" media="(prefers-color-scheme: dark)">
+<title>Standix · Dashboard</title>
+<link rel="icon" href="/app/favicon-32.png">
+<link rel="apple-touch-icon" href="/app/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600&display=swap">
+<!--
+  ═══════════════════════════════════════════════════════════════════════
+  DASHBOARD PRIVÉ STANDIX (25 octobre 2026)
+
+  Réservé au compte admin. La protection est CÔTÉ SERVEUR : chaque chiffre
+  vient de `admin_stats()` ou `admin-stripe`, qui refusent tout autre compte.
+  Cacher cette page ne servirait à rien ; l'ouvrir ne donne rien à un autre.
+
+  Sources : tables `journal_erreurs`, `visites_site`, `couts_fixes`,
+  `reglages_admin` (remplies par /suivi.js) + toutes les tables de l'app.
+  ═══════════════════════════════════════════════════════════════════════
+-->
+<style>
+:root {
+  color-scheme: light;
+  --fond: #F4F4F6;
+  --carte: #FFFFFF;
+  --carte-2: #F7F7F9;
+  --bord: rgba(15, 17, 23, .08);
+  --bord-fort: rgba(15, 17, 23, .14);
+  --texte: #0B0C10;
+  --texte-2: #55575F;
+  --texte-3: #8A8C94;
+  /* Le bleu de l'app (boutons : #1F4CEE → #3A78EE → #4899EC, voir app/style.css). */
+  --accent: #1F4CEE;
+  --accent-doux: rgba(58, 120, 238, .11);
+  --degrade: linear-gradient(135deg, #1F4CEE 0%, #3A78EE 55%, #4899EC 100%);
+  /* Séries des graphiques — palette validée (daltonisme, contraste). La 2ᵉ,
+     grise, sert aux coûts : une référence discrète face au bleu des revenus. */
+  --s1: #3A78EE; --s2: #A3A7B0; --s3: #1F9D74; --s4: #8E5CD9;
+  --ok: #16A34A;    --ok-doux: rgba(22, 163, 74, .12);
+  --alerte: #D97706; --alerte-doux: rgba(217, 119, 6, .13);
+  --grave: #DC2626; --grave-doux: rgba(220, 38, 38, .11);
+  --grille: rgba(15, 17, 23, .07);
+  --ombre: 0 1px 2px rgba(15,17,23,.04), 0 4px 16px rgba(15,17,23,.04);
+  --nav: rgba(255, 255, 255, .78);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --fond: #07080B;
+    --carte: #121318;
+    --carte-2: #191A20;
+    --bord: rgba(255, 255, 255, .07);
+    --bord-fort: rgba(255, 255, 255, .13);
+    --texte: #F2F2F4;
+    --texte-2: #A9ABB3;
+    --texte-3: #6E7079;
+    --accent: #4899EC;
+    --accent-doux: rgba(72, 153, 236, .16);
+    --s1: #3A78EE; --s2: #5C606A; --s3: #199E70; --s4: #9085E9;
+    --ok: #34C76F;    --ok-doux: rgba(52, 199, 111, .14);
+    --alerte: #F5A524; --alerte-doux: rgba(245, 165, 36, .14);
+    --grave: #FF5A5A; --grave-doux: rgba(255, 90, 90, .14);
+    --grille: rgba(255, 255, 255, .06);
+    --ombre: none;
+    --nav: rgba(18, 19, 24, .78);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --fond: #07080B; --carte: #121318; --carte-2: #191A20;
+  --bord: rgba(255,255,255,.07); --bord-fort: rgba(255,255,255,.13);
+  --texte: #F2F2F4; --texte-2: #A9ABB3; --texte-3: #6E7079;
+  --accent: #4899EC; --accent-doux: rgba(72,153,236,.16);
+  --s1: #3A78EE; --s2: #5C606A; --s3: #199E70; --s4: #9085E9;
+  --ok: #34C76F; --ok-doux: rgba(52,199,111,.14);
+  --alerte: #F5A524; --alerte-doux: rgba(245,165,36,.14);
+  --grave: #FF5A5A; --grave-doux: rgba(255,90,90,.14);
+  --grille: rgba(255,255,255,.06); --ombre: none; --nav: rgba(18,19,24,.78);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font: 400 14px/1.45 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+.cache { display: none !important; }
+
+/* ─── Connexion ─── */
+.porte {
+  min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px;
+}
+.porte-boite {
+  width: 100%; max-width: 360px; text-align: center;
+}
+.marque { display: inline-flex; align-items: center; gap: 10px; }
+.marque img { width: 34px; height: 34px; border-radius: 9px; }
+.logotype { font: 600 21px/1 Poppins, Inter, sans-serif; letter-spacing: -.01em; }
+.porte h1 { font-size: 15px; font-weight: 500; color: var(--texte-2); margin: 14px 0 28px; }
+.porte form { display: grid; gap: 10px; text-align: left; }
+.champ {
+  width: 100%; height: 48px; padding: 0 14px; border-radius: 12px;
+  background: var(--carte); border: 1px solid var(--bord-fort); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.champ:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-doux); }
+.bouton {
+  height: 48px; border: 0; border-radius: 12px; background: var(--degrade);
+  color: #fff; font-weight: 600; margin-top: 6px;
+}
+.bouton:disabled { opacity: .6; }
+.porte-msg { min-height: 20px; color: var(--grave); font-size: 13px; margin-top: 12px; }
+
+/* ─── Charpente ─── */
+.coque { display: grid; grid-template-columns: 236px 1fr; min-height: 100dvh; background: linear-gradient(to right, var(--carte) 235px, var(--bord) 235px, var(--bord) 236px, transparent 236px); }
+.cote {
+  position: sticky; top: 0; height: 100dvh; padding: 22px 14px;
+  border-right: 1px solid var(--bord); display: flex; flex-direction: column; gap: 22px;
+  background: var(--carte);
+}
+.cote .marque { padding: 0 8px; }
+.cote .marque img { width: 28px; height: 28px; border-radius: 8px; }
+.cote .logotype { font-size: 17px; }
+.etiquette-prive {
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--accent); background: var(--accent-doux); padding: 3px 7px; border-radius: 6px;
+}
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav button {
+  display: flex; align-items: center; gap: 11px; height: 38px; padding: 0 10px;
+  background: none; border: 0; border-radius: 10px; color: var(--texte-2);
+  font-weight: 500; text-align: left; position: relative; white-space: nowrap;
+}
+.nav button svg { width: 18px; height: 18px; flex: none; }
+.nav button:hover { background: var(--carte-2); color: var(--texte); }
+.nav button[aria-current="page"] { background: var(--accent-doux); color: var(--accent); }
+.pastille {
+  margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px;
+  background: var(--grave); color: #fff; font-size: 11.5px; font-weight: 600;
+  display: inline-grid; place-items: center;
+}
+.cote-bas { margin-top: auto; display: grid; gap: 10px; padding: 0 8px; font-size: 12.5px; color: var(--texte-3); }
+.direct { display: inline-flex; align-items: center; gap: 7px; }
+.point { width: 8px; height: 8px; border-radius: 50%; background: var(--texte-3); flex: none; }
+.point.vivant { background: var(--ok); box-shadow: 0 0 0 0 var(--ok); animation: pouls 2s infinite; }
+@keyframes pouls { 0% { box-shadow: 0 0 0 0 rgba(22,163,74,.45); } 70% { box-shadow: 0 0 0 7px rgba(22,163,74,0); } 100% { box-shadow: 0 0 0 0 rgba(22,163,74,0); } }
+.lien-discret { background: none; border: 0; padding: 0; color: var(--texte-3); text-align: left; text-decoration: underline; text-underline-offset: 2px; }
+.lien-discret:hover { color: var(--texte); }
+
+.principal { min-width: 0; padding: 28px 32px 64px; }
+.entete { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.entete h1 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+.entete p { margin: 4px 0 0; color: var(--texte-2); }
+.actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.btn {
+  height: 34px; padding: 0 13px; border-radius: 9px; border: 1px solid var(--bord-fort);
+  background: var(--carte); font-weight: 500; font-size: 13px; display: inline-flex; align-items: center; gap: 7px;
+}
+.btn:hover { border-color: var(--texte-3); }
+.btn svg { width: 15px; height: 15px; }
+.btn-plein { background: var(--texte); color: var(--fond); border-color: transparent; }
+.btn-ok { color: var(--ok); }
+.btn-grave { color: var(--grave); }
+
+/* Barre du haut + onglets (téléphone) */
+.haut-mobile { display: none; }
+
+/* ─── Blocs ─── */
+.grille { display: grid; gap: 14px; }
+.g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.section { margin-top: 26px; }
+.section > h2 { font-size: 15px; font-weight: 600; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+.section > h2 small { font-weight: 400; color: var(--texte-3); font-size: 13px; }
+.carte {
+  background: var(--carte); border: 1px solid var(--bord); border-radius: 16px;
+  box-shadow: var(--ombre); padding: 18px; min-width: 0;
+}
+.carte h3 { margin: 0 0 14px; font-size: 13.5px; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.carte h3 small { font-weight: 400; color: var(--texte-3); font-size: 12.5px; }
+
+/* Tuiles chiffrées */
+.tuile { display: flex; flex-direction: column; gap: 4px; position: relative; overflow: hidden; }
+.tuile .lib { font-size: 12.5px; color: var(--texte-2); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.tuile .val { font-size: 27px; font-weight: 700; letter-spacing: -.025em; line-height: 1.15; }
+.tuile .val small { font-size: 15px; font-weight: 600; color: var(--texte-2); letter-spacing: 0; }
+.tuile .sous { font-size: 12.5px; color: var(--texte-3); }
+.tuile.heros .val { font-size: 32px; }
+.tuile .spark { height: 34px; margin-top: 8px; }
+.delta { font-size: 12px; font-weight: 600; padding: 1px 6px; border-radius: 6px; }
+.delta.monte { color: var(--ok); background: var(--ok-doux); }
+.delta.baisse { color: var(--grave); background: var(--grave-doux); }
+.val.ok { color: var(--ok); } .val.grave { color: var(--grave); } .val.alerte { color: var(--alerte); }
+
+/* Badges d'état (toujours avec texte, jamais la couleur seule) */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px;
+  border-radius: 7px; font-size: 11.5px; font-weight: 600; white-space: nowrap;
+  background: var(--carte-2); color: var(--texte-2);
+}
+.badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.badge.sans-point::before { display: none; }
+.badge.ok { background: var(--ok-doux); color: var(--ok); }
+.badge.alerte { background: var(--alerte-doux); color: var(--alerte); }
+.badge.grave { background: var(--grave-doux); color: var(--grave); }
+.badge.accent { background: var(--accent-doux); color: var(--accent); }
+.code {
+  font: 600 11.5px/1 ui-monospace, "SF Mono", Menlo, monospace; padding: 4px 7px; border-radius: 6px;
+  background: var(--carte-2); border: 1px solid var(--bord); white-space: nowrap;
+}
+
+/* À traiter */
+.a-traiter { display: grid; gap: 8px; }
+.alerte-ligne {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;
+  background: var(--carte); border: 1px solid var(--bord); text-align: left; width: 100%;
+}
+.alerte-ligne .ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+.alerte-ligne .ico svg { width: 16px; height: 16px; }
+.alerte-ligne.grave .ico { background: var(--grave-doux); color: var(--grave); }
+.alerte-ligne.alerte .ico { background: var(--alerte-doux); color: var(--alerte); }
+.alerte-ligne.ok .ico { background: var(--ok-doux); color: var(--ok); }
+.alerte-ligne b { font-weight: 600; }
+.alerte-ligne span { color: var(--texte-2); }
+.alerte-ligne .fl { margin-left: auto; color: var(--texte-3); }
+
+/* Listes */
+.liste { display: flex; flex-direction: column; }
+.ligne {
+  display: flex; align-items: center; gap: 12px; padding: 11px 0;
+  border-top: 1px solid var(--bord); min-width: 0;
+}
+.ligne:first-child { border-top: 0; padding-top: 2px; }
+.ligne .t { min-width: 0; flex: 1; }
+.ligne .t b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ligne .t span { display: block; color: var(--texte-3); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ligne .n { font-weight: 600; white-space: nowrap; }
+.vide { color: var(--texte-3); padding: 18px 0; text-align: center; font-size: 13px; }
+
+/* Erreurs */
+.filtres { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.filtre {
+  height: 32px; padding: 0 12px; border-radius: 16px; border: 1px solid var(--bord-fort);
+  background: var(--carte); font-size: 13px; font-weight: 500; color: var(--texte-2);
+}
+.filtre[aria-pressed="true"] { background: var(--texte); color: var(--fond); border-color: transparent; }
+.erreur {
+  display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; width: 100%; text-align: left;
+  padding: 14px 16px; border: 1px solid var(--bord); border-radius: 14px; background: var(--carte);
+  margin-bottom: 8px; transition: border-color .15s;
+}
+.erreur:hover { border-color: var(--bord-fort); }
+.erreur .haut { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.erreur .msg { grid-column: 1; font-weight: 500; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word; }
+.erreur .meta { grid-column: 1 / -1; color: var(--texte-3); font-size: 12.5px; display: flex; gap: 14px; flex-wrap: wrap; }
+.erreur .compte { grid-row: 1 / 3; grid-column: 2; text-align: right; }
+.erreur .compte b { display: block; font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+.erreur .compte span { font-size: 12px; color: var(--texte-3); }
+.erreur.nouvelle { border-left: 3px solid var(--grave); }
+@keyframes arrive { from { background: var(--grave-doux); } to { background: var(--carte); } }
+.erreur.fraiche { animation: arrive 2.4s ease-out; }
+
+/* Tableau */
+.table-boite { overflow-x: auto; margin: 0 -18px -18px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left; font-weight: 500; color: var(--texte-3); font-size: 12px; padding: 10px 12px;
+  border-bottom: 1px solid var(--bord); white-space: nowrap; user-select: none;
+}
+th[data-tri] { cursor: pointer; }
+th[data-tri]:hover { color: var(--texte); }
+th.num, td.num { text-align: right; }
+td { padding: 11px 12px; border-bottom: 1px solid var(--bord); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td:first-child, th:first-child { padding-left: 18px; }
+td:last-child, th:last-child { padding-right: 18px; }
+td.nom { font-weight: 600; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.recherche { height: 34px; border-radius: 9px; border: 1px solid var(--bord-fort); background: var(--carte); padding: 0 12px; min-width: 200px; outline: none; }
+.recherche:focus { border-color: var(--accent); }
+
+/* Barres horizontales */
+.hbars { display: grid; gap: 10px; }
+.hbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: 13px; }
+.hbar .k { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--texte); }
+.hbar .v { font-weight: 600; text-align: right; }
+.hbar .piste { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--carte-2); overflow: hidden; }
+.hbar .rempli { height: 100%; border-radius: 3px; background: var(--s1); }
+
+/* Graphiques */
+.graph { position: relative; width: 100%; }
+.graph svg { display: block; width: 100%; overflow: visible; }
+.graph text { fill: var(--texte-3); font-size: 11px; font-family: inherit; }
+.legende { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--texte-2); margin-bottom: 10px; }
+.legende i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.bulle {
+  position: fixed; z-index: 50; pointer-events: none; padding: 8px 10px; border-radius: 10px;
+  background: var(--texte); color: var(--fond); font-size: 12.5px; line-height: 1.4;
+  box-shadow: 0 6px 24px rgba(0,0,0,.18); opacity: 0; transition: opacity .1s; max-width: 240px;
+}
+.bulle b { font-weight: 600; }
+.bulle i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; }
+
+/* Santé */
+.sante { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--bord); }
+.sante:first-child { border-top: 0; padding-top: 0; }
+.sante .t { flex: 1; } .sante .t b { display: block; font-weight: 600; } .sante .t span { color: var(--texte-3); font-size: 12.5px; }
+.jauge { height: 8px; border-radius: 4px; background: var(--carte-2); overflow: hidden; margin-top: 8px; }
+.jauge div { height: 100%; border-radius: 4px; background: var(--s2); }
+
+/* Coûts éditables */
+.cout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 100px 108px 44px 32px; gap: 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--bord); }
+.cout:first-child { border-top: 0; }
+.cout input, .cout select { height: 34px; border-radius: 8px; border: 1px solid var(--bord); background: var(--carte-2); padding: 0 9px; width: 100%; min-width: 0; outline: none; }
+.cout input:focus, .cout select:focus { border-color: var(--accent); }
+.cout input[type="number"] { text-align: right; }
+.cout.inactif input, .cout.inactif select { opacity: .5; }
+.interrupteur { position: relative; width: 40px; height: 24px; border-radius: 12px; border: 0; background: var(--bord-fort); padding: 0; transition: background .2s; }
+.interrupteur::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
+.interrupteur[aria-checked="true"] { background: var(--ok); }
+.interrupteur[aria-checked="true"]::after { transform: translateX(16px); }
+.icone-btn { width: 32px; height: 32px; border-radius: 8px; border: 0; background: none; color: var(--texte-3); display: grid; place-items: center; }
+.icone-btn:hover { background: var(--grave-doux); color: var(--grave); }
+.icone-btn svg { width: 16px; height: 16px; }
+.note { font-size: 12.5px; color: var(--texte-3); margin: 10px 0 0; }
+
+/* Panneau de détail */
+.voile { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.voile.ouvert { opacity: 1; pointer-events: auto; }
+.panneau {
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100%); z-index: 41;
+  background: var(--fond); border-left: 1px solid var(--bord); transform: translateX(100%);
+  transition: transform .28s cubic-bezier(.2,.8,.2,1); display: flex; flex-direction: column;
+}
+.panneau.ouvert { transform: none; }
+.panneau-haut { padding: 18px 20px 14px; border-bottom: 1px solid var(--bord); display: grid; gap: 10px; }
+.panneau-haut .x { position: absolute; top: 14px; right: 14px; }
+.panneau-corps { overflow-y: auto; padding: 16px 20px 40px; -webkit-overflow-scrolling: touch; }
+.occ { background: var(--carte); border: 1px solid var(--bord); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; font-size: 13px; }
+.occ dl { display: grid; grid-template-columns: 96px 1fr; gap: 4px 10px; margin: 8px 0 0; }
+.occ dt { color: var(--texte-3); } .occ dd { margin: 0; word-break: break-word; }
+pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-monospace, "SF Mono", Menlo, monospace; background: var(--carte-2); border-radius: 8px; padding: 10px; margin: 10px 0 0; max-height: 220px; overflow: auto; color: var(--texte-2); }
+
+.toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); z-index: 60;
+  background: var(--texte); color: var(--fond); padding: 11px 16px; border-radius: 12px;
+  font-weight: 500; font-size: 13.5px; opacity: 0; transition: all .25s; pointer-events: none;
+  box-shadow: 0 8px 30px rgba(0,0,0,.2); max-width: calc(100% - 32px);
+}
+.toast.vu { opacity: 1; transform: translate(-50%, 0); }
+
+.chargement { display: grid; place-items: center; min-height: 60vh; color: var(--texte-3); }
+.roue { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid var(--bord-fort); border-top-color: var(--accent); animation: tourne .8s linear infinite; }
+@keyframes tourne { to { transform: rotate(360deg); } }
+.encart { padding: 12px 14px; border-radius: 12px; background: var(--alerte-doux); color: var(--texte); font-size: 13px; margin-bottom: 14px; }
+.encart.info { background: var(--carte-2); color: var(--texte-2); }
+
+/* ─── Tablette ─── */
+@media (max-width: 1180px) {
+  .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .g3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* ─── Téléphone ─── */
+@media (max-width: 860px) {
+  .coque { display: block; }
+  .cote { display: none; }
+  .haut-mobile {
+    display: block; position: sticky; top: 0; z-index: 20;
+    background: var(--nav); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--bord); padding-top: env(safe-area-inset-top);
+  }
+  .haut-mobile .barre { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 6px; }
+  .haut-mobile .marque img { width: 26px; height: 26px; border-radius: 7px; }
+  .haut-mobile .logotype { font-size: 16px; }
+  .onglets { display: flex; gap: 6px; overflow-x: auto; padding: 6px 16px 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .onglets::-webkit-scrollbar { display: none; }
+  .onglets button {
+    flex: none; height: 32px; padding: 0 12px; border-radius: 16px; border: 0; background: var(--carte-2);
+    font-size: 13px; font-weight: 500; color: var(--texte-2); display: inline-flex; align-items: center; gap: 6px;
+  }
+  .onglets button[aria-current="page"] { background: var(--texte); color: var(--fond); }
+  .onglets .pastille { margin-left: 0; height: 18px; min-width: 18px; font-size: 11px; }
+  .principal { padding: 18px 16px calc(48px + env(safe-area-inset-bottom)); }
+  .entete { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .entete h1 { font-size: 24px; }
+  .g4, .g3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .g2 { grid-template-columns: minmax(0, 1fr); }
+  .carte { padding: 15px; border-radius: 14px; }
+  .tuile .val { font-size: 22px; }
+  .tuile.heros .val { font-size: 26px; }
+  .table-boite { margin: 0 -15px -15px; }
+  td:first-child, th:first-child { padding-left: 15px; }
+  .cout { grid-template-columns: minmax(0, 1fr) 90px 44px 32px; }
+  .cout .c-cat, .cout .c-per { display: none; }
+  .recherche { min-width: 0; width: 100%; }
+  .erreur { padding: 13px 14px; }
+}
+@media (max-width: 380px) {
+  .tuile .val { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ Connexion ═══ -->
+<div class="porte cache" id="porte">
+  <div class="porte-boite">
+    <div class="marque"><img src="/app/icone-192.png" alt=""><span class="logotype">Standix</span></div>
+    <h1>Dashboard privé</h1>
+    <form id="form-connexion">
+      <input class="champ" id="c-email" type="email" autocomplete="username" placeholder="Adresse e-mail" required>
+      <input class="champ" id="c-mdp" type="password" autocomplete="current-password" placeholder="Mot de passe" required>
+      <button class="bouton" id="c-btn" type="submit">Se connecter</button>
+    </form>
+    <div class="porte-msg" id="porte-msg"></div>
+    <button class="lien-discret cache" id="porte-sortir" style="margin-top:8px">Se déconnecter</button>
+  </div>
+</div>
+
+<!-- ═══ Dashboard ═══ -->
+<div class="coque cache" id="coque">
+  <aside class="cote">
+    <div class="marque"><img src="/app/icone-192.png" alt=""><span class="logotype">Standix</span><span class="etiquette-prive">Privé</span></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="cote-bas">
+      <span class="direct"><span class="point" id="point"></span><span id="etat-direct">Connexion…</span></span>
+      <span id="maj">—</span>
+      <button class="lien-discret" id="sortir">Se déconnecter</button>
+    </div>
+  </aside>
+
+  <div>
+    <header class="haut-mobile">
+      <div class="barre">
+        <div class="marque"><img src="/app/icone-192.png" alt=""><span class="logotype">Standix</span><span class="etiquette-prive">Privé</span></div>
+        <span class="direct" style="font-size:12.5px;color:var(--texte-3)"><span class="point" id="point-m"></span><span id="maj-m">—</span></span>
+      </div>
+      <div class="onglets" id="onglets"></div>
+    </header>
+    <main class="principal" id="principal">
+      <div class="chargement"><div class="roue"></div></div>
+    </main>
+  </div>
+</div>
+
+<div class="voile" id="voile"></div>
+<aside class="panneau" id="panneau" aria-hidden="true"></aside>
+<div class="bulle" id="bulle"></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+/* ═══════════════════════════════════════════════════════════════════════
+   1. CONNEXION À SUPABASE
+   Même bibliothèque et même session que l'app : si tu es déjà connecté
+   à l'app sur cet appareil, le Dashboard s'ouvre directement.
+   ═══════════════════════════════════════════════════════════════════════ */
+const SUPABASE_URL = 'https://tlrtsoahwqhtvtkhssbm.supabase.co'
+const SUPABASE_CLE = 'sb_publishable_pzGIsj3EE2Sh_OBt21QbGg_4lKfitFw'
+let createClient
+try { ({ createClient } = await import('/app/supabase.js')) }
+catch (e) { ({ createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')) }
+const sb = createClient(SUPABASE_URL, SUPABASE_CLE)
+
+const $ = (s, r = document) => r.querySelector(s)
+const $$ = (s, r = document) => [...r.querySelectorAll(s)]
+const echap = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+
+/* ─── Formats français ─── */
+const nf = new Intl.NumberFormat('fr-FR')
+const nf1 = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
+const eur = (v, dec = 0) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: dec, minimumFractionDigits: dec }).format(v || 0)
+const eur2 = (v) => eur(v, Math.abs(v) < 100 && v % 1 ? 2 : 0)
+const n = (v) => nf.format(v || 0)
+const pct = (v) => (isFinite(v) ? nf1.format(v * 100) : '—') + ' %'
+const octets = (b) => { if (!b) return '0 o'; const u = ['o', 'Ko', 'Mo', 'Go', 'To']; const i = Math.min(4, Math.floor(Math.log(b) / Math.log(1024))); return nf1.format(b / 1024 ** i) + ' ' + u[i] }
+const duree = (s) => { if (!s) return '—'; s = Math.round(s); return s < 60 ? s + ' s' : Math.floor(s / 60) + ' min ' + String(s % 60).padStart(2, '0') }
+const dateC = (d) => d ? new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '—'
+const dateL = (d) => d ? new Date(d).toLocaleString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'
+function ilya(d) {
+  if (!d) return '—'
+  const s = (Date.now() - new Date(d)) / 1000
+  if (s < 0) { const f = -s; if (f < 86400) return 'dans ' + Math.ceil(f / 3600) + ' h'; return 'dans ' + Math.ceil(f / 86400) + ' j' }
+  if (s < 60) return 'à l’instant'
+  if (s < 3600) return 'il y a ' + Math.floor(s / 60) + ' min'
+  if (s < 86400) return 'il y a ' + Math.floor(s / 3600) + ' h'
+  if (s < 86400 * 30) return 'il y a ' + Math.floor(s / 86400) + ' j'
+  return dateC(d)
+}
+const MOIS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
+const moisLib = (m) => { const [a, mm] = m.split('-'); return MOIS[+mm - 1] + (mm === '01' ? ' ' + a.slice(2) : '') }
+
+/* Les prix des offres — les mêmes que l'app (OFFRES dans app.js). Ne
+   servent que si Stripe ne répond pas, pour estimer le revenu. */
+const PRIX = { essentiel: { mensuel: 99, annuel: 1010 }, equipe: { mensuel: 199, annuel: 2030 }, pro: { mensuel: 299, annuel: 3050 } }
+const NOM_OFFRE = { essentiel: 'Essentiel', equipe: 'Équipe', pro: 'Pro', reseau: 'Réseau' }
+
+/* ─── Icônes (trait 1.8, 24×24) ─── */
+const I = {
+  vue: '<path d="M3 13h8V3H3zM13 21h8V11h-8zM3 21h8v-6H3zM13 3v6h8V3z"/>',
+  argent: '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  erreurs: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/>',
+  sante: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  clients: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+  usage: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5"/>',
+  site: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+  securite: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  maj: '<path d="M23 4v6h-6M1 20v-6h6M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/>',
+  fleche: '<path d="m9 18 6-6-6-6"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  ok: '<path d="M20 6 9 17l-5-5"/>',
+  copie: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  poubelle: '<path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  horloge: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+}
+const ico = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`
+
+const PAGES = [
+  { id: 'vue', nom: 'Vue d’ensemble', court: 'Accueil', icone: 'vue' },
+  { id: 'argent', nom: 'Argent', icone: 'argent' },
+  { id: 'erreurs', nom: 'Erreurs', icone: 'erreurs' },
+  { id: 'sante', nom: 'Santé technique', court: 'Santé', icone: 'sante' },
+  { id: 'clients', nom: 'Clients', icone: 'clients' },
+  { id: 'usage', nom: 'Usage de l’app', court: 'Usage', icone: 'usage' },
+  { id: 'site', nom: 'Site internet', court: 'Site', icone: 'site' },
+  { id: 'securite', nom: 'Sécurité', icone: 'securite' },
+]
+
+/* ═══════════════════════════════════════════════════════════════════════
+   2. ÉTAT
+   ═══════════════════════════════════════════════════════════════════════ */
+let S = null          // admin_stats()
+let ST = null         // admin-stripe (ou { erreur })
+let page = (location.hash.slice(1) || 'vue')
+if (!PAGES.some((p) => p.id === page)) page = 'vue'
+let filtreErreurs = 'nouveau'
+let filtreSource = 'tout'
+let triClients = { cle: 'derniere_activite', sens: -1 }
+let rechercheClients = ''
+let canal = null
+let minuteur = null
+let enDirect = false
+const mesures = {}    // temps de réponse mesurés (page Santé)
+
+function toast(t) {
+  const el = $('#toast'); el.textContent = t; el.classList.add('vu')
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('vu'), 2600)
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   3. ENTRÉE : SESSION → ADMIN ? → DASHBOARD
+   ═══════════════════════════════════════════════════════════════════════ */
+async function entrer() {
+  const { data: { session } } = await sb.auth.getSession()
+  if (!session) return montrerPorte()
+  const { data: admin, error } = await sb.rpc('est_admin')
+  if (error || admin !== true) return montrerPorte('Ce compte n’a pas accès au Dashboard.', true)
+  $('#porte').classList.add('cache')
+  $('#coque').classList.remove('cache')
+  construireNav()
+  await charger(true)
+  brancherDirect()
+  clearInterval(minuteur)
+  minuteur = setInterval(() => { if (document.visibilityState === 'visible') charger() }, 60000)
+}
+
+function montrerPorte(msg = '', sortirVisible = false) {
+  $('#coque').classList.add('cache')
+  $('#porte').classList.remove('cache')
+  $('#porte-msg').textContent = msg
+  $('#porte-sortir').classList.toggle('cache', !sortirVisible)
+}
+
+$('#form-connexion').addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const btn = $('#c-btn'); btn.disabled = true; $('#porte-msg').textContent = ''
+  const { error } = await sb.auth.signInWithPassword({ email: $('#c-email').value.trim(), password: $('#c-mdp').value })
+  btn.disabled = false
+  if (error) { $('#porte-msg').textContent = 'E-mail ou mot de passe incorrect.'; return }
+  entrer()
+})
+async function sortir() { await sb.auth.signOut(); location.reload() }
+$('#sortir').onclick = sortir
+$('#porte-sortir').onclick = sortir
+
+/* ═══════════════════════════════════════════════════════════════════════
+   4. CHARGEMENT DES CHIFFRES
+   ═══════════════════════════════════════════════════════════════════════ */
+async function charger(premier = false) {
+  const t0 = performance.now()
+  const stats = sb.rpc('admin_stats').then((r) => { mesures.base = Math.round(performance.now() - t0); return r })
+  const t1 = performance.now()
+  const stripe = sb.functions.invoke('admin-stripe', { body: {} }).then((r) => { mesures.fonctions = Math.round(performance.now() - t1); return r })
+  const [rs, rst] = await Promise.allSettled([stats, stripe])
+
+  if (rs.status === 'fulfilled' && !rs.value.error) { S = rs.value.data; mesures.baseOk = true }
+  else { mesures.baseOk = false; if (!S) { $('#principal').innerHTML = `<div class="encart">Impossible de lire les chiffres : ${echap(rs.reason?.message || rs.value?.error?.message)}</div>`; return } }
+
+  if (rst.status === 'fulfilled' && !rst.value.error && rst.value.data && !rst.value.data.error) { ST = rst.value.data; mesures.fonctionsOk = true }
+  else {
+    let msg = rst.reason?.message || rst.value?.data?.error || rst.value?.error?.message || 'inconnue'
+    try { const c = await rst.value?.error?.context?.json?.(); if (c?.error) msg = c.error } catch (e) {}
+    ST = { erreur: msg }; mesures.fonctionsOk = false
+  }
+
+  majHorloge()
+  majPastilles()
+  if (premier || !$('.panneau.ouvert')) afficher()
+}
+
+function majHorloge() {
+  const t = S?.genere_le ? new Date(S.genere_le).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—'
+  $('#maj').textContent = 'Mis à jour à ' + t
+  $('#maj-m').textContent = t
+}
+
+/* ─── Temps réel : chaque nouvelle erreur arrive sans recharger ─── */
+function brancherDirect() {
+  if (canal) sb.removeChannel(canal)
+  canal = sb.channel('erreurs-direct')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'journal_erreurs' }, (p) => {
+      const e = p.new || {}
+      toast('Nouvelle erreur · ' + (e.code || e.genre || '') + ' — ' + String(e.message || '').slice(0, 60))
+      clearTimeout(brancherDirect.t)
+      brancherDirect.t = setTimeout(() => charger().then(() => {
+        const el = $(`.erreur[data-emp="${e.empreinte}"]`); if (el) el.classList.add('fraiche')
+      }), 800)
+    })
+    .subscribe((statut) => {
+      enDirect = statut === 'SUBSCRIBED'
+      $('#point').classList.toggle('vivant', enDirect)
+      $('#point-m').classList.toggle('vivant', enDirect)
+      $('#etat-direct').textContent = enDirect ? 'En direct' : 'Hors direct'
+      const b = $('#badge-direct'); if (b) { b.textContent = enDirect ? 'En direct' : 'Hors direct'; b.classList.toggle('ok', enDirect) }
+    })
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) charger() })
+
+/* ═══════════════════════════════════════════════════════════════════════
+   5. NAVIGATION
+   ═══════════════════════════════════════════════════════════════════════ */
+function construireNav() {
+  $('#nav').innerHTML = PAGES.map((p) => `<button data-page="${p.id}">${ico(p.icone)}<span>${p.nom}</span><span class="pastille cache" data-pastille="${p.id}"></span></button>`).join('')
+  $('#onglets').innerHTML = PAGES.map((p) => `<button data-page="${p.id}">${p.court || p.nom}<span class="pastille cache" data-pastille="${p.id}"></span></button>`).join('')
+  $$('[data-page]').forEach((b) => b.addEventListener('click', () => aller(b.dataset.page)))
+}
+function aller(p) {
+  page = p
+  history.replaceState(null, '', '#' + p)
+  afficher()
+  window.scrollTo({ top: 0 })
+  const actif = $(`#onglets [data-page="${p}"]`)
+  actif?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
+}
+function majPastilles() {
+  const nb = { erreurs: S?.kpi?.erreurs_ouvertes || 0, clients: S?.kpi?.impayes || 0 }
+  $$('[data-pastille]').forEach((el) => {
+    const v = nb[el.dataset.pastille] || 0
+    el.textContent = v > 99 ? '99+' : v
+    el.classList.toggle('cache', !v)
+  })
+}
+
+function afficher() {
+  if (!S) return
+  $$('[data-page]').forEach((b) => { if (b.dataset.page === page) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current') })
+  const fn = { vue: pageVue, argent: pageArgent, erreurs: pageErreurs, sante: pageSante, clients: pageClients, usage: pageUsage, site: pageSite, securite: pageSecurite }[page]
+  $('#principal').innerHTML = fn()
+  document.title = 'Standix · ' + PAGES.find((p) => p.id === page).nom
+  dessinerGraphiques()
+  brancherPage()
+}
+
+function entete(titre, sous, actions = '') {
+  return `<div class="entete"><div><h1>${titre}</h1>${sous ? `<p>${sous}</p>` : ''}</div>
+    <div class="actions">${actions}<button class="btn" data-action="actualiser">${ico('maj')}Actualiser</button></div></div>`
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   6. CALCULS PARTAGÉS (argent)
+   ═══════════════════════════════════════════════════════════════════════ */
+const moisCourant = () => new Date().toISOString().slice(0, 7)
+function reglage(cle, defaut) { return Number(S?.reglages?.[cle]?.valeur ?? defaut) }
+function coutsFixesMensuels() {
+  return (S.couts_fixes || []).filter((c) => c.actif).reduce((s, c) => s + (c.periodicite === 'annuel' ? Number(c.montant) / 12 : Number(c.montant)), 0)
+}
+function nbDuMois(liste, m) { return (liste || []).find((x) => x.m === m)?.n || 0 }
+function coutsDuMois(m) {
+  const ia = nbDuMois(S.analyses_par_mois, m) * reglage('cout_analyse_ia', 0.3)
+  const trad = nbDuMois(S.traductions_par_mois, m) * reglage('cout_traduction_ia', 0.02)
+  return { fixes: coutsFixesMensuels(), ia, trad, total: coutsFixesMensuels() + ia + trad }
+}
+function mrrEstime() {
+  return (S.abonnements || []).reduce((s, a) => {
+    const p = PRIX[a.palier]; if (!p) return s
+    return s + a.n * (a.rythme === 'annuel' ? p.annuel / 12 : p.mensuel)
+  }, 0)
+}
+function argent() {
+  const m = moisCourant()
+  const stripeOk = ST && !ST.erreur
+  const mrr = stripeOk ? ST.mrr : mrrEstime()
+  const encaisse = stripeOk ? (ST.par_mois.find((x) => x.m === m) || { brut: 0, frais: 0, net: 0, rembourse: 0 }) : null
+  const couts = coutsDuMois(m)
+  const revenuMois = encaisse ? encaisse.net : mrr
+  const benefice = revenuMois - couts.total
+  return { m, stripeOk, mrr, encaisse, couts, revenuMois, benefice }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   7. LES PAGES
+   ═══════════════════════════════════════════════════════════════════════ */
+const serie = (cle, jours = 30) => (S.serie || []).slice(-jours).map((d) => ({ x: d.j, y: d[cle] || 0 }))
+const somme = (l) => l.reduce((s, d) => s + d.y, 0)
+
+function tuile(lib, val, sous = '', opts = {}) {
+  return `<div class="carte tuile${opts.heros ? ' heros' : ''}">
+    <div class="lib">${lib}</div>
+    <div class="val ${opts.ton || ''}">${val}</div>
+    ${sous ? `<div class="sous">${sous}</div>` : ''}
+    ${opts.spark ? `<div class="spark graph" data-graph='${echap(JSON.stringify({ type: 'spark', d: opts.spark, lib }))}'></div>` : ''}
+  </div>`
+}
+function delta(actuel, avant) {
+  if (!avant) return ''
+  const d = (actuel - avant) / avant
+  return `<span class="delta ${d >= 0 ? 'monte' : 'baisse'}">${d >= 0 ? '+' : ''}${nf1.format(d * 100)} %</span>`
+}
+function graph(type, d, opts = {}) {
+  return `<div class="graph" data-graph='${echap(JSON.stringify({ type, d, ...opts }))}'></div>`
+}
+function hbars(items, opts = {}) {
+  if (!items?.length) return `<div class="vide">${opts.vide || 'Rien pour l’instant'}</div>`
+  const max = Math.max(...items.map((i) => i.n), 1)
+  return `<div class="hbars">${items.map((i) => `<div class="hbar"><span class="k">${echap(i.k ?? '—')}</span><span class="v">${opts.fmt ? opts.fmt(i.n) : n(i.n)}</span><div class="piste"><div class="rempli" style="width:${Math.max(2, (i.n / max) * 100)}%;background:${opts.couleur || 'var(--s1)'}"></div></div></div>`).join('')}</div>`
+}
+const objEnListe = (o, noms = {}) => Object.entries(o || {}).map(([k, v]) => ({ k: noms[k] || k, n: v })).sort((a, b) => b.n - a.n)
+
+/* ─── Vue d'ensemble ─── */
+function pageVue() {
+  const k = S.kpi, a = argent()
+  const alertes = []
+  const nouvelles = (S.erreurs || []).filter((e) => e.statut === 'nouveau')
+  if (nouvelles.length) alertes.push({ ton: 'grave', ico: 'erreurs', t: `<b>${nouvelles.length} erreur${nouvelles.length > 1 ? 's' : ''} à corriger</b> <span>· ${n(nouvelles.reduce((s, e) => s + e.n_24h, 0))} fois dans les dernières 24 h</span>`, va: 'erreurs' })
+  if (k.impayes) alertes.push({ ton: 'grave', ico: 'argent', t: `<b>${k.impayes} paiement${k.impayes > 1 ? 's' : ''} refusé${k.impayes > 1 ? 's' : ''}</b> <span>· carte à mettre à jour</span>`, va: 'clients' })
+  const finissent = (S.entreprises || []).filter((e) => e.statut === 'essai' && e.essai_fin && new Date(e.essai_fin) > new Date() && new Date(e.essai_fin) - new Date() < 3 * 86400e3)
+  if (finissent.length) alertes.push({ ton: 'alerte', ico: 'horloge', t: `<b>${finissent.length} essai${finissent.length > 1 ? 's' : ''} se termine${finissent.length > 1 ? 'nt' : ''} sous 3 jours</b> <span>· ${finissent.map((e) => echap(e.nom)).slice(0, 3).join(', ')}</span>`, va: 'clients' })
+  const echecsRecents = (S.echecs_ia || []).filter((e) => new Date(e.date) > Date.now() - 7 * 86400e3)
+  if (echecsRecents.length) alertes.push({ ton: 'alerte', ico: 'usage', t: `<b>${echecsRecents.length} génération${echecsRecents.length > 1 ? 's' : ''} IA en échec</b> <span>· 7 derniers jours</span>`, va: 'erreurs' })
+  if (!S.securite.mfa_admin) alertes.push({ ton: 'alerte', ico: 'securite', t: `<b>Double authentification non activée</b> <span>· sur le compte admin</span>`, va: 'securite' })
+  if (!a.stripeOk) alertes.push({ ton: 'alerte', ico: 'argent', t: `<b>Stripe ne répond pas</b> <span>· revenus estimés</span>`, va: 'argent' })
+  if (!alertes.length) alertes.push({ ton: 'ok', ico: 'ok', t: '<b>Tout va bien</b> <span>· rien à traiter</span>' })
+
+  const visites30 = serie('visites'), inscr30 = serie('entreprises'), proc30 = serie('procedures'), valid30 = serie('validations')
+
+  return entete('Vue d’ensemble', 'Standix en un coup d’œil') + `
+  <div class="grille g4">
+    ${tuile('Revenu mensuel récurrent', eur(a.mrr), a.stripeOk ? 'Stripe · ' + (ST.mode === 'réel' ? 'mode réel' : 'mode test') : 'Estimé (Stripe indisponible)', { heros: 1 })}
+    ${tuile('Bénéfice ce mois', eur(a.benefice), `${eur(a.revenuMois)} encaissés − ${eur(a.couts.total)} de coûts`, { heros: 1, ton: a.benefice >= 0 ? 'ok' : 'grave' })}
+    ${tuile('Erreurs à corriger', n(k.erreurs_ouvertes), `${n(k.erreurs_24h)} signalement${k.erreurs_24h > 1 ? 's' : ''} en 24 h`, { heros: 1, ton: k.erreurs_ouvertes ? 'grave' : 'ok' })}
+    ${tuile('Entreprises actives', `${n(k.actives_7j)} <small>/ ${n(k.entreprises)}</small>`, `${n(k.actives_30j)} actives sur 30 jours`, { heros: 1 })}
+  </div>
+
+  <div class="section"><h2>À traiter</h2>
+    <div class="a-traiter">${alertes.map((x) => `<button class="alerte-ligne ${x.ton}" ${x.va ? `data-aller="${x.va}"` : 'disabled'}><span class="ico">${ico(x.ico)}</span><span>${x.t}</span>${x.va ? `<span class="fl">${ico('fleche').replace('<svg', '<svg width="16" height="16"')}</span>` : ''}</button>`).join('')}</div>
+  </div>
+
+  <div class="section"><h2>30 derniers jours</h2>
+    <div class="grille g4">
+      ${tuile('Inscriptions', n(somme(inscr30)), 'nouvelles entreprises', { spark: inscr30 })}
+      ${tuile('Procédures créées', n(somme(proc30)), n(k.analyses_mois) + ' analyses IA ce mois ' + delta(k.analyses_mois, k.analyses_mois_dernier), { spark: proc30 })}
+      ${tuile('Procédures lues', n(somme(valid30)), 'validations par les équipes', { spark: valid30 })}
+      ${tuile('Visiteurs du site', n(somme(visites30)), n(S.site.en_ligne) + ' en ligne maintenant', { spark: visites30 })}
+    </div>
+  </div>
+
+  <div class="section grille g2">
+    <div class="carte"><h3>Dernières erreurs <small><button class="lien-discret" data-aller="erreurs">Tout voir</button></small></h3>
+      ${listeErreursCourte(6)}
+    </div>
+    <div class="carte"><h3>Dernières inscriptions <small><button class="lien-discret" data-aller="clients">Tout voir</button></small></h3>
+      <div class="liste">${[...S.entreprises].sort((x, y) => new Date(y.cree_le) - new Date(x.cree_le)).slice(0, 6).map((e) => `
+        <div class="ligne"><div class="t"><b>${echap(e.nom)}</b><span>${ilya(e.cree_le)} · ${e.membres} membre${e.membres > 1 ? 's' : ''} · ${e.procedures} procédure${e.procedures > 1 ? 's' : ''}</span></div>${badgeStatut(e)}</div>`).join('')}</div>
+    </div>
+  </div>`
+}
+
+function listeErreursCourte(nb) {
+  const l = (S.erreurs || []).slice(0, nb)
+  if (!l.length) return '<div class="vide">Aucune erreur sur 30 jours</div>'
+  return `<div class="liste">${l.map((e) => `<div class="ligne" style="cursor:pointer" data-erreur="${e.empreinte}"><span class="code">${echap(e.code || e.genre)}</span><div class="t"><b>${echap(e.message)}</b><span>${e.source === 'site' ? 'Site' : 'App'} · ${ilya(e.derniere)}</span></div><span class="n">${n(e.n)}×</span></div>`).join('')}</div>`
+}
+
+function badgeStatut(e) {
+  if (e.statut === 'actif') return `<span class="badge ok">${NOM_OFFRE[e.palier] || 'Abonné'}${e.rythme === 'annuel' ? ' · an' : ''}</span>`
+  if (e.statut === 'impaye') return '<span class="badge grave">Impayé</span>'
+  if (e.statut === 'resilie') return '<span class="badge">Résilié</span>'
+  if (e.essai_fin && new Date(e.essai_fin) > new Date()) return `<span class="badge accent">Essai · ${Math.ceil((new Date(e.essai_fin) - Date.now()) / 86400e3)} j</span>`
+  return '<span class="badge alerte">Essai fini</span>'
+}
+
+/* ─── Argent ─── */
+function pageArgent() {
+  const a = argent(), k = S.kpi
+  const abonnes = k.abonnes || 0
+  const historique = []
+  const debutStandix = S.entreprises.reduce((min, e) => (e.cree_le && e.cree_le.slice(0, 7) < min ? e.cree_le.slice(0, 7) : min), moisCourant())
+  const d = new Date(); d.setDate(1)
+  for (let i = 11; i >= 0; i--) {
+    const x = new Date(d.getFullYear(), d.getMonth() - i, 1)
+    const m = `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}`
+    const enc = a.stripeOk ? (ST.par_mois.find((p) => p.m === m)?.net || 0) : 0
+    /* Avant la première inscription, Standix n'existait pas : pas de coûts à compter. */
+    const b = m < debutStandix ? 0 : Math.round(coutsDuMois(m).total * 100) / 100
+    historique.push({ x: moisLib(m), a: enc, b })
+  }
+  const clients = a.stripeOk ? [...ST.clients].sort((x, y) => (y.statut === 'active') - (x.statut === 'active') || y.mensuel - x.mensuel) : []
+
+  return entete('Argent', 'Ce que tu gagnes, ce que tu payes') + `
+  ${a.stripeOk ? (ST.mode === 'test' ? '<div class="encart">Stripe est en <b>mode test</b> : ces revenus ne sont pas réels.</div>' : '') : `<div class="encart">Stripe ne répond pas (${echap(ST?.erreur)}). Les revenus ci-dessous sont <b>estimés</b> d’après les abonnements enregistrés dans Standix.</div>`}
+  <div class="grille g4">
+    ${tuile('Revenu mensuel récurrent', eur(a.mrr), 'MRR · ' + eur(a.mrr * 12) + ' par an', { heros: 1 })}
+    ${tuile('Encaissé ce mois', a.encaisse ? eur2(a.encaisse.net) : '—', a.encaisse ? `${eur2(a.encaisse.brut)} brut − ${eur2(a.encaisse.frais)} de frais Stripe` : 'Stripe indisponible', { heros: 1 })}
+    ${tuile('Coûts ce mois', eur2(a.couts.total), `${eur2(a.couts.fixes)} fixes + ${eur2(a.couts.ia + a.couts.trad)} d’IA`, { heros: 1 })}
+    ${tuile('Bénéfice ce mois', eur2(a.benefice), a.revenuMois > 0 ? 'Marge ' + pct(a.benefice / a.revenuMois) : 'Pas encore de revenu ce mois', { heros: 1, ton: a.benefice >= 0 ? 'ok' : 'grave' })}
+  </div>
+
+  <div class="section carte">
+    <h3>Encaissé et dépensé, 12 derniers mois <small>Coûts IA estimés</small></h3>
+    <div class="legende"><span><i style="background:var(--s1)"></i>Encaissé (net de frais)</span><span><i style="background:var(--s2)"></i>Coûts</span></div>
+    ${graph('barres2', historique, { h: 240, fmt: 'eur', libA: 'Encaissé', libB: 'Coûts' })}
+  </div>
+
+  <div class="section grille g4">
+    ${tuile('Revenu moyen par client', abonnes ? eur(a.mrr / abonnes) : '—', abonnes + ' client' + (abonnes > 1 ? 's' : '') + ' payant' + (abonnes > 1 ? 's' : ''))}
+    ${tuile('Coût par entreprise', k.entreprises ? eur2(a.couts.total / k.entreprises) : '—', 'ce mois, essais compris')}
+    ${tuile('Coût IA ce mois', eur2(a.couts.ia), n(k.analyses_mois) + ' analyses × ' + eur2(reglage('cout_analyse_ia', 0.3)))}
+    ${tuile('Solde Stripe', a.stripeOk ? eur2(ST.solde.disponible) : '—', a.stripeOk ? eur2(ST.solde.en_attente) + ' en attente de virement' : '')}
+  </div>
+
+  <div class="section grille g2">
+    <div class="carte"><h3>Abonnements Stripe <small>${a.stripeOk ? Object.entries(ST.par_statut).map(([s, v]) => v + ' ' + ({ active: 'actif', past_due: 'impayé', canceled: 'résilié', trialing: 'essai', incomplete: 'incomplet', incomplete_expired: 'expiré', unpaid: 'impayé', paused: 'en pause' }[s] || s) + (v > 1 && !/é$/.test(s) ? 's' : '')).join(' · ') : ''}</small></h3>
+      ${clients.length ? `<div class="liste">${clients.map((c) => `<div class="ligne"><div class="t"><b>${echap(c.nom)}</b><span>${NOM_OFFRE[c.offre] || echap(c.offre)} · ${c.rythme} · ${c.statut === 'active' ? (c.resiliation_prevue ? 'résiliation le ' : 'renouvellement le ') + dateC((c.fin_periode || 0) * 1000) : 'depuis le ' + dateC(c.debut * 1000)}</span></div>${c.statut === 'active' ? (c.resiliation_prevue ? '<span class="badge alerte">Se termine</span>' : '<span class="badge ok">Actif</span>') : c.statut === 'past_due' || c.statut === 'unpaid' ? '<span class="badge grave">Impayé</span>' : `<span class="badge">${echap(c.statut)}</span>`}<span class="n">${eur(c.mensuel)}<small style="color:var(--texte-3);font-weight:400">/mois</small></span></div>`).join('')}</div>` : `<div class="vide">${a.stripeOk ? 'Aucun abonnement' : 'Stripe indisponible'}</div>`}
+    </div>
+    <div class="carte"><h3>Revenu par offre</h3>
+      ${a.stripeOk ? hbars(Object.entries(ST.par_offre).map(([k2, v]) => ({ k: (NOM_OFFRE[k2] || k2) + ' · ' + v.n + ' client' + (v.n > 1 ? 's' : ''), n: v.mrr })), { fmt: (v) => eur(v) + '/mois', vide: 'Aucun abonné' }) : hbars((S.abonnements || []).map((x) => ({ k: (NOM_OFFRE[x.palier] || x.palier) + ' · ' + x.rythme, n: x.n })), { vide: 'Aucun abonné' })}
+    </div>
+  </div>
+
+  <div class="section carte">
+    <h3>Coûts fixes <small>Modifie directement : c’est enregistré</small></h3>
+    <div id="couts">${(S.couts_fixes || []).map(ligneCout).join('')}</div>
+    <button class="btn" data-action="ajout-cout" style="margin-top:10px">${ico('plus')}Ajouter un coût</button>
+    <h3 style="margin-top:24px">Coûts variables <small>Estimations par utilisation</small></h3>
+    ${Object.entries(S.reglages || {}).map(([cle, r]) => `<div class="cout" style="grid-template-columns:minmax(0,1fr) 100px"><span>${echap(r.libelle)}</span><input type="number" step="0.01" min="0" value="${r.valeur}" data-reglage="${cle}"></div>`).join('')}
+    <p class="note">Les coûts variables d’IA (Azure, Claude) ne sont pas encore lus sur les factures : ils sont estimés à partir du nombre d’analyses et de traductions. Ajuste le prix unitaire quand tu reçois une facture.</p>
+  </div>`
+}
+function ligneCout(c) {
+  return `<div class="cout${c.actif ? '' : ' inactif'}" data-cout="${c.id}">
+    <input value="${echap(c.nom)}" data-champ="nom" aria-label="Nom">
+    <input class="c-cat" value="${echap(c.categorie)}" data-champ="categorie" aria-label="Catégorie">
+    <input type="number" step="0.01" min="0" value="${c.montant}" data-champ="montant" aria-label="Montant en euros">
+    <select class="c-per" data-champ="periodicite" aria-label="Périodicité"><option value="mensuel"${c.periodicite === 'mensuel' ? ' selected' : ''}>€ / mois</option><option value="annuel"${c.periodicite === 'annuel' ? ' selected' : ''}>€ / an</option></select>
+    <button class="interrupteur" role="switch" aria-checked="${c.actif}" aria-label="Actif" data-champ="actif"></button>
+    <button class="icone-btn" data-action="suppr-cout" aria-label="Supprimer">${ico('poubelle')}</button>
+  </div>`
+}
+
+/* ─── Erreurs ─── */
+function pageErreurs() {
+  const toutes = S.erreurs || []
+  const l = toutes.filter((e) => (filtreErreurs === 'tout' || e.statut === filtreErreurs) && (filtreSource === 'tout' || e.source === filtreSource))
+  const nb = (s) => toutes.filter((e) => e.statut === s).length
+  const err30 = serie('erreurs')
+  return entete('Erreurs', 'Chaque erreur rencontrée par un client, regroupée', `<span class="badge ${enDirect ? 'ok' : ''}" id="badge-direct">${enDirect ? 'En direct' : 'Hors direct'}</span>`) + `
+  <div class="grille g4">
+    ${tuile('À corriger', n(nb('nouveau')), 'types d’erreur différents', { ton: nb('nouveau') ? 'grave' : 'ok' })}
+    ${tuile('Dernières 24 h', n(S.kpi.erreurs_24h), 'signalements')}
+    ${tuile('Entreprises touchées', n(toutes.filter((e) => e.statut === 'nouveau').reduce((m, e) => Math.max(m, e.nb_entreprises || 0), 0)), 'au plus, par une même erreur')}
+    ${tuile('Échecs IA', n(S.echecs_ia.length), 'procédures non générées', { ton: S.echecs_ia.length ? 'alerte' : '' })}
+  </div>
+  <div class="section carte"><h3>Signalements par jour <small>30 jours</small></h3>${graph('barres', err30, { h: 140, couleur: 'var(--grave)', lib: 'signalements' })}</div>
+  <div class="section">
+    <div class="filtres">
+      ${[['nouveau', 'À corriger'], ['corrige', 'Corrigées'], ['ignore', 'Ignorées'], ['tout', 'Toutes']].map(([v, t]) => `<button class="filtre" data-filtre="${v}" aria-pressed="${filtreErreurs === v}">${t} ${v !== 'tout' ? nb(v) : toutes.length}</button>`).join('')}
+      <span style="width:10px"></span>
+      ${[['tout', 'App + site'], ['app', 'App'], ['site', 'Site']].map(([v, t]) => `<button class="filtre" data-source="${v}" aria-pressed="${filtreSource === v}">${t}</button>`).join('')}
+    </div>
+    ${l.length ? l.map(carteErreur).join('') : `<div class="carte vide">${filtreErreurs === 'nouveau' ? 'Aucune erreur à corriger. Les nouvelles apparaîtront ici en direct.' : 'Rien ici.'}</div>`}
+  </div>
+  <div class="section carte"><h3>Générations IA en échec <small>${S.echecs_ia.length}</small></h3>
+    ${S.echecs_ia.length ? `<div class="liste">${S.echecs_ia.map((e) => `<div class="ligne"><div class="t"><b>${echap(e.titre || 'Sans titre')}</b><span>${echap(e.entreprise || '—')} · ${ilya(e.date)}${e.erreur ? ' · ' + echap(e.erreur) : ''}</span></div><span class="badge alerte">Échec</span></div>`).join('')}</div>` : '<div class="vide">Aucun échec</div>'}
+  </div>`
+}
+function carteErreur(e) {
+  const genre = { js: 'Code', promesse: 'Code', console: 'Console', reseau: 'Serveur', ressource: 'Fichier', manuel: 'Signalée', ia: 'IA' }[e.genre] || e.genre
+  return `<button class="erreur${e.statut === 'nouveau' ? ' nouvelle' : ''}" data-erreur="${e.empreinte}" data-emp="${e.empreinte}">
+    <div class="haut"><span class="code">${echap(e.code || 'ERREUR')}</span><span class="badge sans-point">${e.source === 'site' ? 'Site' : 'App'} · ${genre}</span>${e.statut === 'corrige' ? '<span class="badge ok">Corrigée</span>' : e.statut === 'ignore' ? '<span class="badge">Ignorée</span>' : ''}</div>
+    <div class="msg">${echap(e.message)}</div>
+    <div class="compte"><b>${n(e.n)}</b><span>${e.n_24h ? n(e.n_24h) + ' en 24 h' : 'fois'}</span></div>
+    <div class="meta"><span>${ilya(e.derniere)}</span><span>${e.nb_entreprises} entreprise${e.nb_entreprises > 1 ? 's' : ''}</span><span>${e.nb_personnes} personne${e.nb_personnes > 1 ? 's' : ''}</span>${e.page ? `<span>${echap(e.page)}</span>` : ''}</div>
+  </button>`
+}
+
+async function ouvrirErreur(emp) {
+  const e = (S.erreurs || []).find((x) => x.empreinte === emp); if (!e) return
+  const p = $('#panneau')
+  p.innerHTML = `<div class="panneau-haut"><button class="icone-btn x" data-action="fermer" aria-label="Fermer">${ico('x')}</button>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-right:40px"><span class="code">${echap(e.code || 'ERREUR')}</span><span class="badge sans-point">${e.source === 'site' ? 'Site' : 'App'}</span></div>
+    <div style="font-weight:600;font-size:15px;word-break:break-word">${echap(e.message)}</div>
+    <div style="color:var(--texte-3);font-size:12.5px">${n(e.n)} fois · ${e.nb_entreprises} entreprise(s) · première fois ${ilya(e.premiere)} · dernière ${ilya(e.derniere)}</div>
+    <div class="actions">
+      ${e.statut !== 'corrige' ? `<button class="btn btn-ok" data-statut="corrige">${ico('ok')}Corrigée</button>` : ''}
+      ${e.statut !== 'ignore' ? '<button class="btn" data-statut="ignore">Ignorer</button>' : ''}
+      ${e.statut !== 'nouveau' ? '<button class="btn" data-statut="nouveau">Rouvrir</button>' : ''}
+      <button class="btn btn-plein" data-action="copier">${ico('copie')}Copier pour Claude</button>
+    </div></div>
+    <div class="panneau-corps"><div class="chargement" style="min-height:120px"><div class="roue"></div></div></div>`
+  p.classList.add('ouvert'); p.setAttribute('aria-hidden', 'false'); $('#voile').classList.add('ouvert')
+  const { data, error } = await sb.rpc('admin_erreur_detail', { p_empreinte: emp })
+  const occ = data || []
+  ouvrirErreur.occ = occ; ouvrirErreur.e = e
+  $('.panneau-corps', p).innerHTML = error ? `<div class="encart">${echap(error.message)}</div>` : `<h3 style="font-size:13.5px;margin:0 0 10px">${occ.length >= 50 ? '50 dernières' : occ.length} occurrence${occ.length > 1 ? 's' : ''}</h3>` + occ.map((o) => `
+    <div class="occ"><b>${dateL(o.cree_le)}</b>
+      <dl>
+        <dt>Entreprise</dt><dd>${echap(o.entreprise || 'Visiteur non connecté')}${o.membre ? ' · ' + echap(o.membre) + (o.role ? ' (' + echap(o.role) + ')' : '') : ''}</dd>
+        <dt>Appareil</dt><dd>${echap([o.appareil, o.systeme, o.navigateur].filter(Boolean).join(' · ') || '—')}${o.ecran ? ' · ' + echap(o.ecran) : ''}</dd>
+        <dt>Page</dt><dd>${echap(o.page || '—')}</dd>
+        ${o.url ? `<dt>Adresse</dt><dd>${echap(o.url)}</dd>` : ''}
+        ${o.version ? `<dt>Version</dt><dd>${echap(o.version)}</dd>` : ''}
+        ${o.langue ? `<dt>Langue</dt><dd>${echap(o.langue)}</dd>` : ''}
+      </dl>
+      ${o.message !== e.message ? `<div style="margin-top:8px;color:var(--texte-2)">${echap(o.message)}</div>` : ''}
+      ${o.pile ? `<pre class="pile">${echap(o.pile)}</pre>` : ''}
+    </div>`).join('')
+}
+function fermerPanneau() {
+  $('#panneau').classList.remove('ouvert'); $('#panneau').setAttribute('aria-hidden', 'true'); $('#voile').classList.remove('ouvert')
+}
+$('#voile').onclick = fermerPanneau
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerPanneau() })
+
+async function changerStatut(statut) {
+  const e = ouvrirErreur.e; if (!e) return
+  const { error } = await sb.from('erreurs_suivi').upsert({ empreinte: e.empreinte, statut, maj_le: new Date().toISOString() })
+  if (error) return toast('Échec : ' + error.message)
+  e.statut = statut
+  toast(statut === 'corrige' ? 'Marquée comme corrigée. Si elle revient, elle repassera « à corriger ».' : statut === 'ignore' ? 'Erreur ignorée' : 'Erreur rouverte')
+  fermerPanneau(); await charger(); majPastilles()
+}
+function copierPourClaude() {
+  const e = ouvrirErreur.e, occ = ouvrirErreur.occ || []
+  const o = occ[0] || {}
+  const appareils = [...new Set(occ.map((x) => [x.appareil, x.systeme, x.navigateur].filter(Boolean).join(' / ')))].slice(0, 5)
+  const t = [
+    `Erreur Standix à corriger (${e.source === 'site' ? 'site' : 'app'})`,
+    `Code : ${e.code || '—'}`,
+    `Message : ${e.message}`,
+    `Fréquence : ${e.n} fois sur 30 jours, ${e.nb_entreprises} entreprise(s), dernière fois le ${dateL(e.derniere)}`,
+    `Page : ${o.page || e.page || '—'}`,
+    o.url ? `Adresse appelée : ${o.url}` : '',
+    o.version ? `Version de l'app : ${o.version}` : '',
+    `Appareils : ${appareils.join(' ; ') || '—'}`,
+    o.pile ? `Pile d'appels :\n${o.pile}` : '',
+  ].filter(Boolean).join('\n')
+  navigator.clipboard?.writeText(t).then(() => toast('Copié : colle-le dans ta conversation avec Claude'), () => toast('Copie impossible'))
+}
+
+/* ─── Santé technique ─── */
+function pageSante() {
+  const k = S.kpi, t = S.technique
+  const stock = t.stockage.reduce((s, x) => s + Number(x.octets), 0)
+  const LIM_BASE = 8 * 1024 ** 3, LIM_STOCK = 100 * 1024 ** 3
+  const ligne = (ok, titre, detail, val) => `<div class="sante"><span class="badge ${ok === true ? 'ok' : ok === false ? 'grave' : 'alerte'}">${ok === true ? 'OK' : ok === false ? 'En panne' : 'À vérifier'}</span><div class="t"><b>${titre}</b><span>${detail}</span></div><span class="n">${val || ''}</span></div>`
+  const tauxEchec = k.procedures ? k.procedures_echec / k.procedures : 0
+  return entete('Santé technique', 'Tout ce qui fait tourner Standix') + `
+  <div class="grille g2">
+    <div class="carte"><h3>Services <small>testés à l’ouverture de la page</small></h3>
+      ${ligne(mesures.baseOk, 'Base de données', 'Supabase · Francfort', mesures.base ? mesures.base + ' ms' : '')}
+      ${ligne(mesures.fonctionsOk, 'Fonctions serveur', 'Supabase Edge Functions', mesures.fonctions ? mesures.fonctions + ' ms' : '')}
+      ${ligne(ST && !ST.erreur ? true : false, 'Paiements', ST && !ST.erreur ? 'Stripe · mode ' + ST.mode : 'Stripe : ' + echap(ST?.erreur || '—'))}
+      ${ligne(enDirect, 'Temps réel', enDirect ? 'Les erreurs arrivent en direct' : 'Connexion temps réel interrompue')}
+      <div id="sante-sites">${ligne(null, 'Site et app', 'Test en cours…')}</div>
+    </div>
+    <div class="carte"><h3>Intelligence artificielle</h3>
+      ${ligne(tauxEchec < 0.1 ? true : tauxEchec < 0.25 ? null : false, 'Générations réussies', `${n(k.procedures - k.procedures_echec)} sur ${n(k.procedures)} procédures`, pct(1 - tauxEchec))}
+      ${ligne(true, 'Analyses ce mois', `${n(k.analyses_mois_dernier)} le mois dernier`, n(k.analyses_mois))}
+      ${ligne(true, 'Traductions IA', 'procédures traduites', n(k.traductions))}
+      ${ligne(S.echecs_ia.length ? null : true, 'Échecs à revoir', 'voir la page Erreurs', n(S.echecs_ia.length))}
+    </div>
+  </div>
+  <div class="section grille g2">
+    <div class="carte"><h3>Stockage <small>Supabase Pro</small></h3>
+      <div class="sante"><div class="t"><b>Base de données</b><span>${octets(t.base_octets)} sur 8 Go inclus</span><div class="jauge"><div style="width:${Math.max(1, t.base_octets / LIM_BASE * 100)}%"></div></div></div><span class="n">${pct(t.base_octets / LIM_BASE)}</span></div>
+      <div class="sante"><div class="t"><b>Fichiers (vidéos, logos, images)</b><span>${octets(stock)} sur 100 Go inclus</span><div class="jauge"><div style="width:${Math.max(1, stock / LIM_STOCK * 100)}%"></div></div></div><span class="n">${pct(stock / LIM_STOCK)}</span></div>
+      <h3 style="margin-top:16px">Par dossier</h3>
+      ${hbars(t.stockage.map((x) => ({ k: x.k + ' · ' + n(x.fichiers) + ' fichiers', n: Number(x.octets) })), { fmt: octets, couleur: 'var(--s2)' })}
+    </div>
+    <div class="carte"><h3>Lignes par table</h3>${hbars(t.tables.map((x) => ({ k: x.k, n: x.n })), { couleur: 'var(--s2)' })}</div>
+  </div>`
+}
+async function testerSites() {
+  const el = $('#sante-sites'); if (!el) return
+  const test = async (url) => { const t = performance.now(); try { await fetch(url, { mode: 'no-cors', cache: 'no-store' }); return { ok: true, ms: Math.round(performance.now() - t) } } catch (e) { return { ok: false } } }
+  const [site, app] = await Promise.all([test('https://standix.app/?ping=' + Date.now()), test('https://standix.app/app/?ping=' + Date.now())])
+  const l = (r, titre) => `<div class="sante"><span class="badge ${r.ok ? 'ok' : 'grave'}">${r.ok ? 'OK' : 'En panne'}</span><div class="t"><b>${titre}</b><span>standix.app${titre === 'App' ? '/app/' : ''}</span></div><span class="n">${r.ok ? r.ms + ' ms' : ''}</span></div>`
+  if ($('#sante-sites')) $('#sante-sites').innerHTML = l(site, 'Site internet') + l(app, 'App')
+}
+
+/* ─── Clients ─── */
+function pageClients() {
+  const k = S.kpi
+  const essais = S.entreprises.filter((e) => e.statut === 'essai')
+  const bientot = essais.filter((e) => e.essai_fin && new Date(e.essai_fin) > new Date()).sort((a, b) => new Date(a.essai_fin) - new Date(b.essai_fin))
+  const finis = essais.filter((e) => e.essai_fin && new Date(e.essai_fin) <= new Date() && new Date(e.essai_fin) > Date.now() - 30 * 86400e3).sort((a, b) => new Date(b.essai_fin) - new Date(a.essai_fin))
+  const conversion = k.entreprises ? k.abonnes / k.entreprises : 0
+  const inscr90 = serie('entreprises', 90)
+  return entete('Clients', 'Toutes les entreprises inscrites') + `
+  <div class="grille g4">
+    ${tuile('Entreprises', n(k.entreprises), n(k.membres) + ' membres au total')}
+    ${tuile('Clients payants', n(k.abonnes), 'Conversion ' + pct(conversion), { ton: k.abonnes ? 'ok' : '' })}
+    ${tuile('Essais en cours', n(k.essais_en_cours), n(k.essais_expires) + ' essais terminés sans abonnement')}
+    ${tuile('Impayés · résiliés', `${n(k.impayes)} <small>· ${n(k.resilies)}</small>`, 'à relancer', { ton: k.impayes ? 'grave' : '' })}
+  </div>
+  <div class="section grille g2">
+    <div class="carte"><h3>Essais en cours <small>du plus urgent au moins urgent</small></h3>
+      ${bientot.length ? `<div class="liste">${bientot.map((e) => `<div class="ligne"><div class="t"><b>${echap(e.nom)}</b><span>${e.membres} membre${e.membres > 1 ? 's' : ''} · ${e.procedures} procédure${e.procedures > 1 ? 's' : ''} · actif ${ilya(e.derniere_activite)}</span></div><span class="badge ${new Date(e.essai_fin) - Date.now() < 3 * 86400e3 ? 'alerte' : 'accent'}">Fin ${ilya(e.essai_fin)}</span></div>`).join('')}</div>` : '<div class="vide">Aucun essai en cours</div>'}
+    </div>
+    <div class="carte"><h3>Essais terminés ce mois <small>à relancer</small></h3>
+      ${finis.length ? `<div class="liste">${finis.map((e) => `<div class="ligne"><div class="t"><b>${echap(e.nom)}</b><span>${e.membres} membre${e.membres > 1 ? 's' : ''} · ${e.procedures} procédure${e.procedures > 1 ? 's' : ''} · fini ${ilya(e.essai_fin)}</span></div><span class="badge alerte">Essai fini</span></div>`).join('')}</div>` : '<div class="vide">Aucun</div>'}
+    </div>
+  </div>
+  <div class="section carte"><h3>Inscriptions par jour <small>90 jours</small></h3>${graph('barres', inscr90, { h: 150, lib: 'inscriptions' })}</div>
+  <div class="section carte">
+    <h3>Toutes les entreprises <small><input class="recherche" id="recherche" placeholder="Rechercher…" value="${echap(rechercheClients)}"></small></h3>
+    <div class="table-boite" id="table-clients">${tableClients()}</div>
+  </div>`
+}
+function tableClients() {
+  const cols = [
+    ['nom', 'Entreprise'], ['statut', 'Statut'], ['membres', 'Membres', 1], ['procedures', 'Procédures', 1],
+    ['analyses_mois', 'IA ce mois', 1], ['validations', 'Lectures', 1], ['scans', 'Scans QR', 1],
+    ['erreurs_7j', 'Erreurs 7 j', 1], ['derniere_activite', 'Dernière activité'], ['cree_le', 'Inscrite'],
+  ]
+  const q = rechercheClients.toLowerCase()
+  const l = S.entreprises.filter((e) => !q || String(e.nom).toLowerCase().includes(q)).sort((a, b) => {
+    const x = a[triClients.cle], y = b[triClients.cle]
+    if (typeof x === 'number' || typeof y === 'number') return ((x || 0) - (y || 0)) * triClients.sens
+    return String(x || '').localeCompare(String(y || '')) * triClients.sens
+  })
+  return `<table><thead><tr>${cols.map(([c, t, num]) => `<th data-tri="${c}" class="${num ? 'num' : ''}">${t}${triClients.cle === c ? (triClients.sens > 0 ? ' ↑' : ' ↓') : ''}</th>`).join('')}</tr></thead><tbody>
+    ${l.map((e) => `<tr><td class="nom" title="${echap(e.nom)}">${echap(e.nom)}</td><td>${badgeStatut(e)}</td><td class="num">${e.membres}${e.membres_max ? '<span style="color:var(--texte-3)"> / ' + e.membres_max + '</span>' : ''}</td><td class="num">${n(e.procedures)}</td><td class="num">${n(e.analyses_mois)}</td><td class="num">${n(e.validations)}</td><td class="num">${n(e.scans)}</td><td class="num" style="${e.erreurs_7j ? 'color:var(--grave);font-weight:600' : ''}">${n(e.erreurs_7j)}</td><td>${ilya(e.derniere_activite)}</td><td>${dateC(e.cree_le)}</td></tr>`).join('')}
+  </tbody></table>${l.length ? '' : '<div class="vide">Aucune entreprise</div>'}`
+}
+
+/* ─── Usage ─── */
+function pageUsage() {
+  const k = S.kpi, u = S.usage
+  const TYPES = { logiciel: 'Logiciel', technique: 'Technique', preparation: 'Préparation', entretien: 'Entretien', 'non classé': 'Non classé' }
+  const LANG = { fr: 'Français', en: 'Anglais', de: 'Allemand', it: 'Italien', es: 'Espagnol' }
+  return entete('Usage de l’app', 'Comment les entreprises utilisent Standix') + `
+  <div class="grille g4">
+    ${tuile('Procédures', n(k.procedures), `${n(k.brouillons)} brouillons · ${nf1.format(u.etapes_moy || 0)} étapes en moyenne`)}
+    ${tuile('Analyses IA', n(k.analyses_total), n(k.analyses_mois) + ' ce mois ' + delta(k.analyses_mois, k.analyses_mois_dernier))}
+    ${tuile('Lectures (30 j)', n(k.validations_30j), 'Temps de lecture moyen ' + duree(k.lecture_moy_s))}
+    ${tuile('Scans QR (30 j)', n(k.scans_30j), n(k.traductions) + ' traductions IA')}
+  </div>
+  <div class="section grille g2">
+    <div class="carte"><h3>Procédures créées par jour <small>90 jours</small></h3>${graph('barres', serie('procedures', 90), { h: 150, lib: 'procédures' })}</div>
+    <div class="carte"><h3>Lectures par jour <small>90 jours</small></h3>${graph('barres', serie('validations', 90), { h: 150, lib: 'lectures', couleur: 'var(--s3)' })}</div>
+  </div>
+  <div class="section grille g3">
+    <div class="carte"><h3>Type de procédure</h3>${hbars(objEnListe(u.par_type, TYPES))}</div>
+    <div class="carte"><h3>Créée à partir de</h3>${hbars([{ k: 'Vidéo', n: u.source.video }, { k: 'Document', n: u.source.document }].filter((x) => x.n))}</div>
+    <div class="carte"><h3>Langue des membres</h3>${hbars(objEnListe(u.langue_membres, LANG), { couleur: 'var(--s2)' })}</div>
+  </div>
+  <div class="section carte"><h3>Procédures les plus utilisées</h3>
+    ${u.top_procedures.length ? `<div class="liste">${u.top_procedures.map((p, i) => `<div class="ligne"><span style="width:20px;color:var(--texte-3);font-weight:600">${i + 1}</span><div class="t"><b>${echap(p.titre || 'Sans titre')}</b><span>${echap(p.entreprise || '—')}</span></div><span class="n">${n(p.validations)} lecture${p.validations > 1 ? 's' : ''}${p.scans ? ' · ' + n(p.scans) + ' scan' + (p.scans > 1 ? 's' : '') : ''}</span></div>`).join('')}</div>` : '<div class="vide">Rien pour l’instant</div>'}
+  </div>`
+}
+
+/* ─── Site ─── */
+function pageSite() {
+  const s = S.site
+  const v30 = serie('visites')
+  const tauxEssai = s.sessions_30j ? s.clics_essai_30j / s.sessions_30j : 0
+  const pays = (s.pays || []).map((x) => ({ k: String(x.k || '?').replace(/_/g, ' ').replace(/^Europe\//, '').replace(/^America\//, 'Amérique · '), n: x.n }))
+  const debut = !s.sessions_30j
+  return entete('Site internet', 'standix.app · sans cookie') + `
+  ${debut ? '<div class="encart info">Le suivi du site démarre avec cette version : les chiffres vont se remplir au fil des visites.</div>' : ''}
+  <div class="grille g4">
+    ${tuile('En ligne maintenant', n(s.en_ligne), 'visiteurs depuis 5 min', { ton: s.en_ligne ? 'ok' : '' })}
+    ${tuile('Visiteurs 30 j', n(s.sessions_30j), n(s.sessions_24h) + ' dans les dernières 24 h')}
+    ${tuile('Clics « Essayer »', n(s.clics_essai_30j), pct(tauxEssai) + ' des visiteurs')}
+    ${tuile('Inscriptions 30 j', n(s.inscriptions_30j), 'Durée de visite moyenne ' + duree(s.duree_moy_s))}
+  </div>
+  <div class="section carte"><h3>Visiteurs par jour <small>30 jours</small></h3>${graph('barres', v30, { h: 170, lib: 'visiteurs' })}</div>
+  <div class="section grille g3">
+    <div class="carte"><h3>D’où ils viennent</h3>${hbars(s.referents)}</div>
+    <div class="carte"><h3>Appareils</h3>${hbars(s.appareils, { couleur: 'var(--s2)' })}</div>
+    <div class="carte"><h3>Systèmes</h3>${hbars(s.systemes, { couleur: 'var(--s2)' })}</div>
+    <div class="carte"><h3>Région <small>d’après le fuseau horaire</small></h3>${hbars(pays, { couleur: 'var(--s3)' })}</div>
+    <div class="carte"><h3>Pages vues</h3>${hbars(s.pages, { couleur: 'var(--s3)' })}</div>
+    <div class="carte"><h3>Boutons cliqués</h3>${hbars(s.clics, { couleur: 'var(--s4)' })}</div>
+  </div>
+  <div class="section grille g3">
+    ${tuile('Pages vues 30 j', n(s.vues_30j))}
+    ${tuile('Clics « Se connecter »', n(s.clics_connexion_30j))}
+    ${tuile('Clics « Contact »', n(s.clics_contact_30j))}
+  </div>`
+}
+
+/* ─── Sécurité ─── */
+function pageSecurite() {
+  const s = S.securite
+  const ligne = (ok, titre, detail) => `<div class="sante"><span class="badge ${ok === true ? 'ok' : ok === false ? 'grave' : 'alerte'}">${ok === true ? 'OK' : ok === false ? 'Risque' : 'À voir'}</span><div class="t"><b>${titre}</b><span>${detail}</span></div></div>`
+  const MV = { promotion: 'Promotion', retrogradation: 'Rétrogradation', depart: 'Départ', arrivee: 'Arrivée', exclusion: 'Exclusion' }
+  return entete('Sécurité', 'Comptes, connexions et accès') + `
+  <div class="grille g4">
+    ${tuile('Comptes', n(s.comptes), n(s.comptes_30j) + ' créés en 30 jours')}
+    ${tuile('Connexions 24 h', n(s.connexions_24h), n(s.connexions_7j) + ' sur 7 jours')}
+    ${tuile('Sessions ouvertes', n(s.sessions_actives), 'appareils connectés')}
+    ${tuile('Appareils vus', n(s.appareils), n(s.appareils_revoques) + ' révoqués')}
+  </div>
+  <div class="section grille g2">
+    <div class="carte"><h3>Points de contrôle</h3>
+      ${ligne(s.mfa_admin, 'Double authentification admin', s.mfa_admin ? 'Activée sur ton compte' : 'À activer sur ton compte Supabase / Standix')}
+      ${ligne(s.admins === 1 ? true : null, 'Accès au Dashboard', s.admins + ' compte' + (s.admins > 1 ? 's' : '') + ' admin')}
+      ${ligne(s.non_confirmes ? null : true, 'E-mails non confirmés', n(s.non_confirmes) + ' compte' + (s.non_confirmes > 1 ? 's' : ''))}
+      ${ligne(s.alertes_partage ? null : true, 'Comptes partagés', s.alertes_partage ? n(s.alertes_partage) + ' compte(s) utilisé(s) sur trop d’appareils' : 'Aucun partage suspect')}
+      ${ligne(true, 'Visiteurs du site', 'Aucune adresse IP ni cookie enregistré')}
+    </div>
+    <div class="carte"><h3>Derniers comptes créés</h3>
+      <div class="liste">${s.derniers_comptes.map((c) => `<div class="ligne"><div class="t"><b>Créé ${ilya(c.created_at)}</b><span>${c.last_sign_in_at ? 'Dernière connexion ' + ilya(c.last_sign_in_at) : 'Jamais connecté'}</span></div>${c.confirme ? '<span class="badge ok">Confirmé</span>' : '<span class="badge alerte">Non confirmé</span>'}</div>`).join('')}</div>
+    </div>
+  </div>
+  <div class="section carte"><h3>Changements de rôle récents</h3>
+    ${s.mouvements.length ? `<div class="liste">${s.mouvements.map((m) => `<div class="ligne"><div class="t"><b>${echap(MV[m.type] || m.type)}</b><span>${echap(m.entreprise || '—')}${m.role_avant || m.role_apres ? ' · ' + echap(m.role_avant || '—') + ' → ' + echap(m.role_apres || '—') : ''}</span></div><span class="n" style="font-weight:400;color:var(--texte-3)">${ilya(m.cree_le)}</span></div>`).join('')}</div>` : '<div class="vide">Aucun</div>'}
+  </div>`
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   8. ACTIONS DES PAGES
+   ═══════════════════════════════════════════════════════════════════════ */
+function brancherPage() {
+  const P = $('#principal')
+  $$('[data-action="actualiser"]', P).forEach((b) => b.onclick = async () => { b.disabled = true; await charger(); toast('Chiffres à jour') })
+  $$('[data-aller]', P).forEach((b) => b.onclick = () => aller(b.dataset.aller))
+  $$('[data-erreur]', P).forEach((b) => b.onclick = () => ouvrirErreur(b.dataset.erreur))
+  $$('[data-filtre]', P).forEach((b) => b.onclick = () => { filtreErreurs = b.dataset.filtre; afficher() })
+  $$('[data-source]', P).forEach((b) => b.onclick = () => { filtreSource = b.dataset.source; afficher() })
+  if (page === 'sante') testerSites()
+  if (page === 'clients') {
+    const r = $('#recherche')
+    r.oninput = () => { rechercheClients = r.value; $('#table-clients').innerHTML = tableClients(); brancherTri() }
+    brancherTri()
+  }
+  if (page === 'argent') brancherCouts()
+}
+function brancherTri() {
+  $$('#table-clients th[data-tri]').forEach((th) => th.onclick = () => {
+    const c = th.dataset.tri
+    triClients = { cle: c, sens: triClients.cle === c ? -triClients.sens : (c === 'nom' ? 1 : -1) }
+    $('#table-clients').innerHTML = tableClients(); brancherTri()
+  })
+}
+$('#panneau').addEventListener('click', (ev) => {
+  const b = ev.target.closest('button'); if (!b) return
+  if (b.dataset.action === 'fermer') fermerPanneau()
+  if (b.dataset.action === 'copier') copierPourClaude()
+  if (b.dataset.statut) changerStatut(b.dataset.statut)
+})
+
+function brancherCouts() {
+  const boite = $('#couts')
+  const enregistrer = async (ligne, champ, valeur) => {
+    const id = ligne.dataset.cout
+    const { error } = await sb.from('couts_fixes').update({ [champ]: valeur }).eq('id', id)
+    if (error) return toast('Échec : ' + error.message)
+    const c = S.couts_fixes.find((x) => x.id === id); if (c) c[champ] = valeur
+    toast('Enregistré')
+    rafraichirTuilesArgent()
+  }
+  boite.addEventListener('change', (ev) => {
+    const el = ev.target, ligne = el.closest('[data-cout]'); if (!ligne || !el.dataset.champ) return
+    let v = el.value
+    if (el.dataset.champ === 'montant') { v = Math.max(0, parseFloat(String(v).replace(',', '.')) || 0) }
+    if (el.dataset.champ === 'nom' && !v.trim()) return toast('Le nom ne peut pas être vide')
+    enregistrer(ligne, el.dataset.champ, v)
+  })
+  boite.addEventListener('click', async (ev) => {
+    const b = ev.target.closest('button'); if (!b) return
+    const ligne = b.closest('[data-cout]')
+    if (b.dataset.champ === 'actif') {
+      const v = b.getAttribute('aria-checked') !== 'true'
+      b.setAttribute('aria-checked', v); ligne.classList.toggle('inactif', !v)
+      enregistrer(ligne, 'actif', v)
+    }
+    if (b.dataset.action === 'suppr-cout') {
+      const nom = $('[data-champ="nom"]', ligne).value
+      if (!confirm('Supprimer « ' + nom + ' » ?')) return
+      const { error } = await sb.from('couts_fixes').delete().eq('id', ligne.dataset.cout)
+      if (error) return toast('Échec : ' + error.message)
+      S.couts_fixes = S.couts_fixes.filter((x) => x.id !== ligne.dataset.cout)
+      ligne.remove(); toast('Supprimé'); rafraichirTuilesArgent()
+    }
+  })
+  $('[data-action="ajout-cout"]').onclick = async () => {
+    const { data, error } = await sb.from('couts_fixes').insert({ nom: 'Nouveau coût', categorie: 'Autre', montant: 0 }).select().single()
+    if (error) return toast('Échec : ' + error.message)
+    S.couts_fixes.push(data)
+    boite.insertAdjacentHTML('beforeend', ligneCout(data))
+    const champ = boite.lastElementChild.querySelector('[data-champ="nom"]'); champ.focus(); champ.select()
+  }
+  $$('[data-reglage]').forEach((el) => el.onchange = async () => {
+    const v = Math.max(0, parseFloat(String(el.value).replace(',', '.')) || 0)
+    const { error } = await sb.from('reglages_admin').update({ valeur: v }).eq('cle', el.dataset.reglage)
+    if (error) return toast('Échec : ' + error.message)
+    S.reglages[el.dataset.reglage].valeur = v; toast('Enregistré'); rafraichirTuilesArgent()
+  })
+}
+/* Après une modification de coût : on redessine la page sans perdre le défilement. */
+function rafraichirTuilesArgent() {
+  clearTimeout(rafraichirTuilesArgent.t)
+  rafraichirTuilesArgent.t = setTimeout(() => {
+    if (page !== 'argent' || document.activeElement?.closest('#couts, [data-reglage]')) return
+    const y = window.scrollY; afficher(); window.scrollTo(0, y)
+  }, 900)
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   9. GRAPHIQUES (SVG fait main, sans bibliothèque)
+   Barres fines arrondies du côté des données, grille discrète, une bulle
+   au survol/toucher. Redessinés à chaque changement de largeur.
+   ═══════════════════════════════════════════════════════════════════════ */
+const bulle = $('#bulle')
+function montrerBulle(html, x, y) {
+  bulle.innerHTML = html; bulle.style.opacity = 1
+  const r = bulle.getBoundingClientRect()
+  let gx = x + 14, gy = y - r.height - 12
+  if (gx + r.width > innerWidth - 8) gx = x - r.width - 14
+  if (gy < 8) gy = y + 16
+  bulle.style.left = gx + 'px'; bulle.style.top = gy + 'px'
+}
+const cacherBulle = () => { bulle.style.opacity = 0 }
+document.addEventListener('scroll', cacherBulle, { passive: true })
+
+function echelle(max) {
+  if (max <= 0) return { max: 1, pas: [0, 1] }
+  const brut = max / 4, p = 10 ** Math.floor(Math.log10(brut)), f = brut / p
+  const unite = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p
+  const m = Math.ceil(max / unite) * unite
+  const pas = []; for (let v = 0; v <= m + 1e-9; v += unite) pas.push(v)
+  return { max: m, pas }
+}
+const court = (v, fmt) => fmt === 'eur' ? (Math.abs(v) >= 1000 ? nf1.format(v / 1000) + ' k€' : nf.format(Math.round(v)) + ' €') : (v >= 1000 ? nf1.format(v / 1000) + ' k' : nf.format(v))
+const jourLib = (j) => new Date(j + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+const arrondi = (x, y, w, h, r) => { r = Math.min(r, w / 2, h); return h <= 0 ? '' : `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z` }
+
+function dessinerGraphiques() {
+  $$('[data-graph]').forEach((el) => {
+    let cfg; try { cfg = JSON.parse(el.dataset.graph) } catch (e) { return }
+    const w = Math.max(120, el.clientWidth)
+    if (cfg.type === 'spark') return spark(el, cfg, w)
+    if (cfg.type === 'barres') return barres(el, cfg, w)
+    if (cfg.type === 'barres2') return barres2(el, cfg, w)
+  })
+}
+
+function spark(el, cfg, w) {
+  const d = cfg.d, h = 34, max = Math.max(1, ...d.map((p) => p.y))
+  const pas = w / d.length, bw = Math.max(1.5, pas - 2)
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" height="${h}">${d.map((p, i) => {
+    const bh = p.y ? Math.max(2, (p.y / max) * (h - 2)) : 1
+    return `<path d="${arrondi(i * pas + (pas - bw) / 2, h - bh, bw, bh, Math.min(2, bw / 2))}" fill="${p.y ? 'var(--s1)' : 'var(--grille)'}" opacity="${p.y ? (i === d.length - 1 ? 1 : .55) : 1}"/>`
+  }).join('')}<rect x="0" y="0" width="${w}" height="${h}" fill="transparent" class="zone"/></svg>`
+  survol(el, w, d.length, (i) => `<b>${jourLib(d[i].x)}</b><br>${n(d[i].y)} ${echap(cfg.lib || '').toLowerCase()}`)
+}
+
+function barres(el, cfg, w) {
+  const d = cfg.d, h = cfg.h || 160, g = 34, bas = 22, haut = 6
+  const { max, pas: lignes } = echelle(Math.max(...d.map((p) => p.y)))
+  const larg = w - g, pas = larg / d.length, bw = Math.max(2, Math.min(28, pas - 2))
+  const Y = (v) => haut + (h - haut - bas) * (1 - v / max)
+  const couleur = cfg.couleur || 'var(--s1)'
+  const etiquettes = d.length > 45 ? 6 : d.length > 20 ? 5 : d.length
+  const tous = Math.max(1, Math.round(d.length / etiquettes))
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" height="${h}">
+    ${lignes.map((v) => `<line x1="${g}" x2="${w}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grille)"/><text x="${g - 8}" y="${Y(v) + 4}" text-anchor="end">${court(v, cfg.fmt)}</text>`).join('')}
+    ${d.map((p, i) => { const bh = (h - haut - bas) * (p.y / max); return p.y ? `<path d="${arrondi(g + i * pas + (pas - bw) / 2, Y(p.y), bw, bh, 3)}" fill="${couleur}" data-i="${i}"/>` : '' }).join('')}
+    ${d.map((p, i) => (i % tous === 0 || i === d.length - 1) && !(i !== d.length - 1 && d.length - 1 - i < tous * .6) ? `<text x="${g + i * pas + pas / 2}" y="${h - 5}" text-anchor="middle">${/^\d{4}-/.test(p.x) ? jourLib(p.x) : echap(p.x)}</text>` : '').join('')}
+    <rect x="${g}" y="0" width="${larg}" height="${h}" fill="transparent"/>
+  </svg>`
+  survol(el, larg, d.length, (i) => `<b>${/^\d{4}-/.test(d[i].x) ? jourLib(d[i].x) : echap(d[i].x)}</b><br>${cfg.fmt === 'eur' ? eur2(d[i].y) : n(d[i].y) + ' ' + echap(cfg.lib || '')}`, g)
+}
+
+function barres2(el, cfg, w) {
+  const d = cfg.d, h = cfg.h || 220, g = 46, bas = 22, haut = 6
+  const { max, pas: lignes } = echelle(Math.max(1, ...d.flatMap((p) => [p.a, p.b])))
+  const larg = w - g, pas = larg / d.length, bw = Math.max(3, Math.min(18, (pas - 8) / 2))
+  const Y = (v) => haut + (h - haut - bas) * (1 - v / max)
+  const H = (v) => (h - haut - bas) * (v / max)
+  const etroit = w < 520
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" height="${h}">
+    ${lignes.map((v) => `<line x1="${g}" x2="${w}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grille)"/><text x="${g - 8}" y="${Y(v) + 4}" text-anchor="end">${court(v, 'eur')}</text>`).join('')}
+    ${d.map((p, i) => { const cx = g + i * pas + pas / 2; return `${p.a > 0 ? `<path d="${arrondi(cx - bw - 1, Y(p.a), bw, H(p.a), 3)}" fill="var(--s1)"/>` : ''}${p.b > 0 ? `<path d="${arrondi(cx + 1, Y(p.b), bw, H(p.b), 3)}" fill="var(--s2)"/>` : ''}` }).join('')}
+    ${d.map((p, i) => !etroit || i % 2 === 1 ? `<text x="${g + i * pas + pas / 2}" y="${h - 5}" text-anchor="middle">${echap(p.x)}</text>` : '').join('')}
+    <rect x="${g}" y="0" width="${larg}" height="${h}" fill="transparent"/>
+  </svg>`
+  survol(el, larg, d.length, (i) => `<b>${echap(d[i].x)}</b><br><i style="background:var(--s1)"></i>${cfg.libA} ${eur2(d[i].a)}<br><i style="background:var(--s2)"></i>${cfg.libB} ${eur2(d[i].b)}<br>Résultat <b>${eur2(d[i].a - d[i].b)}</b>`, g)
+}
+
+/* Survol à la souris ET au doigt : la bulle suit la colonne la plus proche. */
+function survol(el, larg, nb, contenu, decalage = 0) {
+  const svg = el.querySelector('svg')
+  const montrer = (cx, cy) => {
+    const r = svg.getBoundingClientRect()
+    const echelleX = r.width / svg.viewBox.baseVal.width
+    const x = (cx - r.left) / echelleX - decalage
+    const i = Math.floor(x / (larg / nb))
+    if (i < 0 || i >= nb) return cacherBulle()
+    $$('path[data-i]', svg).forEach((p) => p.style.opacity = +p.dataset.i === i ? 1 : .55)
+    montrerBulle(contenu(i), cx, cy)
+  }
+  const fin = () => { cacherBulle(); $$('path[data-i]', svg).forEach((p) => p.style.opacity = '') }
+  svg.addEventListener('pointermove', (e) => montrer(e.clientX, e.clientY))
+  svg.addEventListener('pointerdown', (e) => montrer(e.clientX, e.clientY))
+  svg.addEventListener('pointerleave', fin)
+  svg.addEventListener('pointercancel', fin)
+}
+
+let largeurPrecedente = innerWidth
+new ResizeObserver(() => {
+  if (Math.abs(innerWidth - largeurPrecedente) < 2) return
+  largeurPrecedente = innerWidth
+  dessinerGraphiques()
+}).observe(document.body)
+
+sb.auth.onAuthStateChange((evt) => { if (evt === 'SIGNED_OUT') montrerPorte() })
+window.addEventListener('hashchange', () => { const p = location.hash.slice(1); if (S && p !== page && PAGES.some((x) => x.id === p)) aller(p) })
+entrer()
+</script>
+</body>
+</html>

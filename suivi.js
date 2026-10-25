@@ -27,7 +27,7 @@
     var JETON = 'sb-tlrtsoahwqhtvtkhssbm-auth-token'
     var chemin = location.pathname || '/'
     var SOURCE = /^\/app(\/|$)/.test(chemin) ? 'app' : 'site'
-    if (/^\/admin(\/|$)/.test(chemin)) return // le Dashboard ne se surveille pas lui-même
+    if (/^\/admin(\.html)?(\/|$)/.test(chemin)) return // le Dashboard ne se surveille pas lui-même
 
     /* La vraie fonction `fetch`, gardée avant qu'on l'enveloppe : nos propres
        envois ne doivent jamais repasser par la surveillance. */

@@ -766,6 +766,7 @@ const DICO = {
     "Expire dans {v}": "Expires in {v}",
     "Expiré": "Expired",
     "Exécutez migration-presences.sql.": "Run migration-presences.sql.",
+    "Facultatif": "Optional",
     "Facultatif · les initiales serviront sinon": "Optional · initials are used otherwise",
     "Faites glisser pour affiner au dixième de seconde": "Drag to adjust to a tenth of a second",
     "Favori non enregistré : {v}": "Favourite not saved: {v}",
@@ -1403,6 +1404,7 @@ const DICO = {
     "Vos appareils numériques": "Your devices",
     "Vos catégories existent, mais personne ne les a encore ouvertes ce mois-ci.": "Your folders exist, but no one has opened them yet this month.",
     "Vos changements ne partent qu'à l'enregistrement": "Your changes are only sent when you save",
+    "Vos données seront supprimées définitivement le {date}. Abonnez-vous pour les garder.": "Your data will be permanently deleted on {date}. Subscribe to keep it.",
     "Vos dossiers": "Your folders",
     "Vos membres ne la verront plus. Vous pourrez la republier à tout moment ; les lectures déjà enregistrées restent dans l’analyse.": "Your members will no longer see it. You can publish it again any time; reads already counted stay in the analysis.",
     "Vos paroles": "What you say",
@@ -2134,6 +2136,7 @@ const DICO = {
     "Expire dans {v}": "Läuft ab in {v}",
     "Expiré": "Abgelaufen",
     "Exécutez migration-presences.sql.": "Führen Sie migration-presences.sql aus.",
+    "Facultatif": "Optional",
     "Facultatif · les initiales serviront sinon": "Optional · sonst werden die Initialen verwendet",
     "Faites glisser pour affiner au dixième de seconde": "Ziehen Sie, um auf die Zehntelsekunde genau einzustellen",
     "Favori non enregistré : {v}": "Favorit nicht gespeichert: {v}",
@@ -2771,6 +2774,7 @@ const DICO = {
     "Vos appareils numériques": "Ihre Geräte",
     "Vos catégories existent, mais personne ne les a encore ouvertes ce mois-ci.": "Ihre Ordner gibt es, aber diesen Monat hat sie noch niemand geöffnet.",
     "Vos changements ne partent qu'à l'enregistrement": "Ihre Änderungen werden erst beim Speichern übernommen",
+    "Vos données seront supprimées définitivement le {date}. Abonnez-vous pour les garder.": "Ihre Daten werden am {date} endgültig gelöscht. Schließen Sie ein Abonnement ab, um sie zu behalten.",
     "Vos dossiers": "Ihre Ordner",
     "Vos membres ne la verront plus. Vous pourrez la republier à tout moment ; les lectures déjà enregistrées restent dans l’analyse.": "Ihre Mitglieder sehen sie nicht mehr. Sie können sie jederzeit wieder veröffentlichen; bisherige Aufrufe bleiben in der Auswertung.",
     "Vos paroles": "Was Sie sagen",
@@ -19912,8 +19916,11 @@ window.ouvrirEtapesManuelles = async function(procId) {
   /* ⚠ EN MODIFICATION, PAS DE SOUS-TITRE (demande d'Em) : la phrase « Vos
      changements ne partent qu'à l'enregistrement » et la note du verrou ont
      été retirées. Le bouton « Enregistrer les modifications » le dit déjà. */
-  el('man-sous').textContent = manEdition ? '' : tLang('Écrivez chaque étape dans l\'ordre')
-  el('man-sous').style.display = manEdition ? 'none' : ''
+  /* ⚠ PLUS DE SOUS-TITRE DU TOUT (demande d'Em du 25 octobre 2026) : « Écrivez
+     chaque étape dans l'ordre » est retiré aussi à la création. Les étapes
+     numérotées le disent déjà. */
+  el('man-sous').textContent = ''
+  el('man-sous').style.display = 'none'
   el('publish-btn-manual').textContent = manEdition ? tLang('Enregistrer les modifications') : tLang('Publier la procédure')
   el('man-annuler').textContent = manEdition ? tLang('Annuler les modifications') : tLang('Tout effacer')
   el('create-error-manual').textContent = ''
@@ -23485,6 +23492,17 @@ function lireEtatAbonnementSiAncien() {
   return lireEtatAbonnement()
 }
 
+/* La date de suppression des données de l'établissement affiché, ou `null`. */
+let suppressionLe = null
+/* La phrase d'avertissement, seulement dans les 30 derniers jours. */
+function phraseSuppression() {
+  if (!suppressionLe || isNaN(suppressionLe)) return ''
+  const jours = (suppressionLe - Date.now()) / 86400000
+  if (jours > 30) return ''
+  const date = suppressionLe.toLocaleDateString(localeApp(), { day: 'numeric', month: 'long', year: 'numeric' })
+  return tLang('Vos données seront supprimées définitivement le {date}. Abonnez-vous pour les garder.', { date })
+}
+
 async function lireEtatAbonnementReseau() {
   if (!currentMembre?.entreprise_id) return null
   const { data, error } = await supabase
@@ -23514,6 +23532,20 @@ async function lireEtatAbonnementReseau() {
      ouvre les reglages, qui est le seul endroit ou `dessinerAlerteEssai`
      passe. */
   majPastilleProfil()
+
+  /* ═══ LA DATE DE SUPPRESSION DES DONNÉES (25 octobre 2026) ═══
+     120 jours après la fin de l'essai ou de l'abonnement, tout est supprimé
+     (fonction `purge-donnees`). Le gérant est prévenu 30 jours avant, dans
+     l'encadré et dans la fenêtre d'accès fermé. Sans la fonction en base
+     (SQL pas encore passé), on n'affiche rien. */
+  suppressionLe = null
+  if (brut.statut !== 'actif' && currentMembre?.role === 'gestion') {
+    try {
+      const { data: d, error: eD } = await supabase
+        .rpc('donnees_supprimees_le', { p_entreprise: currentMembre.entreprise_id })
+      if (!eD && d) suppressionLe = new Date(d)
+    } catch (e) { /* rien à dire */ }
+  }
 
   /* ═══ LE COMPTE D'ANALYSES, LU EN MÊME TEMPS ═══
 
@@ -23684,11 +23716,13 @@ async function fenetreAbonnementRequis() {
     return
   }
 
+  const avert = phraseSuppression()
   const ok = await confirmDialog({
     titre: titreAccesFerme(),
-    message: cause === 'fin'
+    message: (cause === 'fin'
       ? tLang('Vos procédures et votre équipe sont conservées. Choisissez une offre pour rouvrir l\'accès à toute votre équipe.')
-      : tLang('Vos procédures et votre équipe sont conservées. Choisissez une offre pour continuer à créer et partager vos procédures.'),
+      : tLang('Vos procédures et votre équipe sont conservées. Choisissez une offre pour continuer à créer et partager vos procédures.'))
+      + (avert ? '\n\n' + avert : ''),
     confirmer: tLang('Voir les offres'),
     annuler: tLang('Plus tard'),
     danger: false,
@@ -23889,7 +23923,7 @@ function dessinerAlerteEssai(hote) {
         <b>${fini ? titreAccesFerme() : tLang('Essai 14 jours gratuits')}</b>
         <i>${fini
           ? `${(nbProc > 1 ? (nbMembres > 1 ? tLang('Vos <b>{nbProc} procédures</b> et <b>{nbMembres} membres</b> vous attendent.', { nbProc, nbMembres }) : tLang('Vos <b>{nbProc} procédures</b> et <b>{nbMembres} membre</b> vous attendent.', { nbProc, nbMembres })) : (nbMembres > 1 ? tLang('Vos <b>{nbProc} procédure</b> et <b>{nbMembres} membres</b> vous attendent.', { nbProc, nbMembres }) : tLang('Vos <b>{nbProc} procédure</b> et <b>{nbMembres} membre</b> vous attendent.', { nbProc, nbMembres })))}`
-          : tLang('Profitez de toutes les fonctionnalit\u00e9s de Standix. Sans engagement.')}</i>
+          : tLang('Profitez de toutes les fonctionnalit\u00e9s de Standix. Sans engagement.')}${fini && phraseSuppression() ? ` <b class="ess-supp">${escapeHtml(phraseSuppression())}</b>` : ''}</i>
       </span>
 
       <!-- ⚠ LE BOUTON EST EN HAUT A DROITE, hors du texte. Pose a la suite, il
@@ -29176,7 +29210,7 @@ function renderManualSteps() {
       <input type="text" class="step-titre-saisie" maxlength="60"
              placeholder="Titre de l\u2019\u00e9tape (facultatif)" value="${escapeHtml(step.titre || '')}">
       <div class="step-filet"></div>
-      <textarea rows="1" placeholder="${escapeHtml(tLang('Écrivez ici ce qu’il faut faire'))}">${escapeHtml(step.texte)}</textarea>
+      <textarea rows="1" placeholder="${escapeHtml(tLang('Étape {v}', { v: i + 1 }))}">${escapeHtml(step.texte)}</textarea>
       <div class="step-outils">
         <span class="step-outils-lbl">${tLang('Ajouter si besoin')}</span>
         <button type="button" class="step-titre-bouton">
@@ -29486,7 +29520,7 @@ function peindreCouverture() {
         <path d="m41 40-9-9-7 7-3.5-3.5L3 44" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>`
       oter.style.display = 'none'
-      sous.textContent = tLang('Elle apparaît sur sa carte et en tête de la fiche. Facultative.')
+      sous.textContent = tLang('Facultatif')
     }
   })
 }
@@ -30194,7 +30228,7 @@ function renderVideoSteps(listEl) {
       <input type="text" class="step-titre-saisie" maxlength="60"
              placeholder="Titre de l\u2019\u00e9tape (facultatif)" value="${escapeHtml(step.titre || '')}">
       <div class="step-filet"></div>
-      <textarea rows="1" placeholder="${escapeHtml(tLang('Écrivez ici ce qu’il faut faire'))}">${escapeHtml(step.texte || '')}</textarea>
+      <textarea rows="1" placeholder="${escapeHtml(tLang('Étape {v}', { v: i + 1 }))}">${escapeHtml(step.texte || '')}</textarea>
       <div class="step-outils">
         <span class="step-outils-lbl">${tLang('Ajouter si besoin')}</span>
         <button type="button" class="step-titre-bouton">

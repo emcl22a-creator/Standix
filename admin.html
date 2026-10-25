@@ -47,6 +47,7 @@
   --grille: rgba(15, 17, 23, .07);
   --ombre: 0 1px 2px rgba(15,17,23,.04), 0 4px 16px rgba(15,17,23,.04);
   --nav: rgba(255, 255, 255, .78);
+  --verre: rgba(255, 255, 255, .88);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -68,6 +69,7 @@
     --grille: rgba(255, 255, 255, .06);
     --ombre: none;
     --nav: rgba(18, 19, 24, .78);
+    --verre: rgba(28, 29, 35, .88);
   }
 }
 :root[data-theme="dark"] {
@@ -80,7 +82,7 @@
   --ok: #34C76F; --ok-doux: rgba(52,199,111,.14);
   --alerte: #F5A524; --alerte-doux: rgba(245,165,36,.14);
   --grave: #FF5A5A; --grave-doux: rgba(255,90,90,.14);
-  --grille: rgba(255,255,255,.06); --ombre: none; --nav: rgba(18,19,24,.78);
+  --grille: rgba(255,255,255,.06); --ombre: none; --nav: rgba(18,19,24,.78); --verre: rgba(28,29,35,.88);
 }
 
 * { box-sizing: border-box; }
@@ -186,7 +188,39 @@ button { cursor: pointer; }
 .btn-grave { color: var(--grave); }
 
 /* Barre du haut + onglets (téléphone) */
-.haut-mobile { display: none; }
+.haut-mobile, .tabbar, .tirer, .poignee, .cartes-clients, .couts-m { display: none; }
+.replie { display: none !important; }
+.seul-mobile { display: none; }
+.coque.cache ~ .tabbar, .coque.cache ~ .tirer { display: none !important; }
+.voir-tout { display: block; width: 100%; margin-top: 6px; padding: 12px 0 2px; border: 0; border-top: 1px solid var(--bord); background: none; color: var(--accent); font-weight: 600; font-size: 14px; }
+.segments { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; padding: 2px; border-radius: 10px; background: var(--carte-2); border: 1px solid var(--bord); }
+.segments button { height: 30px; padding: 0 12px; border: 0; border-radius: 8px; background: none; font-size: 13px; font-weight: 500; color: var(--texte-2); white-space: nowrap; }
+.segments button[aria-pressed="true"] { background: var(--carte); color: var(--texte); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.outils-clients { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 12px; }
+.panneau-pied { margin-top: auto; padding: 12px 20px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--bord); display: flex; gap: 8px; flex-wrap: wrap; background: var(--fond); }
+.graph line.guide { stroke: var(--texte-3); stroke-dasharray: 3 3; pointer-events: none; }
+.graph svg { touch-action: pan-y; }
+/* Feuille iOS : listes groupées */
+.feuille-titre { font-size: 20px; font-weight: 700; letter-spacing: -.01em; margin: 6px 0 14px; }
+.groupe { background: var(--carte); border: 1px solid var(--bord); border-radius: 14px; overflow: hidden; margin-bottom: 16px; }
+.groupe-ligne { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 0 14px; border: 0; background: none; text-align: left; font-size: 16px; font-weight: 500; position: relative; }
+.groupe-ligne + .groupe-ligne::before { content: ""; position: absolute; top: 0; left: 56px; right: 0; height: 1px; background: var(--bord); }
+.groupe-ligne.sans-icone + .groupe-ligne::before, .groupe-ligne.sans-icone::before { left: 14px; }
+.groupe-ligne .gi { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--accent-doux); color: var(--accent); flex: none; }
+.groupe-ligne .gi svg { width: 17px; height: 17px; }
+.groupe-ligne > svg:last-child { width: 16px; height: 16px; margin-left: auto; color: var(--texte-3); }
+.groupe-ligne.rouge { color: var(--grave); justify-content: center; }
+.groupe-ligne.statique { color: var(--texte-2); font-size: 14px; font-weight: 400; }
+.champ-feuille { display: grid; gap: 6px; margin-bottom: 14px; }
+.champ-feuille label { font-size: 13px; color: var(--texte-3); font-weight: 500; padding-left: 4px; }
+.champ-feuille input { height: 48px; border-radius: 12px; border: 1px solid var(--bord-fort); background: var(--carte); padding: 0 14px; outline: none; width: 100%; }
+.champ-feuille input:focus { border-color: var(--accent); }
+.champ-feuille .segments { display: grid; width: 100%; }
+.champ-feuille .segments button { height: 36px; font-size: 14px; }
+.ligne-interrupteur { display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 14px; background: var(--carte); border: 1px solid var(--bord); border-radius: 12px; margin-bottom: 18px; font-weight: 500; }
+.gros-btn { width: 100%; height: 50px; border-radius: 13px; border: 0; font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+.gros-btn.plein { background: var(--degrade); color: #fff; }
+.gros-btn.rouge { background: var(--grave-doux); color: var(--grave); }
 
 /* ─── Blocs ─── */
 .grille { display: grid; gap: 14px; }
@@ -358,7 +392,8 @@ td.nom { font-weight: 600; max-width: 220px; overflow: hidden; text-overflow: el
 .panneau.ouvert { transform: none; }
 .panneau-haut { padding: 18px 20px 14px; border-bottom: 1px solid var(--bord); display: grid; gap: 10px; }
 .panneau-haut .x { position: absolute; top: 14px; right: 14px; }
-.panneau-corps { overflow-y: auto; padding: 16px 20px 40px; -webkit-overflow-scrolling: touch; }
+.panneau-corps { overflow-y: auto; padding: 16px 20px 40px; -webkit-overflow-scrolling: touch; flex: 1; }
+.feuille-corps { padding: 20px; overflow-y: auto; }
 .occ { background: var(--carte); border: 1px solid var(--bord); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; font-size: 13px; }
 .occ dl { display: grid; grid-template-columns: 96px 1fr; gap: 4px 10px; margin: 8px 0 0; }
 .occ dt { color: var(--texte-3); } .occ dd { margin: 0; word-break: break-word; }
@@ -385,7 +420,7 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
 }
 /* ─── Téléphone ─── */
 @media (max-width: 860px) {
-  .coque { display: block; }
+  .coque { display: block; background: none; }
   .cote { display: none; }
   .haut-mobile {
     display: block; position: sticky; top: 0; z-index: 20;
@@ -395,17 +430,98 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
   .haut-mobile .barre { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 6px; }
   .haut-mobile .marque img { width: 26px; height: 26px; border-radius: 7px; }
   .haut-mobile .logotype { font-size: 16px; }
-  .onglets { display: flex; gap: 6px; overflow-x: auto; padding: 6px 16px 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-  .onglets::-webkit-scrollbar { display: none; }
-  .onglets button {
-    flex: none; height: 32px; padding: 0 12px; border-radius: 16px; border: 0; background: var(--carte-2);
-    font-size: 13px; font-weight: 500; color: var(--texte-2); display: inline-flex; align-items: center; gap: 6px;
+
+  /* ① Barre du haut : discrète, le titre y apparaît quand le grand titre sort de l'écran */
+  .haut-mobile { border-bottom-color: transparent; transition: border-color .2s; }
+  .haut-mobile.compact { border-bottom-color: var(--bord); }
+  .haut-mobile .barre { position: relative; height: 46px; padding: 0 16px; }
+  .mini-logo { width: 26px; height: 26px; border-radius: 7px; }
+  .titre-compact { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -30%); font-size: 16px; font-weight: 600; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; white-space: nowrap; }
+  .haut-mobile.compact .titre-compact { opacity: 1; transform: translate(-50%, -50%); }
+
+  /* ② Barre d'onglets flottante en verre, au pouce */
+  .tabbar {
+    display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; z-index: 30;
+    left: 12px; right: 12px; bottom: calc(10px + env(safe-area-inset-bottom));
+    height: 64px; padding: 0 4px; border-radius: 32px;
+    background: var(--verre); -webkit-backdrop-filter: saturate(180%) blur(30px); backdrop-filter: saturate(180%) blur(30px);
+    border: 1px solid var(--bord-fort); box-shadow: 0 8px 32px rgba(0,0,0,.12);
   }
-  .onglets button[aria-current="page"] { background: var(--texte); color: var(--fond); }
-  .onglets .pastille { margin-left: 0; height: 18px; min-width: 18px; font-size: 11px; }
-  .principal { padding: 18px 16px calc(48px + env(safe-area-inset-bottom)); }
-  .entete { flex-direction: column; align-items: flex-start; gap: 10px; }
-  .entete h1 { font-size: 24px; }
+  .tabbar button {
+    background: none; border: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; font-size: 10.5px; font-weight: 600; color: var(--texte-3); position: relative; border-radius: 26px; margin: 5px 0;
+    transition: color .15s, background .15s; -webkit-tap-highlight-color: transparent;
+  }
+  .tabbar button svg { width: 23px; height: 23px; }
+  .tabbar button[aria-current="page"] { color: var(--accent); background: var(--accent-doux); }
+  .tabbar button:active { transform: scale(.94); }
+  .tabbar .pastille { position: absolute; top: 4px; left: calc(50% + 5px); margin: 0; height: 17px; min-width: 17px; padding: 0 5px; font-size: 10.5px; border: 2px solid var(--carte); box-sizing: content-box; }
+
+  /* ③ Tirer pour actualiser */
+  .tirer { display: grid; place-items: center; position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 52px); z-index: 19;
+    width: 36px; height: 36px; margin-left: -18px; border-radius: 50%; background: var(--carte); box-shadow: 0 2px 10px rgba(0,0,0,.12);
+    opacity: 0; transform: translateY(-40px); pointer-events: none; }
+  .tirer .roue { width: 18px; height: 18px; border-width: 2px; animation: none; }
+  .tirer.actif .roue { animation: tourne .8s linear infinite; }
+
+  .principal { padding: 4px 16px calc(100px + env(safe-area-inset-bottom)); }
+  .entete { flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 18px; }
+  .entete h1 { font-size: 34px; letter-spacing: -.025em; line-height: 1.1; }
+  .entete p { font-size: 15px; }
+  .entete [data-action="actualiser"] { display: none; }
+  .entete .actions:empty { display: none; }
+
+  /* ④ Les deux chiffres clés en grand, pleine largeur */
+  .g4 > .tuile.heros:nth-child(-n+2) { grid-column: 1 / -1; padding: 18px; }
+  .g4 > .tuile.heros:nth-child(-n+2) .val { font-size: 36px !important; }
+
+  /* ⑦ Clients : cartes empilées, recherche et filtres fixés en haut */
+  .liste-entreprises { background: none; border: 0; box-shadow: none; padding: 0; }
+  .liste-entreprises > h3 { font-size: 15px; }
+  .liste-entreprises .table-boite { margin: 0; overflow: visible; }
+  .liste-entreprises table { display: none; }
+  .cartes-clients { display: grid; gap: 10px; }
+  .carte-client { background: var(--carte); border: 1px solid var(--bord); border-radius: 16px; padding: 14px 15px; box-shadow: var(--ombre); }
+  .cc-haut { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .cc-haut b { font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cc-chiffres { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 12px 0 10px; }
+  .cc-chiffres span { display: flex; flex-direction: column; font-size: 11.5px; color: var(--texte-3); }
+  .cc-chiffres span b { font-size: 17px; font-weight: 700; color: var(--texte); letter-spacing: -.01em; }
+  .cc-bas { font-size: 12.5px; color: var(--texte-3); }
+  .outils-clients { position: sticky; top: calc(env(safe-area-inset-top) + 46px); z-index: 10; margin: 0 -16px 12px; padding: 10px 16px;
+    background: var(--nav); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+  .outils-clients .recherche { height: 40px; border-radius: 12px; background: var(--carte-2); border-color: transparent; }
+  .outils-clients .segments { width: 100%; }
+
+  /* ⑧ Le panneau devient une feuille qui monte du bas */
+  .panneau {
+    top: auto; left: 0; right: 0; bottom: 0; width: 100%; max-height: 92dvh; border-left: 0;
+    border-radius: 22px 22px 0 0; transform: translateY(100%); box-shadow: 0 -10px 40px rgba(0,0,0,.18);
+  }
+  .panneau.glisse { transition: none; }
+  .poignee { display: block; flex: none; width: 38px; height: 5px; border-radius: 3px; background: var(--bord-fort); margin: 8px auto 0; }
+  .panneau-haut { padding: 12px 18px 14px; }
+  .panneau-haut .x { display: none; }
+  .panneau-corps { padding: 14px 16px 24px; }
+  .panneau-pied { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); display: grid; grid-template-columns: 1fr 1fr; }
+  .panneau-pied .btn { height: 48px; justify-content: center; font-size: 15px; border-radius: 13px; }
+  .panneau-pied .btn-plein { grid-column: 1 / -1; order: -1; background: var(--degrade); color: #fff; }
+  .panneau-pied .btn:only-of-type { grid-column: 1 / -1; }
+  .feuille-corps { padding: 6px 16px calc(20px + env(safe-area-inset-bottom)); overflow-y: auto; }
+
+  /* ⑨ Coûts : une ligne simple, on touche pour modifier */
+  #couts, .ajout-desktop, .seul-pc { display: none; }
+  .seul-mobile { display: inline; }
+  .couts-m { display: block; }
+  .cout-m { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 6px 0; border: 0; border-top: 1px solid var(--bord); background: none; text-align: left; }
+  .cout-m:first-child { border-top: 0; }
+  .cout-m .t { flex: 1; min-width: 0; }
+  .cout-m .t b { display: block; font-weight: 600; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cout-m .t span { font-size: 12.5px; color: var(--texte-3); }
+  .cout-m .m { font-weight: 600; font-size: 15px; white-space: nowrap; }
+  .cout-m.inactif .t, .cout-m.inactif .m { opacity: .45; }
+  .ajout-m { width: 100%; margin-top: 8px; height: 46px; border-radius: 12px; border: 1px dashed var(--bord-fort); background: none; color: var(--accent); font-weight: 600; font-size: 15px; }
+  .toast { bottom: calc(92px + env(safe-area-inset-bottom)); }
   .g4, .g3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .g2 { grid-template-columns: minmax(0, 1fr); }
   .carte { padding: 15px; border-radius: 14px; }
@@ -413,8 +529,7 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
   .tuile.heros .val { font-size: 26px; }
   .table-boite { margin: 0 -15px -15px; }
   td:first-child, th:first-child { padding-left: 15px; }
-  .cout { grid-template-columns: minmax(0, 1fr) 90px 44px 32px; }
-  .cout .c-cat, .cout .c-per { display: none; }
+  .cout { grid-template-columns: minmax(0, 1fr) 100px; }
   .recherche { min-width: 0; width: 100%; }
   .erreur { padding: 13px 14px; }
 }
@@ -471,19 +586,21 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
   </aside>
 
   <div>
-    <header class="haut-mobile">
-      <div class="barre">
-        <div class="marque"><img src="/app/icone-192.png" alt=""><span class="logotype">Standix</span><span class="etiquette-prive">Privé</span></div>
+    <header class="haut-mobile" id="haut-mobile">
+      <div class="barre" style="display:flex;align-items:center;justify-content:space-between">
+        <img class="mini-logo" src="/app/icone-192.png" alt="Standix">
+        <span class="titre-compact" id="titre-compact"></span>
         <span class="direct" style="font-size:12.5px;color:var(--texte-3)"><span class="point" id="point-m"></span><span id="maj-m">—</span></span>
       </div>
-      <div class="onglets" id="onglets"></div>
     </header>
+    <div class="tirer" id="tirer"><div class="roue"></div></div>
     <main class="principal" id="principal">
       <div class="chargement"><div class="roue"></div></div>
     </main>
   </div>
 </div>
 
+<nav class="tabbar" id="tabbar" aria-label="Pages"></nav>
 <div class="voile" id="voile"></div>
 <aside class="panneau" id="panneau" aria-hidden="true"></aside>
 <div class="bulle" id="bulle"></div>
@@ -553,6 +670,7 @@ const I = {
   poubelle: '<path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   horloge: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  plus3: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
 }
 const ico = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`
 
@@ -578,6 +696,7 @@ let filtreErreurs = 'nouveau'
 let filtreSource = 'tout'
 let triClients = { cle: 'derniere_activite', sens: -1 }
 let rechercheClients = ''
+let filtreClients = 'tout'
 let canal = null
 let minuteur = null
 let enDirect = false
@@ -769,17 +888,83 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
    ═══════════════════════════════════════════════════════════════════════ */
 function construireNav() {
   $('#nav').innerHTML = PAGES.map((p) => `<button data-page="${p.id}">${ico(p.icone)}<span>${p.nom}</span><span class="pastille cache" data-pastille="${p.id}"></span></button>`).join('')
-  $('#onglets').innerHTML = PAGES.map((p) => `<button data-page="${p.id}">${p.court || p.nom}<span class="pastille cache" data-pastille="${p.id}"></span></button>`).join('')
+  $('#tabbar').innerHTML = ONGLETS.map((id) => {
+    if (id === 'plus') return `<button data-plus>${ico('plus3')}<span>Plus</span></button>`
+    const p = PAGES.find((x) => x.id === id)
+    return `<button data-page="${id}">${ico(p.icone)}<span>${p.court || p.nom}</span><span class="pastille cache" data-pastille="${id}"></span></button>`
+  }).join('')
   $$('[data-page]').forEach((b) => b.addEventListener('click', () => aller(b.dataset.page)))
+  $('[data-plus]').addEventListener('click', ouvrirPlus)
 }
 function aller(p) {
   page = p
   history.replaceState(null, '', '#' + p)
   afficher()
   window.scrollTo({ top: 0 })
-  const actif = $(`#onglets [data-page="${p}"]`)
-  actif?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
 }
+/* Le téléphone a 5 onglets ; les 4 autres pages sont dans « Plus ». */
+const ONGLETS = ['vue', 'argent', 'erreurs', 'clients', 'plus']
+const DANS_PLUS = ['sante', 'usage', 'site', 'securite']
+const mobile = () => matchMedia('(max-width: 860px)').matches
+
+function ouvrirFeuille(html) {
+  const p = $('#panneau')
+  p.innerHTML = '<div class="poignee" aria-hidden="true"></div>' + html
+  p.classList.add('ouvert'); p.setAttribute('aria-hidden', 'false'); $('#voile').classList.add('ouvert')
+  return p
+}
+function ouvrirPlus() {
+  const t = S?.genere_le ? new Date(S.genere_le).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—'
+  ouvrirFeuille(`<div class="feuille-corps">
+    <div class="feuille-titre">Plus</div>
+    <div class="groupe">${DANS_PLUS.map((id) => { const p = PAGES.find((x) => x.id === id); return `<button class="groupe-ligne" data-page-feuille="${id}"><span class="gi">${ico(p.icone)}</span><span>${p.nom}</span>${ico('fleche')}</button>` }).join('')}</div>
+    <div class="groupe">
+      <div class="groupe-ligne statique sans-icone"><span class="point${enDirect ? ' vivant' : ''}"></span>${enDirect ? 'En direct' : 'Hors direct'} · mis à jour à ${t}</div>
+      <button class="groupe-ligne rouge sans-icone" data-action="sortir">Se déconnecter</button>
+    </div>
+  </div>`)
+}
+
+/* ─── Grand titre qui passe dans la barre du haut au défilement ─── */
+let observateurTitre = null
+function surveillerTitre() {
+  observateurTitre?.disconnect()
+  const h1 = $('#principal .entete h1'), haut = $('#haut-mobile')
+  if (!h1 || !haut) return
+  $('#titre-compact').textContent = h1.textContent
+  observateurTitre = new IntersectionObserver(([e]) => haut.classList.toggle('compact', !e.isIntersecting), { rootMargin: '-50px 0px 0px 0px' })
+  observateurTitre.observe(h1)
+}
+
+/* ─── Tirer vers le bas pour actualiser (téléphone) ─── */
+let tirage = null, actualisation = false
+function majTirer(px) {
+  const el = $('#tirer')
+  el.style.opacity = Math.min(1, px / 50)
+  el.style.transform = `translateY(${px - 40}px) rotate(${px * 5}deg)`
+}
+document.addEventListener('touchstart', (e) => {
+  if (!mobile() || actualisation || window.scrollY > 0 || $('.panneau.ouvert') || $('#coque').classList.contains('cache')) return
+  tirage = { y: e.touches[0].clientY, d: 0 }
+}, { passive: true })
+document.addEventListener('touchmove', (e) => {
+  if (!tirage) return
+  tirage.d = Math.max(0, e.touches[0].clientY - tirage.y)
+  if (window.scrollY > 0) { tirage = null; majTirer(0); return }
+  majTirer(Math.min(tirage.d * .45, 80))
+}, { passive: true })
+document.addEventListener('touchend', async () => {
+  if (!tirage) return
+  const assez = tirage.d * .45 >= 62
+  tirage = null
+  if (!assez) { $('#tirer').style.transition = 'transform .25s, opacity .25s'; majTirer(0); setTimeout(() => $('#tirer').style.transition = '', 260); return }
+  actualisation = true
+  const el = $('#tirer'); el.classList.add('actif'); el.style.transition = 'transform .2s'; majTirer(56)
+  await charger()
+  el.classList.remove('actif'); majTirer(0); setTimeout(() => el.style.transition = '', 260)
+  actualisation = false
+  toast('Chiffres à jour')
+})
 function majPastilles() {
   const nb = { erreurs: S?.kpi?.erreurs_ouvertes || 0, clients: S?.kpi?.impayes || 0 }
   $$('[data-pastille]').forEach((el) => {
@@ -792,11 +977,14 @@ function majPastilles() {
 function afficher() {
   if (!S) return
   $$('[data-page]').forEach((b) => { if (b.dataset.page === page) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current') })
+  $('[data-plus]')?.toggleAttribute('aria-current', DANS_PLUS.includes(page))
+  if (DANS_PLUS.includes(page)) $('[data-plus]')?.setAttribute('aria-current', 'page')
   const fn = { vue: pageVue, argent: pageArgent, erreurs: pageErreurs, sante: pageSante, clients: pageClients, usage: pageUsage, site: pageSite, securite: pageSecurite }[page]
   $('#principal').innerHTML = fn()
   document.title = 'Standix · ' + PAGES.find((p) => p.id === page).nom
   dessinerGraphiques()
   brancherPage()
+  surveillerTitre()
 }
 
 function entete(titre, sous, actions = '') {
@@ -976,13 +1164,59 @@ function pageArgent() {
   </div>
 
   <div class="section carte">
-    <h3>Coûts fixes <small>Modifie directement : c’est enregistré</small></h3>
+    <h3>Coûts fixes <small><span class="seul-pc">Modifie directement : c’est enregistré</span><span class="seul-mobile">Touche une ligne pour la modifier</span></small></h3>
     <div id="couts">${(S.couts_fixes || []).map(ligneCout).join('')}</div>
-    <button class="btn" data-action="ajout-cout" style="margin-top:10px">${ico('plus')}Ajouter un coût</button>
+    <div class="couts-m" id="couts-m">${(S.couts_fixes || []).map(ligneCoutMobile).join('')}</div>
+    <button class="btn ajout-desktop" data-action="ajout-cout" style="margin-top:10px">${ico('plus')}Ajouter un coût</button>
+    <button class="ajout-m couts-m" data-action="ajout-cout-m">+ Ajouter un coût</button>
     <h3 style="margin-top:24px">Coûts variables <small>Estimations par utilisation</small></h3>
     ${Object.entries(S.reglages || {}).map(([cle, r]) => `<div class="cout" style="grid-template-columns:minmax(0,1fr) 100px"><span>${echap(r.libelle)}</span><input type="number" step="0.01" min="0" value="${r.valeur}" data-reglage="${cle}"></div>`).join('')}
     <p class="note">Les coûts variables d’IA (Azure, Claude) ne sont pas encore lus sur les factures : ils sont estimés à partir du nombre d’analyses et de traductions. Ajuste le prix unitaire quand tu reçois une facture.</p>
   </div>`
+}
+function ligneCoutMobile(c) {
+  return `<div class="cout-m${c.actif ? '' : ' inactif'}" data-cout-m="${c.id}" role="button" tabindex="0">
+    <div class="t"><b>${echap(c.nom)}</b><span>${echap(c.categorie)}${c.actif ? '' : ' · désactivé'}</span></div>
+    <span class="m">${eur2(Number(c.montant))}<small style="color:var(--texte-3);font-weight:400">/${c.periodicite === 'annuel' ? 'an' : 'mois'}</small></span>
+    <button class="interrupteur" role="switch" aria-checked="${c.actif}" aria-label="Actif" data-bascule="${c.id}"></button>
+  </div>`
+}
+function ouvrirCout(id) {
+  const c = S.couts_fixes.find((x) => x.id === id); if (!c) return
+  const p = ouvrirFeuille(`<div class="feuille-corps">
+    <div class="feuille-titre">${echap(c.nom)}</div>
+    <div class="champ-feuille"><label for="f-nom">Nom</label><input id="f-nom" value="${echap(c.nom)}"></div>
+    <div class="champ-feuille"><label for="f-cat">Catégorie</label><input id="f-cat" value="${echap(c.categorie)}"></div>
+    <div class="champ-feuille"><label for="f-mt">Montant (€)</label><input id="f-mt" type="text" inputmode="decimal" value="${String(c.montant).replace('.', ',')}"></div>
+    <div class="champ-feuille"><label>Fréquence</label><div class="segments">
+      <button type="button" data-per="mensuel" aria-pressed="${c.periodicite === 'mensuel'}">Par mois</button>
+      <button type="button" data-per="annuel" aria-pressed="${c.periodicite === 'annuel'}">Par an</button></div></div>
+    <div class="ligne-interrupteur"><span>Compté dans les coûts</span><button class="interrupteur" role="switch" id="f-actif" aria-checked="${c.actif}"></button></div>
+    <button class="gros-btn plein" id="f-ok">Enregistrer</button>
+    <button class="gros-btn rouge" id="f-suppr">Supprimer</button>
+  </div>`)
+  $$('[data-per]', p).forEach((b) => b.onclick = () => $$('[data-per]', p).forEach((x) => x.setAttribute('aria-pressed', x === b)))
+  $('#f-actif', p).onclick = (e) => e.currentTarget.setAttribute('aria-checked', e.currentTarget.getAttribute('aria-checked') !== 'true')
+  $('#f-ok', p).onclick = async () => {
+    const champs = {
+      nom: $('#f-nom', p).value.trim() || c.nom,
+      categorie: $('#f-cat', p).value.trim() || 'Autre',
+      montant: Math.max(0, parseFloat($('#f-mt', p).value.replace(',', '.')) || 0),
+      periodicite: $('[data-per][aria-pressed="true"]', p)?.dataset.per || 'mensuel',
+      actif: $('#f-actif', p).getAttribute('aria-checked') === 'true',
+    }
+    const { error } = await sb.from('couts_fixes').update(champs).eq('id', id)
+    if (error) return toast('Échec : ' + error.message)
+    Object.assign(c, champs); fermerPanneau(); toast('Enregistré')
+    const y = scrollY; afficher(); scrollTo(0, y)
+  }
+  $('#f-suppr', p).onclick = async () => {
+    if (!confirm('Supprimer « ' + c.nom + ' » ?')) return
+    const { error } = await sb.from('couts_fixes').delete().eq('id', id)
+    if (error) return toast('Échec : ' + error.message)
+    S.couts_fixes = S.couts_fixes.filter((x) => x.id !== id); fermerPanneau(); toast('Supprimé')
+    const y = scrollY; afficher(); scrollTo(0, y)
+  }
 }
 function ligneCout(c) {
   return `<div class="cout${c.actif ? '' : ' inactif'}" data-cout="${c.id}">
@@ -1015,7 +1249,7 @@ function pageErreurs() {
       <span style="width:10px"></span>
       ${[['tout', 'App + site'], ['app', 'App'], ['site', 'Site']].map(([v, t]) => `<button class="filtre" data-source="${v}" aria-pressed="${filtreSource === v}">${t}</button>`).join('')}
     </div>
-    ${l.length ? l.map(carteErreur).join('') : `<div class="carte vide">${filtreErreurs === 'nouveau' ? 'Aucune erreur à corriger. Les nouvelles apparaîtront ici en direct.' : 'Rien ici.'}</div>`}
+    ${l.length ? `<div id="liste-erreurs">${l.map(carteErreur).join('')}</div>` : `<div class="carte vide">${filtreErreurs === 'nouveau' ? 'Aucune erreur à corriger. Les nouvelles apparaîtront ici en direct.' : 'Rien ici.'}</div>`}
   </div>
   <div class="section carte"><h3>Générations IA en échec <small>${S.echecs_ia.length}</small></h3>
     ${S.echecs_ia.length ? `<div class="liste">${S.echecs_ia.map((e) => `<div class="ligne"><div class="t"><b>${echap(e.titre || 'Sans titre')}</b><span>${echap(e.entreprise || '—')} · ${ilya(e.date)}${e.erreur ? ' · ' + echap(e.erreur) : ''}</span></div><span class="badge alerte">Échec</span></div>`).join('')}</div>` : '<div class="vide">Aucun échec</div>'}
@@ -1038,13 +1272,15 @@ async function ouvrirErreur(emp) {
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-right:40px"><span class="code">${echap(e.code || 'ERREUR')}</span><span class="badge sans-point">${e.source === 'site' ? 'Site' : 'App'}</span></div>
     <div style="font-weight:600;font-size:15px;word-break:break-word">${echap(e.message)}</div>
     <div style="color:var(--texte-3);font-size:12.5px">${n(e.n)} fois · ${e.nb_entreprises} entreprise(s) · première fois ${ilya(e.premiere)} · dernière ${ilya(e.derniere)}</div>
-    <div class="actions">
+    </div>
+    <div class="panneau-corps"><div class="chargement" style="min-height:120px"><div class="roue"></div></div></div>
+    <div class="panneau-pied">
+      <button class="btn btn-plein" data-action="copier">${ico('copie')}Copier pour Claude</button>
       ${e.statut !== 'corrige' ? `<button class="btn btn-ok" data-statut="corrige">${ico('ok')}Corrigée</button>` : ''}
       ${e.statut !== 'ignore' ? '<button class="btn" data-statut="ignore">Ignorer</button>' : ''}
       ${e.statut !== 'nouveau' ? '<button class="btn" data-statut="nouveau">Rouvrir</button>' : ''}
-      <button class="btn btn-plein" data-action="copier">${ico('copie')}Copier pour Claude</button>
-    </div></div>
-    <div class="panneau-corps"><div class="chargement" style="min-height:120px"><div class="roue"></div></div></div>`
+    </div>`
+  p.insertAdjacentHTML('afterbegin', '<div class="poignee" aria-hidden="true"></div>')
   p.classList.add('ouvert'); p.setAttribute('aria-hidden', 'false'); $('#voile').classList.add('ouvert')
   const { data, error } = await sb.rpc('admin_erreur_detail', { p_empreinte: emp })
   const occ = data || []
@@ -1067,6 +1303,26 @@ function fermerPanneau() {
   $('#panneau').classList.remove('ouvert'); $('#panneau').setAttribute('aria-hidden', 'true'); $('#voile').classList.remove('ouvert')
 }
 $('#voile').onclick = fermerPanneau
+{
+  const p = $('#panneau'); let g = null
+  p.addEventListener('touchstart', (e) => {
+    if (!mobile()) return
+    const corps = e.target.closest('.panneau-corps, .feuille-corps')
+    if (corps && corps.scrollTop > 0) return
+    g = { y: e.touches[0].clientY, d: 0 }
+  }, { passive: true })
+  p.addEventListener('touchmove', (e) => {
+    if (!g) return
+    g.d = e.touches[0].clientY - g.y
+    if (g.d > 0) { p.classList.add('glisse'); p.style.transform = `translateY(${g.d}px)` }
+  }, { passive: true })
+  p.addEventListener('touchend', () => {
+    if (!g) return
+    const loin = g.d > 110; g = null
+    p.classList.remove('glisse'); p.style.transform = ''
+    if (loin) fermerPanneau()
+  })
+}
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerPanneau() })
 
 async function changerStatut(statut) {
@@ -1160,8 +1416,12 @@ function pageClients() {
     </div>
   </div>
   <div class="section carte"><h3>Inscriptions par jour <small>90 jours</small></h3>${graph('barres', inscr90, { h: 150, lib: 'inscriptions' })}</div>
-  <div class="section carte">
-    <h3>Toutes les entreprises <small><input class="recherche" id="recherche" placeholder="Rechercher…" value="${echap(rechercheClients)}"></small></h3>
+  <div class="section carte liste-entreprises">
+    <h3>Toutes les entreprises</h3>
+    <div class="outils-clients" id="outils-clients">
+      <input class="recherche" id="recherche" type="search" placeholder="Rechercher une entreprise" value="${echap(rechercheClients)}">
+      <div class="segments">${[['tout', 'Toutes'], ['essai', 'Essai'], ['abonnes', 'Abonnés'], ['relancer', 'À relancer']].map(([v, t]) => `<button data-fc="${v}" aria-pressed="${filtreClients === v}">${t}</button>`).join('')}</div>
+    </div>
     <div class="table-boite" id="table-clients">${tableClients()}</div>
   </div>`
 }
@@ -1172,14 +1432,32 @@ function tableClients() {
     ['erreurs_7j', 'Erreurs 7 j', 1], ['derniere_activite', 'Dernière activité'], ['cree_le', 'Inscrite'],
   ]
   const q = rechercheClients.toLowerCase()
-  const l = S.entreprises.filter((e) => !q || String(e.nom).toLowerCase().includes(q)).sort((a, b) => {
+  const maintenant = Date.now()
+  const garde = {
+    tout: () => true,
+    essai: (e) => e.statut === 'essai' && e.essai_fin && new Date(e.essai_fin) > maintenant,
+    abonnes: (e) => e.statut === 'actif',
+    relancer: (e) => e.statut === 'impaye' || e.statut === 'resilie' || (e.statut === 'essai' && (!e.essai_fin || new Date(e.essai_fin) <= maintenant)),
+  }[filtreClients] || (() => true)
+  const l = S.entreprises.filter((e) => garde(e) && (!q || String(e.nom).toLowerCase().includes(q))).sort((a, b) => {
     const x = a[triClients.cle], y = b[triClients.cle]
     if (typeof x === 'number' || typeof y === 'number') return ((x || 0) - (y || 0)) * triClients.sens
     return String(x || '').localeCompare(String(y || '')) * triClients.sens
   })
   return `<table><thead><tr>${cols.map(([c, t, num]) => `<th data-tri="${c}" class="${num ? 'num' : ''}">${t}${triClients.cle === c ? (triClients.sens > 0 ? ' ↑' : ' ↓') : ''}</th>`).join('')}</tr></thead><tbody>
     ${l.map((e) => `<tr><td class="nom" title="${echap(e.nom)}">${echap(e.nom)}</td><td>${badgeStatut(e)}</td><td class="num">${e.membres}${e.membres_max ? '<span style="color:var(--texte-3)"> / ' + e.membres_max + '</span>' : ''}</td><td class="num">${n(e.procedures)}</td><td class="num">${n(e.analyses_mois)}</td><td class="num">${n(e.validations)}</td><td class="num">${n(e.scans)}</td><td class="num" style="${e.erreurs_7j ? 'color:var(--grave);font-weight:600' : ''}">${n(e.erreurs_7j)}</td><td>${ilya(e.derniere_activite)}</td><td>${dateC(e.cree_le)}</td></tr>`).join('')}
-  </tbody></table>${l.length ? '' : '<div class="vide">Aucune entreprise</div>'}`
+  </tbody></table>
+  <div class="cartes-clients">${l.map((e) => `<div class="carte-client">
+    <div class="cc-haut"><b>${echap(e.nom)}</b>${badgeStatut(e)}</div>
+    <div class="cc-chiffres">
+      <span><b>${e.membres}${e.membres_max ? '<small style="font-size:12px;color:var(--texte-3);font-weight:500">/' + e.membres_max + '</small>' : ''}</b>membres</span>
+      <span><b>${n(e.procedures)}</b>procédures</span>
+      <span><b>${n(e.analyses_mois)}</b>IA ce mois</span>
+      <span><b>${n(e.validations)}</b>lectures</span>
+    </div>
+    <div class="cc-bas">Actif ${ilya(e.derniere_activite)} · inscrite le ${dateC(e.cree_le)}${e.erreurs_7j ? ` · <span style="color:var(--grave);font-weight:600">${e.erreurs_7j} erreur${e.erreurs_7j > 1 ? 's' : ''}</span>` : ''}</div>
+  </div>`).join('')}</div>
+  ${l.length ? '' : '<div class="vide">Aucune entreprise</div>'}`
 }
 
 /* ─── Usage ─── */
@@ -1282,9 +1560,34 @@ function brancherPage() {
   if (page === 'clients') {
     const r = $('#recherche')
     r.oninput = () => { rechercheClients = r.value; $('#table-clients').innerHTML = tableClients(); brancherTri() }
+    $$('[data-fc]').forEach((b) => b.onclick = () => {
+      filtreClients = b.dataset.fc
+      $$('[data-fc]').forEach((x) => x.setAttribute('aria-pressed', x === b))
+      $('#table-clients').innerHTML = tableClients(); brancherTri()
+    })
     brancherTri()
   }
   if (page === 'argent') brancherCouts()
+  if (mobile()) limiterListes()
+}
+/* Sur téléphone, une longue liste montre 5 lignes et un « Voir tout ». */
+function limiterListes() {
+  ;[['.liste', '.ligne'], ['.hbars', '.hbar'], ['#liste-erreurs', '.erreur']].forEach(([boite, item]) => {
+    $$('#principal ' + boite).forEach((l) => {
+      const lignes = [...l.children].filter((c) => c.matches(item))
+      if (lignes.length <= 6) return
+      lignes.slice(5).forEach((x) => x.classList.add('replie'))
+      const b = document.createElement('button')
+      b.className = 'voir-tout'; b.textContent = `Voir tout (${lignes.length})`
+      b.onclick = () => {
+        const ouvert = b.dataset.ouvert === '1'
+        lignes.slice(5).forEach((x) => x.classList.toggle('replie', ouvert))
+        b.dataset.ouvert = ouvert ? '0' : '1'
+        b.textContent = ouvert ? `Voir tout (${lignes.length})` : 'Réduire'
+      }
+      l.after(b)
+    })
+  })
 }
 function brancherTri() {
   $$('#table-clients th[data-tri]').forEach((th) => th.onclick = () => {
@@ -1296,6 +1599,8 @@ function brancherTri() {
 $('#panneau').addEventListener('click', (ev) => {
   const b = ev.target.closest('button'); if (!b) return
   if (b.dataset.action === 'fermer') fermerPanneau()
+  if (b.dataset.action === 'sortir') sortir()
+  if (b.dataset.pageFeuille) { fermerPanneau(); aller(b.dataset.pageFeuille) }
   if (b.dataset.action === 'copier') copierPourClaude()
   if (b.dataset.statut) changerStatut(b.dataset.statut)
 })
@@ -1334,6 +1639,27 @@ function brancherCouts() {
       ligne.remove(); toast('Supprimé'); rafraichirTuilesArgent()
     }
   })
+  $('#couts-m').addEventListener('click', async (ev) => {
+    const bascule = ev.target.closest('[data-bascule]')
+    if (bascule) {
+      ev.stopPropagation()
+      const id = bascule.dataset.bascule, v = bascule.getAttribute('aria-checked') !== 'true'
+      bascule.setAttribute('aria-checked', v)
+      const { error } = await sb.from('couts_fixes').update({ actif: v }).eq('id', id)
+      if (error) return toast('Échec : ' + error.message)
+      const c = S.couts_fixes.find((x) => x.id === id); if (c) c.actif = v
+      toast(v ? 'Compté dans les coûts' : 'Plus compté'); rafraichirTuilesArgent()
+      return
+    }
+    const ligne = ev.target.closest('[data-cout-m]'); if (ligne) ouvrirCout(ligne.dataset.coutM)
+  })
+  $('[data-action="ajout-cout-m"]').onclick = async () => {
+    const { data, error } = await sb.from('couts_fixes').insert({ nom: 'Nouveau coût', categorie: 'Autre', montant: 0 }).select().single()
+    if (error) return toast('Échec : ' + error.message)
+    S.couts_fixes.push(data)
+    const y = scrollY; afficher(); scrollTo(0, y)
+    ouvrirCout(data.id)
+  }
   $('[data-action="ajout-cout"]').onclick = async () => {
     const { data, error } = await sb.from('couts_fixes').insert({ nom: 'Nouveau coût', categorie: 'Autre', montant: 0 }).select().single()
     if (error) return toast('Échec : ' + error.message)
@@ -1352,7 +1678,7 @@ function brancherCouts() {
 function rafraichirTuilesArgent() {
   clearTimeout(rafraichirTuilesArgent.t)
   rafraichirTuilesArgent.t = setTimeout(() => {
-    if (page !== 'argent' || document.activeElement?.closest('#couts, [data-reglage]')) return
+    if (page !== 'argent' || $('.panneau.ouvert') || document.activeElement?.closest('#couts, [data-reglage]')) return
     const y = window.scrollY; afficher(); window.scrollTo(0, y)
   }, 900)
 }
@@ -1363,12 +1689,13 @@ function rafraichirTuilesArgent() {
    au survol/toucher. Redessinés à chaque changement de largeur.
    ═══════════════════════════════════════════════════════════════════════ */
 const bulle = $('#bulle')
-function montrerBulle(html, x, y) {
+function montrerBulle(html, x, y, centre = false) {
   bulle.innerHTML = html; bulle.style.opacity = 1
   const r = bulle.getBoundingClientRect()
-  let gx = x + 14, gy = y - r.height - 12
-  if (gx + r.width > innerWidth - 8) gx = x - r.width - 14
-  if (gy < 8) gy = y + 16
+  let gx = centre ? Math.min(innerWidth - r.width - 8, Math.max(8, x - r.width / 2)) : x + 14, gy = y - r.height - 10
+  if (!centre && gx + r.width > innerWidth - 8) gx = x - r.width - 14
+  const hautLibre = mobile() ? 56 : 8
+  if (gy < hautLibre) gy = hautLibre
   bulle.style.left = gx + 'px'; bulle.style.top = gy + 'px'
 }
 const cacherBulle = () => { bulle.style.opacity = 0 }
@@ -1420,7 +1747,7 @@ function barres(el, cfg, w) {
     ${d.map((p, i) => (i % tous === 0 || i === d.length - 1) && !(i !== d.length - 1 && d.length - 1 - i < tous * .6) ? `<text x="${g + i * pas + pas / 2}" y="${h - 5}" text-anchor="middle">${/^\d{4}-/.test(p.x) ? jourLib(p.x) : echap(p.x)}</text>` : '').join('')}
     <rect x="${g}" y="0" width="${larg}" height="${h}" fill="transparent"/>
   </svg>`
-  survol(el, larg, d.length, (i) => `<b>${/^\d{4}-/.test(d[i].x) ? jourLib(d[i].x) : echap(d[i].x)}</b><br>${cfg.fmt === 'eur' ? eur2(d[i].y) : n(d[i].y) + ' ' + echap(cfg.lib || '')}`, g)
+  survol(el, larg, d.length, (i) => `<b>${/^\d{4}-/.test(d[i].x) ? jourLib(d[i].x) : echap(d[i].x)}</b><br>${cfg.fmt === 'eur' ? eur2(d[i].y) : n(d[i].y) + ' ' + echap(d[i].y > 1 ? (cfg.lib || '') : String(cfg.lib || '').replace(/s$/, ''))}`, g)
 }
 
 function barres2(el, cfg, w) {
@@ -1449,9 +1776,16 @@ function survol(el, larg, nb, contenu, decalage = 0) {
     const i = Math.floor(x / (larg / nb))
     if (i < 0 || i >= nb) return cacherBulle()
     $$('path[data-i]', svg).forEach((p) => p.style.opacity = +p.dataset.i === i ? 1 : .55)
-    montrerBulle(contenu(i), cx, cy)
+    /* Une ligne verticale suit la colonne ; la valeur s'affiche AU-DESSUS du
+       graphique, jamais sous le doigt. */
+    const vx = decalage + (i + .5) * (larg / nb)
+    let g = svg.querySelector('line.guide')
+    if (!g) { g = document.createElementNS('http://www.w3.org/2000/svg', 'line'); g.setAttribute('class', 'guide'); svg.prepend(g) }
+    const vh = svg.viewBox.baseVal.height
+    g.setAttribute('x1', vx); g.setAttribute('x2', vx); g.setAttribute('y1', 0); g.setAttribute('y2', vh > 60 ? vh - 22 : vh)
+    montrerBulle(contenu(i), r.left + vx * echelleX, r.top, true)
   }
-  const fin = () => { cacherBulle(); $$('path[data-i]', svg).forEach((p) => p.style.opacity = '') }
+  const fin = () => { cacherBulle(); svg.querySelector('line.guide')?.remove(); $$('path[data-i]', svg).forEach((p) => p.style.opacity = '') }
   svg.addEventListener('pointermove', (e) => montrer(e.clientX, e.clientY))
   svg.addEventListener('pointerdown', (e) => montrer(e.clientX, e.clientY))
   svg.addEventListener('pointerleave', fin)

@@ -1771,6 +1771,10 @@
   "en": "Run migration-presences.sql.",
   "de": "Führen Sie migration-presences.sql aus."
  },
+ "Facultatif": {
+  "en": "Optional",
+  "de": "Optional"
+ },
  "Facultatif · les initiales serviront sinon": {
   "en": "Optional · initials are used otherwise",
   "de": "Optional · sonst werden die Initialen verwendet"
@@ -4086,6 +4090,10 @@
  "Vos changements ne partent qu'à l'enregistrement": {
   "en": "Your changes are only sent when you save",
   "de": "Ihre Änderungen werden erst beim Speichern übernommen"
+ },
+ "Vos données seront supprimées définitivement le {date}. Abonnez-vous pour les garder.": {
+  "en": "Your data will be permanently deleted on {date}. Subscribe to keep it.",
+  "de": "Ihre Daten werden am {date} endgültig gelöscht. Schließen Sie ein Abonnement ab, um sie zu behalten."
  },
  "Vos dossiers": {
   "en": "Your folders",

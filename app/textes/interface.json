@@ -459,6 +459,10 @@
   "en": "Discard your changes?",
   "de": "Änderungen verwerfen?"
  },
+ "Appareil retiré": {
+  "en": "Device removed",
+  "de": "Gerät entfernt"
+ },
  "Appareil retiré.": {
   "en": "Device removed.",
   "de": "Gerät entfernt."
@@ -870,6 +874,10 @@
  "Ces durées varient en fonction de l’appareil et de la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": {
   "en": "These times depend on your device and your video. Keep the app open until the analysis is done.",
   "de": "Diese Zeiten hängen von Ihrem Gerät und Ihrem Video ab. Lassen Sie die App offen, bis die Auswertung fertig ist."
+ },
+ "Cet appareil a été retiré de votre compte. Reconnectez-vous pour l’utiliser à nouveau.": {
+  "en": "This device was removed from your account. Sign in again to use it.",
+  "de": "Dieses Gerät wurde aus Ihrem Konto entfernt. Melden Sie sich erneut an, um es zu verwenden."
  },
  "Cet appareil sera déconnecté et libérera une place. Il pourra revenir plus tard s'il en reste une.": {
   "en": "This device will be logged out and free up a seat. It can come back later if a seat is free.",
@@ -1334,6 +1342,10 @@
  "Créée {v}": {
   "en": "Created {v}",
   "de": "Erstellt {v}"
+ },
+ "C’est l’appareil que vous utilisez : vous serez déconnecté et ramené à l’écran de connexion.": {
+  "en": "This is the device you are using: you will be signed out and taken back to the sign-in screen.",
+  "de": "Das ist das Gerät, das Sie gerade verwenden: Sie werden abgemeldet und zum Anmeldebildschirm zurückgebracht."
  },
  "Dans l’équipe depuis": {
   "en": "On the team since",
@@ -2330,6 +2342,10 @@
  "Le démarrage a échoué": {
   "en": "Starting failed",
   "de": "Der Start ist fehlgeschlagen"
+ },
+ "Le fichier se télécharge sur votre appareil. Le PDF s’imprime sur une page A4.": {
+  "en": "The file downloads to your device. The PDF prints on an A4 page.",
+  "de": "Die Datei wird auf Ihr Gerät heruntergeladen. Das PDF lässt sich auf einer A4-Seite drucken."
  },
  "Le micro est allumé : les étapes sont rédigées à partir de ce que vous dites.": {
   "en": "The microphone is on: the steps are written from what you say.",
@@ -3826,6 +3842,10 @@
  "Télécharger le QR code": {
   "en": "Download the QR code",
   "de": "QR-Code herunterladen"
+ },
+ "Télécharger l’image": {
+  "en": "Download the image",
+  "de": "Bild herunterladen"
  },
  "Un <b>PDF</b> par procédure": {
   "en": "A <b>PDF</b> for each procedure",

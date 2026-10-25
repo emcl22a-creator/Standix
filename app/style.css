@@ -4571,6 +4571,10 @@
     justify-content:center; line-height:1;
     font-size:17px; font-weight:850; letter-spacing:-0.04em;
   }
+  /* ⚠ « 100% » TOUCHAIT LE BORD DE L'ANNEAU (relecture du 25 octobre 2026).
+     Le trou fait 46 px ; quatre signes à 17 px en prennent presque autant.
+     Un texte de quatre signes ou plus descend d'une taille. */
+  .ga-anneau .dedans.long{ font-size:14px; letter-spacing:-0.05em; }
   /* Une unité sous le chiffre, quand le chiffre seul serait ambigu. */
   .ga-anneau .unite{
     font-size:8.5px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;
@@ -23231,6 +23235,7 @@ body.abo-expire [data-etab-plus]{
   .recherche-fine input[type=text]{ font-size:calc(16px * var(--ech)); }
   .recherche-fine input[type=text]::placeholder{ font-size:calc(13.5px * var(--ech)); }
   .ga-anneau .dedans{ font-size:calc(17px * var(--ech)); }
+  .ga-anneau .dedans.long{ font-size:calc(14px * var(--ech)); }
   .ga-anneau .unite{ font-size:calc(8.5px * var(--ech)); }
   .ga-libelle{ font-size:calc(9.5px * var(--ech)); }
   .ga-detail{ font-size:calc(12px * var(--ech)); }

@@ -395,6 +395,7 @@ const DICO = {
     "Annuler le code": "Cancel the code",
     "Annuler les modifications": "Discard changes",
     "Annuler les modifications ?": "Discard your changes?",
+    "Appareil retiré": "Device removed",
     "Appareil retiré.": "Device removed.",
     "appel impossible": "call failed",
     "Appui long sur le bouton d’enregistrement, activez le micro, puis « Démarrer ».": "Press and hold the record button, turn on the mic, then tap “Start Recording”.",
@@ -512,6 +513,7 @@ const DICO = {
     "Ce qu’il ne faut surtout pas faire…": "What you must not do…",
     "Ces durées varient en fonction de l’appareil et de la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": "These times depend on your device and your video. Keep the app open until the analysis is done.",
     "cet appareil": "this device",
+    "Cet appareil a été retiré de votre compte. Reconnectez-vous pour l’utiliser à nouveau.": "This device was removed from your account. Sign in again to use it.",
     "Cet appareil sera déconnecté et libérera une place. Il pourra revenir plus tard s'il en reste une.": "This device will be logged out and free up a seat. It can come back later if a seat is free.",
     "cet établissement": "this site",
     "Cette année": "This year",
@@ -638,6 +640,7 @@ const DICO = {
     "Créé {quand}": "Created {quand}",
     "Créée {v}": "Created {v}",
     "c’est la dernière étape, elle prend souvent une à trois minutes.": "this is the last step, it often takes one to three minutes.",
+    "C’est l’appareil que vous utilisez : vous serez déconnecté et ramené à l’écran de connexion.": "This is the device you are using: you will be signed out and taken back to the sign-in screen.",
     "Dans l’équipe depuis": "On the team since",
     "de formation ce mois-ci": "of training this month",
     "de lecture ce mois-ci": "of reading this month",
@@ -925,6 +928,7 @@ const DICO = {
     "Le compteur tourne quand une procédure est OUVERTE à l'écran, et seulement là. • Il s'arrête dès que l'app passe en arrière-plan ou que l'écran s'éteint. • Après deux minutes sans le moindre geste, il demande « vous en êtes où ? » et cesse de compter tant que personne ne répond — un téléphone posé sur le plan de travail n'accumule pas des heures. • Sous trois secondes, rien n'est retenu : c'est un passage, pas une lecture. Les temps s'additionnent à chaque visite.": "The timer runs while a procedure is OPEN on screen, and only then. • It stops as soon as the app goes to the background or the screen turns off. • After two minutes without any touch, it asks “where are you at?” and stops counting until someone answers — a phone left on the counter does not pile up hours. • Under three seconds, nothing is kept: that is a glance, not a read. Times add up with each visit.",
     "Le dernier paiement n'a pas pu être effectué. Mettez à jour votre moyen de paiement pour rouvrir l'accès de toute votre équipe.": "The last payment could not be made. Update your payment method to restore access for your whole team.",
     "Le démarrage a échoué": "Starting failed",
+    "Le fichier se télécharge sur votre appareil. Le PDF s’imprime sur une page A4.": "The file downloads to your device. The PDF prints on an A4 page.",
     "Le micro est allumé : les étapes sont rédigées à partir de ce que vous dites.": "The microphone is on: the steps are written from what you say.",
     "Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.": "The microphone is on while you record. The steps come mostly from what you say.",
     "Le mot de passe doit faire au moins {MDP_MIN} caractères.": "The password must be at least {MDP_MIN} characters.",
@@ -1337,6 +1341,7 @@ const DICO = {
     "Télécharger en PDF": "Download as PDF",
     "Télécharger la fiche": "Download the sheet",
     "Télécharger le QR code": "Download the QR code",
+    "Télécharger l’image": "Download the image",
     "Un <b>PDF</b> par procédure": "A <b>PDF</b> for each procedure",
     "Un <b>QR code</b> par procédure": "A <b>QR code</b> for each procedure",
     "Un autre gestionnaire la modifie en ce moment. Réessayez quand il aura terminé.": "Another manager is editing it right now. Try again when they’re done.",
@@ -1758,6 +1763,7 @@ const DICO = {
     "Annuler le code": "Code aufheben",
     "Annuler les modifications": "Änderungen verwerfen",
     "Annuler les modifications ?": "Änderungen verwerfen?",
+    "Appareil retiré": "Gerät entfernt",
     "Appareil retiré.": "Gerät entfernt.",
     "appel impossible": "Aufruf fehlgeschlagen",
     "Appui long sur le bouton d’enregistrement, activez le micro, puis « Démarrer ».": "Aufnahmetaste lange drücken, Mikrofon einschalten, dann „Aufnahme starten“.",
@@ -1875,6 +1881,7 @@ const DICO = {
     "Ce qu’il ne faut surtout pas faire…": "Was Sie auf keinen Fall tun dürfen…",
     "Ces durées varient en fonction de l’appareil et de la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": "Diese Zeiten hängen von Ihrem Gerät und Ihrem Video ab. Lassen Sie die App offen, bis die Auswertung fertig ist.",
     "cet appareil": "dieses Gerät",
+    "Cet appareil a été retiré de votre compte. Reconnectez-vous pour l’utiliser à nouveau.": "Dieses Gerät wurde aus Ihrem Konto entfernt. Melden Sie sich erneut an, um es zu verwenden.",
     "Cet appareil sera déconnecté et libérera une place. Il pourra revenir plus tard s'il en reste une.": "Dieses Gerät wird abgemeldet und gibt einen Platz frei. Es kann später wieder dazu, wenn ein Platz frei ist.",
     "cet établissement": "dieser Standort",
     "Cette année": "Dieses Jahr",
@@ -2001,6 +2008,7 @@ const DICO = {
     "Créé {quand}": "Erstellt {quand}",
     "Créée {v}": "Erstellt {v}",
     "c’est la dernière étape, elle prend souvent une à trois minutes.": "das ist der letzte Schritt, er dauert oft ein bis drei Minuten.",
+    "C’est l’appareil que vous utilisez : vous serez déconnecté et ramené à l’écran de connexion.": "Das ist das Gerät, das Sie gerade verwenden: Sie werden abgemeldet und zum Anmeldebildschirm zurückgebracht.",
     "Dans l’équipe depuis": "Im Team seit",
     "de formation ce mois-ci": "Einarbeitung diesen Monat",
     "de lecture ce mois-ci": "Lesezeit diesen Monat",
@@ -2288,6 +2296,7 @@ const DICO = {
     "Le compteur tourne quand une procédure est OUVERTE à l'écran, et seulement là. • Il s'arrête dès que l'app passe en arrière-plan ou que l'écran s'éteint. • Après deux minutes sans le moindre geste, il demande « vous en êtes où ? » et cesse de compter tant que personne ne répond — un téléphone posé sur le plan de travail n'accumule pas des heures. • Sous trois secondes, rien n'est retenu : c'est un passage, pas une lecture. Les temps s'additionnent à chaque visite.": "Die Zeit läuft, solange eine Anleitung auf dem Bildschirm OFFEN ist, und nur dann. • Sie stoppt, sobald die App in den Hintergrund geht oder der Bildschirm ausgeht. • Nach zwei Minuten ohne Berührung fragt sie „Wie weit sind Sie?“ und zählt nicht weiter, bis jemand antwortet — ein Handy auf der Arbeitsfläche sammelt keine Stunden. • Unter drei Sekunden zählt nichts: Das ist ein Vorbeischauen, kein Lesen. Die Zeiten addieren sich bei jedem Besuch.",
     "Le dernier paiement n'a pas pu être effectué. Mettez à jour votre moyen de paiement pour rouvrir l'accès de toute votre équipe.": "Die letzte Zahlung konnte nicht durchgeführt werden. Aktualisieren Sie Ihre Zahlungsmethode, um den Zugang für Ihr ganzes Team wiederherzustellen.",
     "Le démarrage a échoué": "Der Start ist fehlgeschlagen",
+    "Le fichier se télécharge sur votre appareil. Le PDF s’imprime sur une page A4.": "Die Datei wird auf Ihr Gerät heruntergeladen. Das PDF lässt sich auf einer A4-Seite drucken.",
     "Le micro est allumé : les étapes sont rédigées à partir de ce que vous dites.": "Das Mikrofon ist an: Die Schritte entstehen aus dem, was Sie sagen.",
     "Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.": "Das Mikrofon ist während der Aufnahme an. Die Schritte entstehen vor allem aus dem, was Sie sagen.",
     "Le mot de passe doit faire au moins {MDP_MIN} caractères.": "Das Passwort muss mindestens {MDP_MIN} Zeichen haben.",
@@ -2700,6 +2709,7 @@ const DICO = {
     "Télécharger en PDF": "Als PDF herunterladen",
     "Télécharger la fiche": "Blatt herunterladen",
     "Télécharger le QR code": "QR-Code herunterladen",
+    "Télécharger l’image": "Bild herunterladen",
     "Un <b>PDF</b> par procédure": "Ein <b>PDF</b> pro Anleitung",
     "Un <b>QR code</b> par procédure": "Ein <b>QR-Code</b> pro Anleitung",
     "Un autre gestionnaire la modifie en ce moment. Réessayez quand il aura terminé.": "Ein anderer Manager bearbeitet es gerade. Versuchen Sie es erneut, wenn er fertig ist.",
@@ -6116,6 +6126,12 @@ document.getElementById('alerte-classer')?.addEventListener('click', async () =>
 
 /* Se signale au serveur. Renvoie `false` si cet appareil-ci vient d'être
    déconnecté parce qu'il dépassait la limite. */
+/* L'empreinte de CET appareil, telle que le serveur la calcule : c'est elle
+   qui permet de reconnaître sa propre ligne dans « Vos appareils ». Et la
+   raison d'un refus : « retire » (retiré depuis cette page) ou « trop ». */
+let monEmpreinte = null
+let raisonBlocage = null
+
 async function signalerPresence(membre) {
   if (!membre?.id) return true
   try {
@@ -6125,6 +6141,8 @@ async function signalerPresence(membre) {
       body: JSON.stringify({ membre_id: membre.id, entreprise_id: membre.entreprise_id }),
     })
     const data = await rep.json()
+    if (data?.empreinte) monEmpreinte = data.empreinte
+    raisonBlocage = data?.bloque ? (data.raison || 'trop') : null
     return !data?.bloque
   } catch (ex) {
     /* Fonction non déployée, réseau coupé : on laisse passer. Mieux vaut ne pas
@@ -6155,6 +6173,24 @@ function lancerSuiviPresence(membre) {
 function arreterSuiviPresence() {
   if (minuteurPresence) { clearInterval(minuteurPresence); minuteurPresence = null }
 }
+
+/* ⚠ AU RETOUR DANS L'APP, ON VÉRIFIE AUSSI (25 octobre 2026). Un appareil
+   retiré depuis un autre ne l'apprenait qu'au passage suivant, jusqu'à cinq
+   minutes plus tard. Rouvrir l'app suffit maintenant. Une fois par minute au
+   plus. */
+let dernierControlePresence = 0
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState !== 'visible' || !minuteurPresence || !currentMembre?.id) return
+  if (Date.now() - dernierControlePresence < 60000) return
+  dernierControlePresence = Date.now()
+  const ok = await signalerPresence(currentMembre)
+  if (!ok) {
+    arreterSuiviPresence()
+    window.__sortieVoulue = true
+    try { await supabase.auth.signOut({ scope: 'local' }) } catch (e) {}
+    location.reload()
+  }
+})
 
 /* Ce qu'on montre à quelqu'un dont l'appareil vient d'être déconnecté. Le ton
    n'est pas accusateur : on explique ce qu'on perd, et ce qu'il faut demander. */
@@ -6280,6 +6316,7 @@ async function peindreAppareils() {
          minuscules — les deux partagent la même liste de navigateurs, donc ils
          ne peuvent pas diverger. */
       parAppareil.set(cle, { ...a, nom: socleAffiche(a.nom), lignes: [a.id],
+                             moi: !!monEmpreinte && a.empreinte === monEmpreinte,
                              reseaux: a.reseau ? [a.reseau] : [] })
       continue
     }
@@ -6292,6 +6329,7 @@ async function peindreAppareils() {
       connu.premiere_fois = a.premiere_fois
     }
     connu.lignes.push(a.id)
+    if (monEmpreinte && a.empreinte === monEmpreinte) connu.moi = true
     if (a.reseau && !connu.reseaux.includes(a.reseau)) connu.reseaux.push(a.reseau)
   }
   const liste = [...parAppareil.values()]
@@ -6330,14 +6368,14 @@ async function peindreAppareils() {
         </svg>
       </span>
       <span class="tx">
-        <span class="nm">${escapeHtml(a.nom || 'Appareil')}${vivant ? '<span class="ici">' + tLang('actif') + '</span>' : ''}</span>
+        <span class="nm">${escapeHtml(a.nom || 'Appareil')}${a.moi ? '<span class="ici">' + tLang('cet appareil') + '</span>' : vivant ? '<span class="ici">' + tLang('actif') + '</span>' : ''}</span>
         <span class="st">${quandLisible(a.derniere_fois)}${
             a.reseaux.length > 1
               ? ' ' + tLang('· {length} réseaux', { length: a.reseaux.length })
               : (a.reseaux[0] ? ' \u00b7 ' + escapeHtml(a.reseaux[0]) : '')
           }</span>
       </span>
-      <button type="button" class="oter" data-appareil="${a.lignes.join(',')}"
+      <button type="button" class="oter" data-appareil="${a.lignes.join(',')}"${a.moi ? ' data-moi="1"' : ''}
         data-nom="${escapeHtml(a.nom || tLang('cet appareil'))}">${tLang('Retirer')}</button>
     </div>`
   }).join('')
@@ -6347,9 +6385,12 @@ async function peindreAppareils() {
 document.addEventListener('click', async (e) => {
   const b = e.target.closest('[data-appareil]')
   if (!b) return
+  const soiMeme = b.dataset.moi === '1'
   const ok = await confirmDialog({
     titre: tLang('Retirer {nom} ?', { nom: b.dataset.nom }),
-    message: tLang('Cet appareil sera déconnecté et libérera une place. Il pourra revenir plus tard s\'il en reste une.'),
+    message: soiMeme
+      ? tLang('C’est l’appareil que vous utilisez : vous serez déconnecté et ramené à l’écran de connexion.')
+      : tLang('Cet appareil sera déconnecté et libérera une place. Il pourra revenir plus tard s\'il en reste une.'),
     confirmer: tLang('Retirer'), annuler: tLang('Annuler'), danger: true,
   })
   if (!ok) return
@@ -6357,8 +6398,35 @@ document.addEventListener('click', async (e) => {
      téléphone vu par deux réseaux. Les retirer toutes : n'en effacer qu'une
      ferait réapparaître l'appareil au rechargement. */
   const lignes = String(b.dataset.appareil || '').split(',').filter(Boolean)
-  const { error } = await supabase.from('presences').delete().in('id', lignes)
-  if (error) { toast(tLang('Échec : {message}', { message: error.message })); return }
+
+  /* ⚠ RETIRER CET APPAREIL-CI DÉCONNECTE (demande d'Em du 25 octobre 2026).
+     On effaçait sa ligne et l'on restait connecté : au passage suivant, il
+     se réinscrivait. On efface, puis on se déconnecte sur cet appareil
+     seulement, et l'app revient à l'écran « se connecter / créer un compte ». */
+  if (soiMeme) {
+    const { error } = await supabase.from('presences').delete().in('id', lignes)
+    if (error) { toast(tLang('Échec : {message}', { message: error.message })); return }
+    arreterSuiviPresence()
+    window.__sortieVoulue = true
+    try { await supabase.auth.signOut({ scope: 'local' }) } catch (e2) {}
+    location.reload()
+    return
+  }
+
+  /* ⚠ UN AUTRE APPAREIL EST VRAIMENT DÉCONNECTÉ (25 octobre 2026). Effacer sa
+     ligne ne suffisait pas : il se réinscrivait au passage suivant. Le
+     serveur la marque « retirée » ; l'appareil est déconnecté à son
+     prochain passage (au plus cinq minutes, ou dès qu'on rouvre l'app). */
+  let erreur = null
+  try {
+    const rep = await fetch(`${SUPABASE_URL}/functions/v1/presence`, {
+      method: 'POST', headers: await enTeteFonction(),
+      body: JSON.stringify({ membre_id: currentMembre.id, action: 'retirer', ids: lignes }),
+    })
+    const data = await rep.json().catch(() => ({}))
+    if (!rep.ok || !data?.ok) erreur = data?.erreur || ('HTTP ' + rep.status)
+  } catch (e2) { erreur = e2?.message || String(e2) }
+  if (erreur) { toast(tLang('Échec : {message}', { message: erreur })); return }
   await peindreAppareils()
   toast(tLang('Appareil retiré.'))
 })
@@ -6660,7 +6728,13 @@ async function enterApp(membre) {
     const sousR = document.getElementById('auth-sous')
     if (sousR) sousR.textContent = tLang('Connectez-vous ou créez votre compte')
     window.__procedoLoaded = true
-    await fenetreTropDAppareils()
+    if (raisonBlocage === 'retire') {
+      await confirmDialog({
+        titre: tLang('Appareil retiré'),
+        message: tLang('Cet appareil a été retiré de votre compte. Reconnectez-vous pour l’utiliser à nouveau.'),
+        confirmer: tLang('Compris'), annuler: null, danger: false,
+      })
+    } else await fenetreTropDAppareils()
     return
   }
   lancerSuiviPresence(membre)
@@ -8726,7 +8800,7 @@ function dessinerAnneau(id, pct, couleur, texte, unite) {
               stroke="${couleur}" stroke-dasharray="${c}"
               style="--vide:${c}; --cible:${cible}; stroke-dashoffset:${cible}"/>
     </svg>
-    <div class="dedans">${escapeHtml(texte)}${unite ? `<span class="unite">${escapeHtml(unite)}</span>` : ''}</div>`
+    <div class="dedans${String(texte ?? '').length >= 4 ? ' long' : ''}">${escapeHtml(texte)}${unite ? `<span class="unite">${escapeHtml(unite)}</span>` : ''}</div>`
 }
 
 /* Classement des dossiers par taux de consultation.
@@ -31162,10 +31236,14 @@ async function openAnalyse(procId) {
        ouvre. */
     const base = proc.titre.normalize('NFD').replace(/[̀-ͯ]/g, '')
       .replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'standix'
-    const fiche = composerFicheQR(canvas, proc.titre, 3)
-    const enImage = fetch(fiche).then(r => r.blob())
+    /* La signature « Standix » est écrite en Poppins 500, comme dans l'app :
+       une toile n'emploie qu'une police déjà chargée, on l'attend donc. */
+    const ficheP = (document.fonts?.load('500 24px Poppins') || Promise.resolve())
+      .catch(() => {}).then(() => composerFicheQR(canvas, proc.titre, 3))
+    const enImage = ficheP.then(fiche => fetch(fiche)).then(r => r.blob())
       .then(b => new File([b], `${base}-qr-code.png`, { type: 'image/png' }))
     const enPdf = (async () => {
+      const fiche = await ficheP
       const dims = await new Promise((ok, non) => {
         const i = new Image()
         i.onload = () => ok({ l: i.naturalWidth, h: i.naturalHeight })
@@ -31193,16 +31271,10 @@ async function openAnalyse(procId) {
     const donner = async (promesse, messageEchec) => {
       try {
         const file = await promesse
-        /* Le partage du système d'abord (iPhone : « Enregistrer l'image »,
-           « Enregistrer dans Fichiers », « Imprimer »), sinon on télécharge. */
-        try {
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file], title: proc.titre })
-            return
-          }
-        } catch (e) {
-          if (e?.name === 'AbortError') return         // partage annulé : rien à faire
-        }
+        /* ⚠ ON TÉLÉCHARGE, COMME LE PDF DE LA PROCÉDURE (demande d'Em du
+           25 octobre 2026). La fenêtre de partage du système passait
+           d'abord : on lisait « Partager » et le fichier ne se téléchargeait
+           pas. Le fichier part maintenant directement, comme `doc.save`. */
         const url = URL.createObjectURL(file)
         const link = document.createElement('a')
         link.download = file.name
@@ -31224,10 +31296,10 @@ async function openAnalyse(procId) {
         <span class="fen-halo bleu"></span>
         <div class="fen-co">
           <div class="fen-t">${escapeHtml(tLang('Télécharger le QR code'))}</div>
-          <div class="fen-s">${escapeHtml(tLang('L’image se range dans Photos. Le PDF s’imprime sur une page A4.'))}</div>
+          <div class="fen-s">${escapeHtml(tLang('Le fichier se télécharge sur votre appareil. Le PDF s’imprime sur une page A4.'))}</div>
         </div>
         <div class="fen-ac">
-          <button type="button" class="fen-p" data-qr="image">${escapeHtml(tLang('Enregistrer l’image'))}</button>
+          <button type="button" class="fen-p" data-qr="image">${escapeHtml(tLang('Télécharger l’image'))}</button>
           <button type="button" class="fen-a" data-qr="pdf">${escapeHtml(tLang('PDF à imprimer'))}</button>
           <button type="button" class="fen-a" data-qr="non">${escapeHtml(tLang('Annuler'))}</button>
         </div>
@@ -31243,8 +31315,6 @@ async function openAnalyse(procId) {
       const choix = e.target.closest('[data-qr]')?.dataset.qr
       if (!choix && e.target !== fond) return
       fermer()
-      /* ⚠ APPELÉ DANS L'APPUI MÊME, sans attente avant : c'est ce qui
-         autorise Safari à ouvrir la fenêtre de partage. */
       if (choix === 'image') donner(enImage, tLang('L’image n’a pas pu être créée'))
       else if (choix === 'pdf') donner(enPdf, tLang('Le PDF n’a pas pu être créé'))
     })
@@ -31329,23 +31399,32 @@ function composerFicheQR(qrCanvas, titre, k = 1) {
      de deux mètres dans une cuisine, ne se lit pas. */
   const NOIR = '#14151A'
   g.fillStyle = NOIR
-  g.font = '500 24px Poppins, Inter, -apple-system, system-ui, sans-serif'
-  const nom = 'Standix'
-  const largeurNom = g.measureText(nom).width
+  /* ⚠ LES PROPORTIONS DE LA BARRE DE L'APP (25 octobre 2026) : signe de
+     24 × 34 px, écart de 9 px, mot en Poppins 500 de 25,5 px resserré de
+     0,02 em. Tout se déduit de la hauteur du signe. */
   const hLogo = 26
   const lLogo = hLogo * 0.706          // le rapport du nouveau dessin
-  const espace = 9
+  const tailleNom = hLogo * 25.5 / 34
+  const espace = hLogo * 9 / 34
+  g.font = `500 ${tailleNom}px Poppins, Inter, -apple-system, system-ui, sans-serif`
+  if ('letterSpacing' in g) g.letterSpacing = `${-0.02 * tailleNom}px`
+  const nom = 'Standix'
+  const largeurNom = g.measureText(nom).width
   const totalL = lLogo + espace + largeurNom
   const xDepart = (L - totalL) / 2
   const yBase = y + 32
+  const yLogo = yBase - hLogo + 3
 
   const img = document.getElementById('logo-src')
   if (img && img.complete && img.naturalWidth) {
-    g.drawImage(img, xDepart, yBase - hLogo + 3, lLogo, hLogo)
+    g.drawImage(img, xDepart, yLogo, lLogo, hLogo)
   }
 
   g.textAlign = 'left'
-  g.fillText(nom, xDepart + lLogo + espace, yBase)
+  g.textBaseline = 'middle'            // calé sur le milieu du signe, comme dans l'app
+  g.fillText(nom, xDepart + lLogo + espace, yLogo + hLogo / 2)
+  g.textBaseline = 'alphabetic'
+  if ('letterSpacing' in g) g.letterSpacing = '0px'
   g.textAlign = 'center'
 
   return c.toDataURL('image/png')
@@ -33527,8 +33606,18 @@ async function chargerPoppins(doc) {
   if (poppinsPret === false) return false
   try {
     if (!poppinsPret) {
-      const r = await fetch('https://cdn.jsdelivr.net/npm/@expo-google-fonts/poppins@0.2.3/500Medium/Poppins_500Medium.ttf')
-      if (!r.ok) throw new Error('HTTP ' + r.status)
+      /* ⚠ LA POLICE EST RANGÉE À CÔTÉ DE L'APP (relecture du 25 octobre 2026).
+         L'adresse précédente n'existait pas (dossier `500Medium/` inconnu de
+         cette version du paquet) : chaque PDF retombait en Helvetica grasse,
+         et « Standix » n'avait pas l'écriture de l'app. Le fichier
+         `Poppins-Medium.ttf` (Poppins 500, licence libre OFL) est servi par
+         Standix ; le CDN, à la bonne adresse, ne sert plus que de secours. */
+      let r = null
+      for (const adresse of ['Poppins-Medium.ttf',
+        'https://cdn.jsdelivr.net/npm/@expo-google-fonts/poppins@0.2.3/Poppins_500Medium.ttf']) {
+        try { r = await fetch(adresse); if (r.ok) break } catch (e) { r = null }
+      }
+      if (!r || !r.ok) throw new Error('HTTP ' + (r?.status ?? 'réseau'))
       const buf = new Uint8Array(await r.arrayBuffer())
       /* En morceaux : `String.fromCharCode` sur 153 000 octets d'un coup
          dépasse la taille d'appel autorisée et lève un RangeError. */
@@ -33551,10 +33640,19 @@ async function chargerPoppins(doc) {
 let logoCache = null
 
 function logoPourPdf() {
-  if (logoCache !== null) return logoCache
+  if (logoCache) return logoCache
   try {
     const src = document.getElementById('logo-src')
-    if (!src || !src.naturalWidth) return (logoCache = false)
+    /* ⚠ LE FICHIER D'ORIGINE, TEL QUEL (relecture du 25 octobre 2026). Le
+       logo est déjà un PNG dans la page : le repasser par une toile le
+       réencodait (sur iPhone, les bords transparents en sortent abîmés). Et
+       un logo pas encore chargé au premier export n'était plus jamais
+       réessayé. */
+    const brut = src?.getAttribute('src') || ''
+    if (/^data:image\/png;base64,/.test(brut)) {
+      return (logoCache = { data: brut, l: src.naturalWidth || 225, h: src.naturalHeight || 320 })
+    }
+    if (!src || !src.naturalWidth) return false
 
     const t = document.createElement('canvas')
     t.width = src.naturalWidth; t.height = src.naturalHeight
@@ -33676,16 +33774,23 @@ async function exporterProcedurePdf(proc, etapes) {
        On descend le signe à 8,5 mm et on monte le mot à 19 points. Poppins
        ayant une hauteur d'x généreuse, le mot occupe alors la même bande que le
        dessin — c'est ce rapport-là qu'on lit, pas les tailles absolues. */
+    /* ⚠ LES PROPORTIONS DE LA BARRE DE L'APP (relecture du 25 octobre 2026) :
+       signe de 24 × 34 px, écart de 9 px, « Standix » en Poppins 500 de
+       25,5 px, lettres resserrées de 0,02 em (`.boot-logo--topbar`,
+       `.tb-logo`, `.tb-nom`). Tout est dérivé de la hauteur du signe. */
     const hL = 8.5, lL = hL * (logo.l / logo.h)
+    const mmParPx = hL / 34
     doc.addImage(logo.data, 'PNG', MARGE, y, lL, hL)
+    const taille = 25.5 * mmParPx * 72 / 25.4
     if (poppins) doc.setFont('Poppins', 'normal')
     else doc.setFont('helvetica', 'bold')
-    doc.setFontSize(19)
+    doc.setFontSize(taille)
     doc.setTextColor(0, 0, 0)
     /* `baseline: 'middle'` cale le mot sur le MILIEU du signe. Sans cela il
        s'aligne sur sa ligne de pied, et les deux paraissent décalés d'un
        millimètre — assez pour que ça se voie sans qu'on sache pourquoi. */
-    doc.text('Standix', MARGE + lL + 3.2, y + hL / 2, { baseline: 'middle' })
+    doc.text('Standix', MARGE + lL + 9 * mmParPx, y + hL / 2,
+      { baseline: 'middle', charSpace: poppins ? -0.02 * taille * 25.4 / 72 : 0 })
     y += hL + 9
   }
 
@@ -39700,6 +39805,13 @@ function peindrePublication(proc) {
   editProcedureId = proc.id
 
   const publiee = !!proc.publiee_le
+
+  /* ⚠ LA MENTION SOUS LE QR SUIT AUSSI CE BOUTON (relecture du 25 octobre
+     2026). Seule `openAnalyse` la mettait à jour : après « Publier »,
+     « Le QR code fonctionnera une fois la procédure en ligne » restait
+     affiché jusqu'à la réouverture de la fiche. */
+  const attenteQR = document.getElementById('qr-attente')
+  if (attenteQR) attenteQR.hidden = publiee
 
   /* ═══ L'ANIMATION DU BASCULEMENT ═══
 

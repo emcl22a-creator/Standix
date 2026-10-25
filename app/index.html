@@ -10,10 +10,6 @@
   <script>
     try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual' } catch (e) {}
   </script>
-  <!-- Dashboard privé : note les erreurs pour qu'on les voie et les corrige.
-       Tout en premier, pour ne rater aucune erreur du démarrage. Ne casse
-       jamais la page (voir l'en-tête de /suivi.js). -->
-  <script src="/suivi.js?v=1"></script>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -147,7 +143,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=fa555510">
+<link rel="stylesheet" href="style.css?v=21d636a9">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2045,7 +2041,7 @@
       </button>
       <h1 class="pagehead" id="man-titre-page">Étapes manuelles</h1>
     </div>
-    <div class="subhead" id="man-sous">Écrivez chaque étape dans l’ordre</div>
+    <div class="subhead" id="man-sous" style="display:none"></div>
 
     <!-- Dossier et titre n'apparaissent QU'EN MODIFICATION. À la création ils
          ont déjà été demandés sur l'écran précédent, et les redemander donnerait
@@ -2386,7 +2382,9 @@
     <!-- Deux usages, deux traitements. Le libellé ne parle pas de réglage
          technique : la personne sait ce qu'elle a filmé, pas ce qu'Azure doit
          en faire. -->
-    <div class="ai-legende"><span class="t">Ajoutez votre vidéo</span></div><div class="dv-depot">
+    <!-- « Ajoutez votre vidéo » retiré (demande d'Em du 25 octobre 2026) : le
+         cadre dit déjà « Importer une vidéo ». -->
+    <div class="dv-depot">
         <input type="file" id="ai-video-input" accept="video/*">
         <div class="video-frame" id="ai-video-frame">
           <video id="ai-video-player" style="display:none;" playsinline="" preload="metadata" muted=""></video>
@@ -2762,7 +2760,7 @@
       </span>
       <span class="tx">
         <span class="t">Ajouter une photo</span>
-        <span class="s">Elle apparaît sur sa carte et en tête de la fiche. Facultative.</span>
+        <span class="s">Facultatif</span>
       </span>
       <button type="button" class="oter" style="display:none;">Retirer</button>
     </div>
@@ -5299,7 +5297,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=56e45bee" onerror="window.__appJsEchec && window.__appJsEchec()"></script>
+<script type="module" src="app.js?v=6389888b" onerror="window.__appJsEchec && window.__appJsEchec()"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

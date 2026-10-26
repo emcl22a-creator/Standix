@@ -5162,33 +5162,40 @@ body.pret .barre-hote{animation-play-state:running}
    · Les grands titres passent du flou au net en montant.
    · Les écrans de l'app (« Découvrez l'application ») glissent un peu
      moins vite que la page : un léger relief.
-   · Au survol, les tuiles de l'app et de la sécurité s'inclinent vers la
-     souris (5° au plus) avec un reflet blanc qui suit le curseur ; les photos se
-     rapprochent lentement ; les cartes de prix se soulèvent.
+   · Au survol, une lumière blanche très faible suit le curseur sur les
+     tuiles et les cartes ; les photos se rapprochent à peine ; les cartes de
+     prix se soulèvent.
+   ⚠ SOBRE, TRÈS PRO (à la demande, 26 oct. 2026) : PLUS D'INCLINAISON EN 3D
+     (« ça ne fait pas pro »), un reflet beaucoup plus faible, un zoom des
+     photos réduit à 2 %. Pas d'animation qui fasse « enfant ».
    ⚠ ORDINATEUR SEULEMENT : souris ou pavé tactile, écran de 981 px ou plus.
      Rien ne change sur tablette ni sur téléphone.
    ⚠ RIEN POUR QUI A DEMANDÉ MOINS D'ANIMATIONS dans les réglages du système.
-   ⚠ LES CARTES QUI SE RETOURNENT (« Vos bénéfices ») NE S'INCLINENT PAS :
-     leur 3D est fragile dans Safari (voir « LES CARTES POINTS FORTS »). Seule
-     la photo bouge, à l'intérieur de la face avant.
    ⚠ L'ENTRÉE DES TITRES n'est plus « sans flou » sur ordinateur (voir
      « L'ENTRÉE AU DÉFILEMENT ») : c'est le choix du 26 octobre.
-   L'inclinaison, le reflet et le relief sont posés par le script « LE SITE
-   PLUS VIVANT », en bas de la page.
+   Le reflet et le relief sont posés par le script « LE SITE PLUS VIVANT »,
+   en bas de la page.
    ═══════════════════════════════════════════════════════════════════════ */
-@media (min-width:981px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
-  /* Les titres : du flou au net, en montant. */
+/* Les titres : du flou au net, en montant. Un peu plus vite que le reste
+   (0,95 s au lieu de 1,35 s, à la demande du 26 oct. 2026).
+   ⚠ SUR TOUS LES ÉCRANS (ordinateur, tablette, téléphone) depuis le 26 oct.
+   2026, comme sur les pages d'Apple. Le reste de « LE SITE PLUS VIVANT »
+   reste réservé à l'ordinateur. */
+@media (prefers-reduced-motion:no-preference){
   .car-t[data-monte], .tar-t[data-monte], .fin-t[data-monte]{
     filter:blur(14px);
-    transition:opacity 1.05s cubic-bezier(.28,.11,.32,1) var(--d, 0ms),
-               translate 1.05s cubic-bezier(.28,.11,.32,1) var(--d, 0ms),
-               filter 1.35s cubic-bezier(.28,.11,.32,1) var(--d, 0ms);
+    transition:opacity .9s cubic-bezier(.28,.11,.32,1) var(--d, 0ms),
+               translate .9s cubic-bezier(.28,.11,.32,1) var(--d, 0ms),
+               filter .95s cubic-bezier(.28,.11,.32,1) var(--d, 0ms);
   }
   .car-t[data-monte].vu, .tar-t[data-monte].vu, .fin-t[data-monte].vu{filter:none}
+}
+@media (min-width:981px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
 
-  /* Le relief : l'image est un peu plus grande que son cadre et glisse
-     dedans (`--relief`, posé par le script). */
-  .car-s3 .car-vue-ecran img{scale:1.08; translate:0 var(--relief, 0px)}
+  /* Le relief : l'image est à peine plus grande que son cadre (3 %, au lieu
+     de 8 % — l'écran paraissait zoomé) et glisse dedans de 5 px au plus
+     (`--relief`, posé par le script). */
+  .car-s3 .car-vue-ecran img{scale:1.03; translate:0 var(--relief, 0px)}
   /* Les photos : pas de relief (il rapprochait les visages des titres) ;
      au survol elles se rapprochent lentement, autour du tiers haut de la
      carte, là où sont les visages et la plaque QR : ils ne bougent presque
@@ -5197,23 +5204,18 @@ body.pret .barre-hote{animation-play-state:running}
     transform-origin:50% 35%;
     transition:scale 1.4s cubic-bezier(.2,.7,.2,1);
   }
-  .car-pf .pf-carte:hover .pf .pf-img{scale:1.06}
+  .car-pf .pf-carte:hover .pf .pf-img{scale:1.02}
 
-  /* Les tuiles qui s'inclinent : la carte garde ses coins arrondis pendant
-     le mouvement. */
+  /* Les tuiles qui portent le reflet. */
   .car-s3 .car-vue, .secu .car-vue{position:relative; isolation:isolate}
-  /* ⚠ DE LA PLACE AU-DESSUS DES TUILES : inclinée, une tuile dépasse de
-     quelques pixels, et la piste rogne tout ce qui dépasse. Même procédé que
-     la section « Vos bénéfices » : une réserve, annulée par une marge
-     négative — la mise en page ne bouge pas. */
-  .car-s3 .car-piste, .secu .car-piste{padding-top:24px; margin-top:-24px}
 
-  /* Le reflet : une lumière douce sous le curseur. */
+  /* Le reflet : une lumière très faible sous le curseur (5 % au centre,
+     au lieu de 13 % — à la demande). */
   .vif-reflet{
     position:absolute; inset:0; z-index:1; border-radius:inherit; pointer-events:none;
-    opacity:0; transition:opacity .6s ease;
-    background:radial-gradient(520px circle at var(--mx, 50%) var(--my, 30%),
-      rgba(255,255,255,.13), rgba(255,255,255,.04) 35%, rgba(255,255,255,0) 65%);
+    opacity:0; transition:opacity .8s ease;
+    background:radial-gradient(560px circle at var(--mx, 50%) var(--my, 30%),
+      rgba(255,255,255,.05), rgba(255,255,255,.015) 40%, rgba(255,255,255,0) 70%);
   }
   .vif-actif .vif-reflet{opacity:1}
   /* Sécurité : la même lumière blanche que les autres cartes (à la demande,
@@ -5223,8 +5225,8 @@ body.pret .barre-hote{animation-play-state:running}
   /* Les photos : sous le texte, au-dessus du voile. */
   .car-pf .pf .vif-reflet{z-index:1}
   .car-pf .pf-clair .vif-reflet{
-    background:radial-gradient(520px circle at var(--mx, 50%) var(--my, 30%),
-      rgba(255,255,255,.22), rgba(255,255,255,0) 60%);
+    background:radial-gradient(560px circle at var(--mx, 50%) var(--my, 30%),
+      rgba(255,255,255,.08), rgba(255,255,255,0) 65%);
   }
 }
 /* Les cartes de prix se soulèvent. Au-delà de 1 100 px seulement : en
@@ -7203,7 +7205,7 @@ body.pret .barre-hote{animation-play-state:running}
 </script>
 <script>
 /* ═══ LE SITE PLUS VIVANT, SUR ORDINATEUR (voir la feuille de style, même
-   titre) : l'inclinaison et le reflet au survol, le relief au défilement.
+   titre) : le reflet au survol, le relief au défilement.
    Tout passe par `requestAnimationFrame`, et chaque mouvement RATTRAPE sa
    cible d'une part de l'écart à chaque image : c'est ce lissage qui le rend
    soyeux, à la souris comme à la molette. ═══ */
@@ -7220,55 +7222,33 @@ body.pret .barre-hote{animation-play-state:running}
     return s;
   }
 
-  /* ─── L'inclinaison : 5° au plus, vers la souris ─── */
-  function inclinable(el, max){
-    var cx = 0, cy = 0, tx = 0, ty = 0, boucle = 0;
-    reflet(el);
-    function peindre(){
-      cx += (tx - cx) * .12; cy += (ty - cy) * .12;
-      if(Math.abs(tx - cx) < .01 && Math.abs(ty - cy) < .01){ cx = tx; cy = ty; }
-      el.style.transform = (cx || cy)
-        ? 'perspective(1000px) rotateX(' + cy.toFixed(3) + 'deg) rotateY(' + cx.toFixed(3) + 'deg)'
-        : '';
-      boucle = (cx === tx && cy === ty) ? 0 : requestAnimationFrame(peindre);
-    }
-    function relancer(){ if(!boucle) boucle = requestAnimationFrame(peindre); }
-    el.addEventListener('pointermove', function(e){
+  /* ─── Le reflet seul, sur les tuiles et les cartes ───
+     ⚠ PLUS D'INCLINAISON EN 3D (retirée à la demande, 26 oct. 2026 : « ça ne
+     fait pas pro »). La carte ne bouge pas ; seule une lumière très faible
+     suit le curseur. */
+  function reflete(zone, hote){
+    reflet(hote);
+    zone.addEventListener('pointermove', function(e){
       if(!actif() || e.pointerType !== 'mouse') return;
-      var r = el.getBoundingClientRect();
-      var px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
-      tx = (px - .5) * 2 * max; ty = -(py - .5) * 2 * max;
-      el.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
-      el.style.setProperty('--my', (py * 100).toFixed(1) + '%');
-      el.classList.add('vif-actif');
-      relancer();
+      var r = hote.getBoundingClientRect();
+      hote.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+      hote.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+      hote.classList.add('vif-actif');
     });
-    el.addEventListener('pointerleave', function(){
-      tx = 0; ty = 0; el.classList.remove('vif-actif'); relancer();
-    });
+    zone.addEventListener('pointerleave', function(){ hote.classList.remove('vif-actif'); });
   }
-  document.querySelectorAll('.car-s3 .car-vue').forEach(function(el){ inclinable(el, 5); });
-  document.querySelectorAll('.secu .car-vue').forEach(function(el){ inclinable(el, 4); });
+  document.querySelectorAll('.car-s3 .car-vue, .secu .car-vue').forEach(function(el){ reflete(el, el); });
 
-  /* ─── Les photos de « Vos bénéfices » : le reflet seul, sur la face avant ─── */
+  /* Les photos de « Vos bénéfices » : sur la face avant. */
   document.querySelectorAll('.car-pf .pf-carte').forEach(function(carte){
     var face = carte.querySelector('.pf-tourne > .pf');
-    if(!face) return;
-    reflet(face);
-    carte.addEventListener('pointermove', function(e){
-      if(!actif() || e.pointerType !== 'mouse') return;
-      var r = face.getBoundingClientRect();
-      face.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
-      face.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
-      face.classList.add('vif-actif');
-    });
-    carte.addEventListener('pointerleave', function(){ face.classList.remove('vif-actif'); });
+    if(face) reflete(carte, face);
   });
 
   /* ─── Le relief : l'écran de l'app glisse un peu moins vite que la page ───
-     0 quand le centre de la tuile est au centre de l'écran ; ±12 px quand
+     0 quand le centre de la tuile est au centre de l'écran ; ±5 px quand
      elle entre ou sort. */
-  var reliefs = [].slice.call(document.querySelectorAll('.car-s3 .car-vue-ecran img')).map(function(i){ return {el:i, amp:12, v:0, c:0}; });
+  var reliefs = [].slice.call(document.querySelectorAll('.car-s3 .car-vue-ecran img')).map(function(i){ return {el:i, amp:5, v:0, c:0}; });
   var boucleR = 0;
   function cibler(){
     var h = innerHeight;

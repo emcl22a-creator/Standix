@@ -9,6 +9,11 @@
 <title>Standix · Dashboard</title>
 <link rel="icon" href="/app/favicon-32.png">
 <link rel="apple-touch-icon" href="/app/apple-touch-icon.png">
+<link rel="manifest" href="/admin.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Standix Admin">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600&display=swap">
 <!--
@@ -251,6 +256,89 @@ button { cursor: pointer; }
 .guide-ligne .num.fl { background: color-mix(in srgb, var(--c) 14%, transparent); color: var(--c); }
 .guide-ligne .num svg { width: 13px; height: 13px; stroke-width: 2.6; }
 .guide .titre-bloc { margin-top: 4px; }
+/* ─── Version 2 ─── */
+.etat-ligne { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--bord); }
+.etat-ligne:first-of-type { border-top: 0; }
+.etat-ligne .t { flex: 1; min-width: 0; } .etat-ligne .t b { display: block; font-weight: 600; font-size: 14px; }
+.etat-ligne .t span { display: block; font-size: 12.5px; color: var(--texte-3); line-height: 1.4; }
+.etat-ligne .n { font-weight: 700; font-size: 15px; white-space: nowrap; }
+.sg { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.sg svg { width: 13px; height: 13px; stroke-width: 3; } .sg i { width: 10px; height: 2.5px; border-radius: 2px; background: currentColor; }
+.sg.ok { background: var(--ok-doux); color: var(--ok); } .sg.ko { background: var(--grave); color: #fff; } .sg.moyen { background: var(--alerte-doux); color: var(--alerte); }
+.gros-chiffre { font-size: 30px; font-weight: 700; letter-spacing: -.02em; } .gros-chiffre small { font-size: 14px; font-weight: 500; color: var(--texte-3); letter-spacing: 0; }
+.vide-grand { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding: 30px 20px; margin-bottom: 14px; }
+.vide-grand b { font-size: 17px; } .vide-grand span { color: var(--texte-2); font-size: 14px; max-width: 46ch; line-height: 1.5; }
+/* Messages */
+.boite { padding: 0; overflow: hidden; }
+.courrier { display: flex; gap: 12px; width: 100%; padding: 14px 16px; border: 0; border-top: 1px solid var(--bord); background: none; text-align: left; position: relative; }
+.courrier:first-child { border-top: 0; } .courrier:hover { background: var(--carte-2); }
+.courrier.non-lu::before { content: ""; position: absolute; left: 5px; top: 22px; width: 7px; height: 7px; border-radius: 50%; background: #3A78EE; }
+.msg-av { width: 38px; height: 38px; border-radius: 50%; flex: none; display: grid; place-items: center; font-weight: 700; color: #fff; background: linear-gradient(180deg, #8E8E93, #636366); }
+.msg-av.grand { width: 52px; height: 52px; font-size: 20px; }
+.msg-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.msg-l1 { display: flex; justify-content: space-between; gap: 10px; } .msg-l1 b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.courrier.non-lu .msg-l1 b, .courrier.non-lu .msg-obj { font-weight: 700; color: var(--texte); }
+.msg-l1 time { font-size: 12.5px; color: var(--texte-3); white-space: nowrap; }
+.msg-obj { font-size: 14px; color: var(--texte-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msg-ext { font-size: 13px; color: var(--texte-3); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.msg-tete { display: flex; gap: 14px; align-items: center; } .msg-tete b { display: block; font-size: 17px; } .msg-tete div span { display: block; font-size: 13px; color: var(--texte-3); }
+.msg-corps { background: var(--carte); border: 1px solid var(--bord); border-radius: 14px; padding: 16px; font-size: 15px; line-height: 1.6; margin-bottom: 16px; word-break: break-word; }
+.lien-btn { display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+.lien-btn svg, .gros-btn svg { width: 18px; height: 18px; }
+.deux-btn { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.gros-btn.gris { background: var(--carte); border: 1px solid var(--bord-fort); color: var(--texte); font-size: 15px; }
+.gros-btn.rouge-plein { background: var(--grave); color: #fff; }
+.btn-grave { color: var(--grave); border-color: color-mix(in srgb, var(--grave) 35%, transparent); }
+.btn-grave svg { width: 15px; height: 15px; }
+/* Notifications */
+.notif-carte { display: flex; align-items: center; gap: 14px; }
+.notif-carte .t { flex: 1; min-width: 0; } .notif-carte .t b { display: block; font-size: 15px; } .notif-carte .t span { display: block; font-size: 13px; color: var(--texte-2); line-height: 1.45; margin-top: 2px; }
+.nc-ico { width: 40px; height: 40px; border-radius: 11px; flex: none; display: grid; place-items: center; color: #fff; background: linear-gradient(180deg, #FF6961, #FF3B30); }
+.nc-ico svg { width: 22px; height: 22px; }
+.notif-carte.actif .nc-ico { background: linear-gradient(180deg, #4CD964, #30A46C); }
+.nc-btns { display: flex; gap: 6px; }
+.notif-carte .btn-plein { background: var(--degrade); color: #fff; border: 0; height: 36px; padding: 0 16px; }
+/* Fil d'activité */
+.fil { display: flex; flex-direction: column; }
+.fil-ligne { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 0; border: 0; border-top: 1px solid var(--bord); background: none; text-align: left; }
+.fil-ligne:first-child { border-top: 0; padding-top: 0; }
+.fil-ligne .t { flex: 1; min-width: 0; } .fil-ligne .t b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-weight: 600; font-size: 14px; line-height: 1.3; overflow: hidden; }
+.fil-ligne .t span { display: block; font-size: 12.5px; color: var(--texte-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fil-ligne time { font-size: 12px; color: var(--texte-3); white-space: nowrap; align-self: flex-start; padding-top: 2px; }
+.fil-ico { width: 30px; height: 30px; border-radius: 9px; flex: none; display: grid; place-items: center; color: #fff; background: var(--c); }
+.fil-ico svg { width: 16px; height: 16px; } .fil-ico.grave { background: var(--grave); } .fil-ico.surveiller { background: var(--alerte); }
+/* Parcours */
+.parcours { padding: 8px 18px 16px; }
+.etape { display: grid; grid-template-columns: 26px minmax(0, 1.3fr) minmax(0, 2fr) 70px 15px; align-items: center; gap: 12px; width: 100%; padding: 12px 0; border: 0; border-top: 1px solid var(--bord); background: none; text-align: left; }
+.etape:first-child { border-top: 0; } .etape:disabled { cursor: default; color: inherit; }
+.etape > svg { width: 15px; height: 15px; color: var(--texte-3); }
+.et-num { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 12.5px; font-weight: 700; color: #fff; background: #6E56CF; }
+.et-t b { display: block; font-weight: 600; font-size: 14px; } .et-t span { display: block; font-size: 12.5px; color: var(--texte-3); }
+.et-t .perte { color: var(--grave); }
+.et-barre { height: 10px; border-radius: 5px; background: var(--carte-2); overflow: hidden; }
+.et-barre span { display: block; height: 100%; border-radius: 5px; background: linear-gradient(90deg, #8E7CE0, #6E56CF); }
+.et-n { text-align: right; } .et-n b { display: block; font-size: 17px; font-weight: 700; } .et-n span { font-size: 12px; color: var(--texte-3); }
+.delais { margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--bord); font-size: 13px; color: var(--texte-2); line-height: 1.6; }
+.delais > span { color: var(--texte-3); margin-right: 4px; }
+.ico-suspect.ok-vert { background: var(--ok-doux); color: var(--ok); }
+/* Disponibilité */
+.dispo + .dispo { border-top: 1px solid var(--bord); margin-top: 4px; }
+.heures { display: grid; grid-template-columns: repeat(24, 1fr); gap: 3px; margin: 0 0 4px 34px; }
+.heures i { height: 22px; border-radius: 4px; background: var(--ok); opacity: .85; } .heures i.ko { background: var(--grave); opacity: 1; }
+.carte > .note + .liste, .carte > .note + .hbars { margin-top: 12px; }
+.heures-leg { display: flex; justify-content: space-between; margin: 0 0 10px 34px; font-size: 11px; color: var(--texte-3); }
+/* Anti-piratage */
+.bouclier { padding: 6px 18px 16px; }
+.bouclier.ok { border-color: color-mix(in srgb, var(--ok) 30%, transparent); }
+.bouclier.alerte { border-color: color-mix(in srgb, var(--grave) 40%, transparent); box-shadow: 0 0 0 4px var(--grave-doux); }
+.bq-haut { display: flex; align-items: center; gap: 14px; padding: 12px 0; }
+.bq-haut b { display: block; font-size: 17px; font-weight: 700; } .bq-haut div span { display: block; margin-top: 2px; font-size: 13px; line-height: 1.35; color: var(--texte-3); }
+.bq-ico { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; color: #fff; flex: none; background: linear-gradient(180deg, #4CD964, #30A46C); }
+.bouclier.alerte .bq-ico { background: linear-gradient(180deg, #FF6961, #E5484D); }
+.bq-ico svg { width: 26px; height: 26px; }
+.bq-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.bq-btns .btn-plein { background: var(--degrade); color: #fff; border: 0; }
+.urgence .guide-ligne .num { background: var(--grave); }
 .gl-t { display: flex; flex-direction: column; min-width: 0; padding: 8px 0; }
 .gl-t b { font-weight: 600; font-size: 16px; }
 .gl-t small { font-size: 12.5px; color: var(--texte-3); font-weight: 400; line-height: 1.35; margin-top: 1px; }
@@ -318,7 +406,7 @@ button { cursor: pointer; }
 .groupe-ligne { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 0 14px; border: 0; background: none; text-align: left; font-size: 16px; font-weight: 500; position: relative; }
 .groupe-ligne + .groupe-ligne::before { content: ""; position: absolute; top: 0; left: 56px; right: 0; height: 1px; background: var(--bord); }
 .groupe-ligne.sans-icone + .groupe-ligne::before, .groupe-ligne.sans-icone::before { left: 14px; }
-.groupe-ligne .gi { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--accent-doux); color: var(--accent); flex: none; }
+.groupe-ligne .gi:not(.pi) { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--accent-doux); color: var(--accent); flex: none; }
 .groupe-ligne .gi svg { width: 17px; height: 17px; }
 .groupe-ligne > svg:last-child { width: 16px; height: 16px; margin-left: auto; color: var(--texte-3); }
 .groupe-ligne > .pastille { margin-left: auto; }
@@ -526,6 +614,8 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
 @keyframes tourne { to { transform: rotate(360deg); } }
 .encart { padding: 12px 14px; border-radius: 12px; background: var(--alerte-doux); color: var(--texte); font-size: 13px; margin-bottom: 14px; }
 .encart.info { background: var(--carte-2); color: var(--texte-2); }
+.encart.grave { background: var(--grave-doux); }
+.note.etat-boite { display: flex; align-items: center; gap: 6px; } .note.etat-boite svg { width: 14px; height: 14px; color: var(--ok); flex: none; }
 
 /* ─── Tablette ─── */
 @media (max-width: 1180px) {
@@ -647,13 +737,23 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
   .ajout-m { width: 100%; margin-top: 8px; height: 46px; border-radius: 12px; border: 1px dashed var(--bord-fort); background: none; color: var(--accent); font-weight: 600; font-size: 15px; }
   .toast { bottom: calc(92px + env(safe-area-inset-bottom)); }
   .g4, .g3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .g2 { grid-template-columns: minmax(0, 1fr); }
+  .g2, .g3.larges { grid-template-columns: minmax(0, 1fr); }
   .carte { padding: 15px; border-radius: 14px; }
   .tuile .val { font-size: 22px; }
   .tuile.heros .val { font-size: 26px; }
   .table-boite { margin: 0 -15px -15px; }
   td:first-child, th:first-child { padding-left: 15px; }
   .cout { grid-template-columns: minmax(0, 1fr) 100px; }
+  .etape { grid-template-columns: 26px minmax(0, 1fr) 54px 15px; row-gap: 6px; }
+  .etape .et-barre { grid-column: 2 / 4; grid-row: 2; }
+  .etape .et-n { grid-column: 3; grid-row: 1; }
+  .etape > svg { grid-column: 4; grid-row: 1 / 3; }
+  .notif-carte { flex-wrap: wrap; }
+  .notif-carte > .btn-plein, .nc-btns { width: 100%; }
+  .notif-carte > .btn-plein { height: 44px; font-size: 15px; }
+  .nc-btns .btn { flex: 1; justify-content: center; height: 40px; }
+  .heures { gap: 2px; margin-left: 0; } .heures-leg { margin-left: 0; }
+  .bq-btns .btn { flex: 1; justify-content: center; height: 44px; }
   .recherche { min-width: 0; width: 100%; }
   .erreur { padding: 13px 14px; }
 }
@@ -797,6 +897,12 @@ const I = {
   etincelle: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
   avertir: '<path d="M3 11l18-8-8 18-2-8-8-2z"/>',
   question: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',
+  enveloppe: '<rect x="2" y="4" width="20" height="16" rx="3"/><path d="m3 7 9 6 9-6"/>',
+  cloche: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>',
+  bouclier: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+  eclair: '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',
+  repondre: '<path d="M9 17 4 12l5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>',
+  archive: '<rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/>',
   plus3: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
 }
 const ico = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`
@@ -806,6 +912,7 @@ const ico = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
    est celui du menu ; les touches 1 à 8 y mènent sur ordinateur. */
 const PAGES = [
   { id: 'vue', nom: 'Vue d’ensemble', court: 'Accueil', icone: 'vue', couleur: '#3A78EE', groupe: 'Pilotage', desc: 'L’essentiel de Standix en un coup d’œil' },
+  { id: 'messages', nom: 'Messages', icone: 'enveloppe', couleur: '#E54D9A', groupe: 'Pilotage', desc: 'Les messages reçus sur contact@standix.app' },
   { id: 'argent', nom: 'Argent', icone: 'argent', couleur: '#30A46C', groupe: 'Business', desc: 'Ce que tu gagnes, ce que tu payes, et ce qu’il reste' },
   { id: 'clients', nom: 'Clients', icone: 'clients', couleur: '#6E56CF', groupe: 'Business', desc: 'Toutes les entreprises inscrites : essais, abonnés, à relancer' },
   { id: 'usage', nom: 'Usage de l’app', court: 'Usage', icone: 'usage', couleur: '#F76B15', groupe: 'Produit', desc: 'Comment les entreprises utilisent l’app au quotidien' },
@@ -825,6 +932,13 @@ let S = null          // admin_stats()
 let ST = null         // admin-stripe (ou { erreur })
 let SU = { alertes: [], acces: [] }   // admin_suspects()
 let AV = []                            // admin_avertissements()
+let CA = null   // admin_clients_analyse() : parcours, risques, opportunités
+let SA = null   // admin_sante() : disponibilité, sauvegardes, vitesse, IA, versions
+let BO = null   // admin_bouclier() : fichiers, mises en ligne, journal
+let NO = []     // admin_notifications() : fil d'activité
+let ME = null   // admin_messages() : boîte de réception
+let CI = null   // admin-couts-ia : coûts réels (chargé à l'ouverture de « Argent »)
+let VERSION_EN_LIGNE = null
 let filtreSuspects = 'nouvelles'
 let page = (location.hash.slice(1) || 'vue')
 if (!PAGES.some((p) => p.id === page)) page = 'vue'
@@ -862,6 +976,7 @@ async function entrer() {
   $('#coque').classList.remove('cache')
   construireNav()
   await charger(true)
+  lireEtatPush().then(() => { if (['vue', 'securite'].includes(page)) afficher() })
   brancherDirect()
   clearInterval(minuteur)
   minuteur = setInterval(() => { if (document.visibilityState === 'visible') charger() }, 60000)
@@ -989,7 +1104,16 @@ async function charger(premier = false) {
   const stripe = sb.functions.invoke('admin-stripe', { body: {} }).then((r) => { mesures.fonctions = Math.round(performance.now() - t1); return r })
   const suspects = sb.rpc('admin_suspects')
   sb.rpc('admin_avertissements').then(({ data }) => { if (Array.isArray(data)) AV = data }, () => {})
-  const [rs, rst, rsu] = await Promise.allSettled([stats, stripe, suspects])
+  /* Les blocs de la version 2 : s'ils ne répondent pas (SQL pas encore
+     exécuté), la page s'affiche quand même, avec « à activer ». */
+  const v2 = Promise.allSettled(['admin_clients_analyse', 'admin_sante', 'admin_bouclier', 'admin_notifications', 'admin_messages'].map((f) => sb.rpc(f)))
+    .then(([ca, sa, bo, no, me]) => {
+      const ok = (x) => x.status === 'fulfilled' && !x.value.error ? x.value.data : null
+      CA = ok(ca); SA = ok(sa); BO = ok(bo); NO = ok(no) || []; ME = ok(me)
+    })
+  if (!VERSION_EN_LIGNE) fetch('/app/index.html?v=' + Date.now(), { cache: 'no-store' }).then((r) => r.text())
+    .then((h) => { VERSION_EN_LIGNE = (h.match(/app\.js\?v=([\w-]+)/) || [])[1] || null }, () => {})
+  const [rs, rst, rsu] = await Promise.allSettled([stats, stripe, suspects, v2])
   if (rsu.status === 'fulfilled' && !rsu.value.error && rsu.value.data) SU = rsu.value.data
   else SU = { alertes: [], acces: [], erreur: rsu.reason?.message || rsu.value?.error?.message || 'inconnue' }
 
@@ -1064,7 +1188,7 @@ function aller(p) {
 }
 /* Le téléphone a 5 onglets ; les 4 autres pages sont dans « Plus ». */
 const ONGLETS = ['vue', 'argent', 'erreurs', 'clients', 'plus']
-const DANS_PLUS = ['sante', 'usage', 'site', 'securite']
+const DANS_PLUS = ['messages', 'sante', 'usage', 'site', 'securite']
 const mobile = () => matchMedia('(max-width: 860px)').matches
 
 function ouvrirFeuille(html) {
@@ -1077,7 +1201,8 @@ function ouvrirPlus() {
   const t = S?.genere_le ? new Date(S.genere_le).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—'
   ouvrirFeuille(`<div class="feuille-corps">
     <div class="feuille-titre">Plus</div>
-    ${['Produit', 'Technique'].map((g) => `<div class="titre-bloc">${g}</div><div class="groupe">${DANS_PLUS.map(pageDe).filter((p) => p.groupe === g).map((p) => `<button class="groupe-ligne" data-page-feuille="${p.id}">${pastilleIcone(p, 'gi')}<span class="gl-t"><b>${p.nom}</b><small>${p.desc}</small></span><span class="pastille cache" data-pastille="${p.id}" style="margin-right:6px"></span>${ico('fleche')}</button>`).join('')}</div>`).join('')}
+    ${notifsLigneFeuille()}
+    ${['Pilotage', 'Produit', 'Technique'].map((g) => `<div class="titre-bloc">${g}</div><div class="groupe">${DANS_PLUS.map(pageDe).filter((p) => p.groupe === g).map((p) => `<button class="groupe-ligne" data-page-feuille="${p.id}">${pastilleIcone(p, 'gi')}<span class="gl-t"><b>${p.nom}</b><small>${p.desc}</small></span><span class="pastille cache" data-pastille="${p.id}" style="margin-right:6px"></span>${ico('fleche')}</button>`).join('')}</div>`).join('')}
     <div class="groupe">
       <div class="groupe-ligne statique sans-icone"><span class="point${enDirect ? ' vivant' : ''}"></span>${enDirect ? 'En direct' : 'Hors direct'} · mis à jour à ${t}</div>
       <button class="groupe-ligne rouge sans-icone" data-action="sortir">Se déconnecter</button>
@@ -1134,7 +1259,7 @@ document.addEventListener('touchend', async () => {
    la page marque tout comme vu. Au tout premier lancement, l'existant est
    considéré comme déjà vu (sinon tout serait « nouveau »). */
 function elementsParPage() {
-  const el = { erreurs: [], clients: [], argent: [], securite: [], sante: [], usage: [], site: [] }
+  const el = { erreurs: [], clients: [], argent: [], securite: [], sante: [], usage: [], site: [], messages: [] }
   if (!S) return el
   const maintenant = Date.now()
   ;(S.erreurs || []).filter((e) => e.statut === 'nouveau').forEach((e) =>
@@ -1150,6 +1275,11 @@ function elementsParPage() {
   if (ST && !ST.erreur) (ST.clients || []).forEach((c) =>
     el.argent.push({ cle: 'st:' + c.nom + ':' + c.statut + ':' + c.debut, grave: c.statut === 'past_due' || c.statut === 'unpaid' }))
   ;(SU.alertes || []).filter((a) => !a.vue).forEach((a) => el.securite.push({ cle: 's:' + a.cle, grave: a.niveau === 'grave' }))
+  ;(ME?.messages || []).filter((m) => !m.lu && !m.archive).forEach((m) => el.messages.push({ cle: 'm:' + m.id, grave: false }))
+  ;(CA?.risques || []).forEach((x) => el.clients.push({ cle: 'r:' + x.id + ':' + x.raison, grave: x.raison === 'impaye' }))
+  ;(CA?.opportunites || []).forEach((x) => el.clients.push({ cle: 'o:' + x.id + ':' + x.raison, grave: false }))
+  ;(BO?.mises_en_ligne || []).forEach((m) => el.securite.push({ cle: 'git:' + m.sha, grave: !m.connu }))
+  ;Object.entries(SA?.disponibilite || {}).forEach(([c, d]) => { if (d.dernier && !d.dernier.ok) el.sante.push({ cle: 'down:' + c + ':' + d.dernier.cree_le, grave: true }) })
   ;(SU.partages || []).filter((p) => p.niveau).forEach((p) => el.securite.push({ cle: 'p:' + p.user_id + ':' + p.niveau, grave: p.niveau === 'grave' }))
   ;(AV || []).forEach((a) => (a.lectures || []).forEach((l) => el.securite.push({ cle: 'lu:' + a.id + ':' + l.nom, grave: false })))
   if (mesures.baseOk === false) el.sante.push({ cle: 'panne:base', grave: true })
@@ -1204,7 +1334,7 @@ function afficher() {
     $('.tb-ico', plus).innerHTML = sous ? ico(sous.icone) : ico('plus3')
     $('.tb-nom', plus).textContent = sous ? (sous.court || sous.nom) : 'Plus'
   }
-  const fn = { vue: pageVue, argent: pageArgent, erreurs: pageErreurs, sante: pageSante, clients: pageClients, usage: pageUsage, site: pageSite, securite: pageSecurite }[page]
+  const fn = { vue: pageVue, messages: pageMessages, argent: pageArgent, erreurs: pageErreurs, sante: pageSante, clients: pageClients, usage: pageUsage, site: pageSite, securite: pageSecurite }[page]
   $('#principal').innerHTML = fn()
   document.title = 'Standix · ' + PAGES.find((p) => p.id === page).nom
   ajouterLegendes()
@@ -1332,7 +1462,349 @@ const AIDE = {
   'Connexions 24 h': 'Comptes qui se sont connectés ces dernières 24 heures.',
   'Sessions ouvertes': 'Connexions encore ouvertes sur des appareils. Une déconnexion ferme la session.',
   'Appareils vus': 'Appareils différents vus par l’app. Révoqué : appareil retiré par un responsable.',
+  'Nouveau ce mois': 'Revenu mensuel apporté par les abonnements commencés ce mois.',
+  'Perdu ce mois': 'Revenu mensuel perdu à cause des abonnements terminés ce mois.',
+  'Taux de départ': 'Part du revenu mensuel perdue en résiliations sur les 30 derniers jours (le « churn »). Au-dessus de 5 %, c’est à surveiller.',
+  'Valeur d’un client': 'Ce que rapporte un client en moyenne sur toute sa durée : revenu moyen par client ÷ taux de départ.',
 }
+/* ═══════════════════════════════════════════════════════════════════════
+   VERSION 2 (26 octobre 2026) : messages, notifications, parcours des
+   clients, évolution du revenu, coûts réels, santé 24h/24, anti-piratage.
+   Chaque bloc s'affiche « à activer » tant que son SQL n'est pas exécuté.
+   ═══════════════════════════════════════════════════════════════════════ */
+const plur = (x, mot, pl = mot + 's') => n(x) + ' ' + (x > 1 ? pl : mot)
+const aActiver = (quoi) => `<div class="encart info">${quoi} : exécute le fichier <b>dashboard-v2.sql</b> dans Supabase pour l’activer.</div>`
+const signe = (ok) => `<span class="sg ${ok === true ? 'ok' : ok === false ? 'ko' : 'moyen'}">${ok === true ? ico('ok') : '<i></i>'}</span>`
+const ligneEtat = (ok, titre, detail, droite = '') => `<div class="etat-ligne">${signe(ok)}<div class="t"><b>${titre}</b>${detail ? `<span>${detail}</span>` : ''}</div>${droite ? `<span class="n">${droite}</span>` : ''}</div>`
+
+/* ─── Messages (contact@standix.app) ─── */
+let filtreMessages = 'boite'
+function pageMessages() {
+  if (!ME) return entete('Messages', '') + aActiver('La boîte de réception')
+  const l = (ME.messages || []).filter((m) => filtreMessages === 'archives' ? m.archive : !m.archive)
+  const nonLus = (ME.messages || []).filter((m) => !m.lu && !m.archive).length
+  return entete('Messages', '') + `
+  ${ME.branche ? (ME.releve?.erreur
+      ? `<div class="encart grave"><b>La boîte ne peut pas être relevée</b> · ${echap(ME.releve.erreur)}<br>Vérifie l’adresse et le mot de passe dans Supabase (voir « Comment lire cette page »).</div>`
+      : `<p class="note etat-boite" style="margin:0 0 12px">${ico('ok')}<span>${echap(ME.adresse || 'contact@standix.app')} · relevée toutes les 5 minutes${ME.releve?.quand ? ', dernière fois ' + ilya(ME.releve.quand) : ''}</span></p>`)
+    : `<div class="carte vide-grand">${pastilleIcone(pageDe('messages'), 'grand')}
+      <b>La boîte n’est pas encore branchée</b>
+      <span>Ajoute 3 réglages dans Supabase et les e-mails envoyés à <b>contact@standix.app</b> apparaîtront ici, avec une notification sur ton téléphone. Touche « Comment lire cette page » pour la marche à suivre.</span></div>`}
+  <div class="filtres">
+    <button class="filtre" data-fm="boite" aria-pressed="${filtreMessages === 'boite'}">Boîte de réception${nonLus ? ' · ' + nonLus + ' non lu' + (nonLus > 1 ? 's' : '') : ''}</button>
+    <button class="filtre" data-fm="archives" aria-pressed="${filtreMessages === 'archives'}">Archivés</button>
+  </div>
+  <div class="carte boite">${l.length ? l.map((m) => `
+    <button class="courrier ${m.lu ? '' : 'non-lu'}" data-msg="${m.id}">
+      <span class="msg-av">${echap((m.de_nom || m.de_email || '?').trim().charAt(0).toUpperCase())}</span>
+      <span class="msg-t"><span class="msg-l1"><b>${echap(m.de_nom || m.de_email || 'Inconnu')}</b><time>${ilya(m.recu_le)}</time></span>
+        <span class="msg-obj">${echap(m.objet || '(sans objet)')}</span>
+        <span class="msg-ext">${echap(String(m.texte || '').replace(/\s+/g, ' ').slice(0, 140))}</span></span>
+    </button>`).join('') : `<div class="vide">${filtreMessages === 'archives' ? 'Aucun message archivé' : 'Aucun message'}</div>`}</div>`
+}
+function ouvrirMessage(id) {
+  const m = (ME?.messages || []).find((x) => x.id === id); if (!m) return
+  if (!m.lu) { m.lu = true; sb.rpc('admin_message_maj', { p_id: id, p_lu: true }).then(() => {}, () => {}); majPastilles() }
+  const sujet = encodeURIComponent((/^re\s*:/i.test(m.objet || '') ? '' : 'Re : ') + (m.objet || ''))
+  ouvrirFeuille(`<div class="feuille-corps" style="--c:${pageDe('messages').couleur}">
+    <div class="msg-tete"><span class="msg-av grand">${echap((m.de_nom || m.de_email || '?').trim().charAt(0).toUpperCase())}</span>
+      <div><b>${echap(m.de_nom || m.de_email || 'Inconnu')}</b><span>${echap(m.de_email || '')}</span><span>${dateL(m.recu_le)}</span></div></div>
+    <div class="feuille-titre" style="margin:14px 0 10px">${echap(m.objet || '(sans objet)')}</div>
+    <div class="msg-corps">${echap(m.texte || '').replace(/\n/g, '<br>') || '<i>Message vide</i>'}</div>
+    ${m.de_email ? `<a class="gros-btn plein lien-btn" href="mailto:${encodeURIComponent(m.de_email)}?subject=${sujet}">${ico('repondre')}Répondre</a>` : ''}
+    <div class="deux-btn">
+      <button class="gros-btn gris" data-msg-id="${m.id}" data-msg-action="${m.archive ? 'desarchiver' : 'archiver'}">${m.archive ? 'Remettre dans la boîte' : 'Archiver'}</button>
+      <button class="gros-btn gris" data-msg-id="${m.id}" data-msg-action="nonlu">Marquer non lu</button>
+    </div></div>`)
+}
+async function actionMessage(id, action) {
+  const m = (ME?.messages || []).find((x) => x.id === id); if (!m) return
+  const p = { p_id: id }
+  if (action === 'archiver') { p.p_archive = true; m.archive = true }
+  if (action === 'desarchiver') { p.p_archive = false; m.archive = false }
+  if (action === 'nonlu') { p.p_lu = false; m.lu = false }
+  const { error } = await sb.rpc('admin_message_maj', p)
+  if (error) return toast('Échec : ' + error.message)
+  fermerPanneau(); toast(action === 'archiver' ? 'Archivé' : action === 'nonlu' ? 'Marqué non lu' : 'Remis dans la boîte')
+  majPastilles(); afficher()
+}
+
+/* ─── Notifications sur ce téléphone (Web Push) ─── */
+const estIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
+const estInstalle = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true
+let etatPush = 'inconnu'
+async function lireEtatPush() {
+  try {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) etatPush = estIOS() && !estInstalle() ? 'installer' : 'impossible'
+    else if (Notification.permission === 'denied') etatPush = 'refuse'
+    else {
+      const reg = await navigator.serviceWorker.getRegistration('/admin.html')
+      const sub = reg && await reg.pushManager.getSubscription()
+      etatPush = sub ? 'actif' : 'inactif'
+    }
+  } catch (e) { etatPush = 'impossible' }
+  return etatPush
+}
+const TEXTE_PUSH = {
+  actif: ['Alertes activées sur cet appareil', 'Tu es prévenu des erreurs, paiements, inscriptions, messages et alertes de sécurité.'],
+  inactif: ['Recevoir les alertes sur cet appareil', 'Une notification dès que quelque chose d’important se passe, même Dashboard fermé.'],
+  installer: ['Ajoute le Dashboard à ton écran d’accueil', 'Sur iPhone, les alertes ne marchent qu’ainsi : touche Partager ⬆︎ puis « Sur l’écran d’accueil », puis rouvre le Dashboard depuis l’icône.'],
+  refuse: ['Notifications bloquées', 'Autorise-les dans Réglages → Notifications → Standix Admin (ou dans les réglages du navigateur).'],
+  impossible: ['Alertes impossibles sur ce navigateur', 'Utilise Safari sur iPhone (Dashboard ajouté à l’écran d’accueil) ou Chrome sur ordinateur.'],
+  inconnu: ['Alertes sur cet appareil', 'Vérification…'],
+}
+function carteNotifs(compacte = false) {
+  const [t, d] = TEXTE_PUSH[etatPush] || TEXTE_PUSH.inconnu
+  if (compacte && etatPush === 'actif') return ''
+  return `<div class="carte notif-carte ${etatPush}">
+    <span class="nc-ico">${ico('cloche')}</span>
+    <div class="t"><b>${t}</b><span>${d}</span></div>
+    ${etatPush === 'inactif' ? '<button class="btn btn-plein" data-action="notifs">Activer</button>' : ''}
+    ${etatPush === 'actif' ? '<div class="nc-btns"><button class="btn" data-action="notifs-test">Tester</button><button class="btn" data-action="notifs-off">Désactiver</button></div>' : ''}
+  </div>`
+}
+function notifsLigneFeuille() {
+  const [t] = TEXTE_PUSH[etatPush] || TEXTE_PUSH.inconnu
+  return `<div class="groupe"><button class="groupe-ligne" data-action="${etatPush === 'inactif' ? 'notifs' : etatPush === 'actif' ? 'notifs-test' : 'guide-notifs'}">
+    <span class="pi gi" style="--c:#FF3B30">${ico('cloche')}</span><span class="gl-t"><b>Notifications</b><small>${t}${etatPush === 'actif' ? ' · toucher pour tester' : ''}</small></span>${ico('fleche')}</button></div>`
+}
+const b64VersU8 = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), (c) => c.charCodeAt(0))
+async function activerNotifs() {
+  try {
+    if (etatPush === 'installer' || etatPush === 'impossible' || etatPush === 'refuse') return toast(TEXTE_PUSH[etatPush][1])
+    const reg = await navigator.serviceWorker.register('/admin-sw.js', { scope: '/admin.html' })
+    await navigator.serviceWorker.ready
+    const perm = await Notification.requestPermission()
+    if (perm !== 'granted') { await lireEtatPush(); afficher(); return toast('Notifications non autorisées') }
+    let cle = SA?.veilleur?.cle_push
+    if (!cle) cle = (await sb.rpc('admin_cle_push')).data
+    if (!cle) return toast('Le veilleur démarre : réessaie dans 5 minutes')
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64VersU8(cle) })
+    const { error } = await sb.rpc('admin_abonner_push', { p: { ...sub.toJSON(), appareil: (estIOS() ? 'iPhone' : navigator.platform || 'appareil') + ' · ' + new Date().toLocaleDateString('fr-FR') } })
+    if (error) return toast('Échec : ' + error.message)
+    await sb.rpc('admin_tester_push')
+    etatPush = 'actif'; fermerPanneau(); afficher()
+    toast('Activé ! Une notification d’essai arrive dans quelques secondes')
+  } catch (e) { toast('Impossible : ' + (e.message || e)) }
+}
+async function desactiverNotifs() {
+  try {
+    const reg = await navigator.serviceWorker.getRegistration('/admin.html')
+    const sub = reg && await reg.pushManager.getSubscription()
+    if (sub) { await sb.rpc('admin_desabonner_push', { p_endpoint: sub.endpoint }); await sub.unsubscribe() }
+    etatPush = 'inactif'; afficher(); toast('Alertes désactivées sur cet appareil')
+  } catch (e) { toast('Impossible : ' + (e.message || e)) }
+}
+async function testerNotifs() {
+  const { error } = await sb.rpc('admin_tester_push')
+  toast(error ? 'Échec : ' + error.message : 'Notification d’essai envoyée')
+}
+
+/* ─── Fil d'activité (accueil) ─── */
+const ICO_NIVEAU = { grave: 'erreurs', surveiller: 'horloge', info: 'cloche' }
+function filActivite(nb = 8) {
+  const l = (NO || []).slice(0, nb)
+  if (!l.length) return '<div class="vide">Le fil se remplit dès que le veilleur a fait son premier passage (toutes les 5 minutes).</div>'
+  return `<div class="fil">${l.map((x) => { const p = pageDe(x.page) || pageDe('vue'); return `
+    <button class="fil-ligne" data-aller="${p.id}">
+      <span class="fil-ico ${x.niveau}" style="--c:${p.couleur}">${ico(x.niveau === 'info' ? p.icone : ICO_NIVEAU[x.niveau])}</span>
+      <span class="t"><b>${echap(x.titre)}</b>${x.corps ? `<span>${echap(x.corps)}</span>` : ''}</span>
+      <time>${ilya(x.cree_le)}</time>
+    </button>` }).join('')}</div>`
+}
+
+/* ─── Parcours des clients, risques, opportunités ─── */
+const ETAPES = { inscrite: 'Inscription', procedure: '1re procédure créée', equipe: '1er employé invité', lecture: '1re procédure lue', abonne: 'Abonnement payé' }
+const ETAPES_BLOCAGE = { procedure: 'N’ont jamais créé de procédure', equipe: 'Ont créé une procédure, mais n’ont invité personne', lecture: 'Ont invité, mais personne n’a encore lu de procédure', abonne: 'Utilisent Standix, mais ne paient pas encore' }
+function blocParcours() {
+  if (!CA) return aActiver('Le parcours des clients')
+  const e = CA.etapes || [], tot = e[0]?.n || 0
+  const d = CA.delais || {}
+  return `<div class="carte parcours">${e.map((x, i) => {
+      const prec = i ? e[i - 1].n : x.n, perdus = prec - x.n, pc = tot ? x.n / tot : 0
+      return `<button class="etape" ${i ? `data-etape="${x.cle}"` : 'disabled'}>
+        <span class="et-num">${i + 1}</span>
+        <span class="et-t"><b>${ETAPES[x.cle]}</b>${i && perdus > 0 ? `<span class="perte">−${n(perdus)} ${perdus > 1 ? 'se sont arrêtées' : 's’est arrêtée'} avant</span>` : '<span>&nbsp;</span>'}</span>
+        <span class="et-barre"><span style="width:${Math.max(2, pc * 100)}%"></span></span>
+        <span class="et-n"><b>${n(x.n)}</b><span>${pct(pc).replace(',0 ', ' ')}</span></span>
+        ${i ? ico('fleche') : '<span style="width:15px"></span>'}
+      </button>` }).join('')}
+    <div class="delais"><span>Délai habituel depuis l’inscription :</span>
+      ${d.procedure != null ? `<b>${nf1.format(d.procedure)} j</b> → 1re procédure` : ''}${d.equipe != null ? ` · <b>${nf1.format(d.equipe)} j</b> → 1er employé` : ''}${d.lecture != null ? ` · <b>${nf1.format(d.lecture)} j</b> → 1re lecture` : ''}</div>
+  </div>`
+}
+function ouvrirEtape(cle) {
+  const l = CA?.bloquees?.[cle] || []
+  ouvrirFeuille(`<div class="feuille-corps" style="--c:${pageDe('clients').couleur}">
+    <div class="feuille-titre">${ETAPES_BLOCAGE[cle]}</div>
+    <p class="note" style="margin:-6px 0 14px">${plur(l.length, 'entreprise')}, de la plus récente à la plus ancienne. Touche une entreprise pour ouvrir sa fiche et lui écrire.</p>
+    <div class="groupe">${l.length ? l.map((x) => `<button class="groupe-ligne sans-icone" data-ouvrir-ent="${x.id}"><span class="gl-t"><b>${echap(x.nom)}</b><small>${x.depuis ? 'depuis ' + ilya(x.depuis).replace('il y a ', '') : ''}${x.statut !== 'essai' ? ' · ' + x.statut : ''}</small></span>${ico('fleche')}</button>`).join('') : '<div class="vide">Aucune</div>'}</div>
+  </div>`)
+  $$('[data-ouvrir-ent]').forEach((b) => b.onclick = () => ouvrirEntreprise(b.dataset.ouvrirEnt))
+}
+function blocRisquesOpportunites() {
+  if (!CA) return ''
+  const ligne = (x, ton) => `<button class="ligne ligne-bouton" data-ouvrir-ent="${x.id}"><span class="ico-suspect ${ton}">${ico(ton === 'ok-vert' ? 'argent' : 'horloge')}</span><div class="t"><b>${echap(x.nom)}</b><span style="white-space:normal">${echap(x.texte)}</span></div>${ico('fleche')}</button>`
+  return `<div class="section grille g2">
+    <div class="carte"><h3>À surveiller <small>risque de départ</small></h3>
+      ${(CA.risques || []).length ? `<div class="liste">${CA.risques.map((x) => ligne(x, x.raison === 'impaye' ? 'grave' : 'surveiller')).join('')}</div>` : '<div class="vide">Aucun client à risque</div>'}</div>
+    <div class="carte"><h3>Opportunités <small>à faire monter en gamme ou convertir</small></h3>
+      ${(CA.opportunites || []).length ? `<div class="liste">${CA.opportunites.map((x) => ligne(x, 'ok-vert')).join('')}</div>` : '<div class="vide">Aucune pour l’instant</div>'}</div>
+  </div>`
+}
+
+/* ─── Évolution du revenu et coûts réels ─── */
+function blocEvolution() {
+  const ev = ST && !ST.erreur ? ST.evolution : null
+  if (!ev) return ''
+  const d = [...ev.mrr_mois.map((x) => ({ x: moisLib(x.m), y: x.mrr })), ...ev.prevision.map((x) => ({ x: moisLib(x.m), y: x.mrr, prev: 1 }))]
+  return `<div class="section"><h2>Évolution du revenu</h2>
+    <div class="grille g4">
+      ${tuile('Nouveau ce mois', '+' + eur(ev.nouveau_mrr), plur(ev.nouveaux, 'nouvel abonnement', 'nouveaux abonnements'), { ton: ev.nouveau_mrr ? 'ok' : '' })}
+      ${tuile('Perdu ce mois', ev.perdu_mrr ? '−' + eur(ev.perdu_mrr) : '0 €', plur(ev.perdus, 'résiliation'), { ton: ev.perdu_mrr ? 'grave' : '' })}
+      ${tuile('Taux de départ', pct(ev.churn_30j), 'du revenu perdu sur 30 jours', { ton: ev.churn_30j > 0.05 ? 'grave' : '' })}
+      ${tuile('Valeur d’un client', ev.ltv ? eur(ev.ltv) : '—', ev.duree_moyenne_mois ? 'reste ' + nf1.format(ev.duree_moyenne_mois) + ' mois en moyenne' : 'pas encore de départ pour calculer')}
+    </div>
+    <div class="carte" style="margin-top:14px"><h3>Revenu mensuel, 12 mois + prévision <small>${ev.tendance ? (ev.tendance > 0 ? '+' : '') + pct(ev.tendance) + ' par mois' : 'stable'}</small></h3>
+      <div class="legende"><span><i style="background:var(--s1)"></i>Revenu mensuel récurrent</span><span><i style="background:var(--s1);opacity:.35"></i>Prévision si la tendance continue</span></div>
+      ${graph('barres', d, { h: 200, fmt: 'eur', lib: '' })}
+    </div></div>`
+}
+let chargementCI = false
+function blocCoutsReels() {
+  if (!CI && !chargementCI) {
+    chargementCI = true
+    sb.functions.invoke('admin-couts-ia', { body: {} }).then(({ data }) => { CI = data || { erreur: true }; if (page === 'argent') { const y = scrollY; afficher(); scrollTo(0, y) } }, () => { CI = { erreur: true } })
+  }
+  const l = (nom, x) => {
+    if (!x) return ligneEtat(null, nom, 'Lecture en cours…')
+    if (x.erreur && x.connecte !== false) return ligneEtat(false, nom, echap(String(x.erreur).slice(0, 120)))
+    if (!x.connecte) return ligneEtat(null, nom, 'Non connecté : le coût reste estimé. Voir « Comment lire cette page ».')
+    const prec = (x.mois || []).slice(-2, -1)[0]
+    return ligneEtat(true, nom, prec ? 'mois dernier : ' + nf1.format(prec.montant) + ' ' + x.devise : 'facture réelle', nf1.format(x.ce_mois || 0) + ' ' + x.devise)
+  }
+  return `<div class="carte"><h3>Coûts réels de l’IA <small>factures, ce mois</small></h3>
+    ${l('Claude (rédaction des procédures)', CI?.claude)}${l('Azure (transcription audio)', CI?.azure)}</div>`
+}
+
+/* ─── Santé 24h/24 ─── */
+function blocsSante() {
+  if (!SA) return aActiver('La surveillance 24h/24')
+  const dsp = SA.disponibilite || {}, sv = SA.sauvegardes || {}, pf = SA.perf || {}, ia = SA.ia || {}
+  const cible = (c, nom) => {
+    const d = dsp[c]; if (!d) return ligneEtat(null, nom, 'Premier contrôle dans moins de 5 minutes')
+    const heures = (d.serie || []).map((h) => `<i class="${h.ok ? 'ok' : 'ko'}" title="${new Date(h.h).getHours()} h : ${h.ok ? 'en ligne' : 'panne'}"></i>`).join('')
+    return `<div class="dispo">${ligneEtat(d.dernier?.ok, nom, (d.dernier?.ok ? 'En ligne' : 'Ne répond pas') + ' · vérifié ' + ilya(d.dernier?.cree_le) + (d.ms_24h ? ' · ' + d.ms_24h + ' ms en moyenne' : ''), d.ok_24h == null ? '—' : new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(d.ok_24h) + ' %')}
+      <div class="heures">${heures}</div><div class="heures-leg"><span>il y a 24 h</span><span>maintenant</span></div></div>`
+  }
+  const versions = SA.versions?.actives || []
+  const totV = versions.reduce((t, v) => t + v.sessions, 0)
+  const aJour = VERSION_EN_LIGNE ? versions.filter((v) => v.version === VERSION_EN_LIGNE).reduce((t, v) => t + v.sessions, 0) : null
+  return `<div class="section grille g2">
+    <div class="carte"><h3>Disponibilité 24h/24 <small>vérifiée toutes les 5 min</small></h3>
+      ${cible('site', 'Site internet')}${cible('app', 'App')}
+      ${(SA.incidents || []).length ? `<p class="note">${plur(SA.incidents.length, 'panne détectée', 'pannes détectées')} sur 7 jours, la dernière ${ilya(SA.incidents[0].cree_le)}.</p>` : '<p class="note">Aucune panne sur 7 jours.</p>'}
+      <p class="note">Veilleur : dernier passage ${ilya(SA.veilleur?.dernier_passage)} · ${plur(SA.veilleur?.appareils_notifies || 0, 'appareil prévenu', 'appareils prévenus')} en cas de problème.</p>
+    </div>
+    <div class="carte"><h3>Sauvegardes des vidéos</h3>
+      ${ligneEtat(sv.derniere_verif_ok !== false && !(sv.derniere_reponse?.echecs || []).length, 'Vérification automatique', sv.derniere_verif ? 'toutes les heures · dernière ' + ilya(sv.derniere_verif) : 'jamais lancée')}
+      ${ligneEtat(!sv.restantes, 'Vidéos en attente de copie', sv.restantes ? 'seront copiées au prochain passage' : 'toutes sont copiées', n(sv.restantes || 0))}
+      ${ligneEtat(true, 'Dernière copie', sv.derniere_copie ? ilya(sv.derniere_copie) + ' · ' + plur(sv.fichiers || 0, 'fichier sauvegardé', 'fichiers sauvegardés') : 'aucune')}
+      ${(sv.derniere_reponse?.echecs || []).length ? ligneEtat(false, 'Échecs au dernier passage', sv.derniere_reponse.echecs.length + ' vidéo(s)') : ''}
+    </div>
+  </div>
+  <div class="section grille g3 larges">
+    <div class="carte"><h3>Vitesse chez les clients <small>7 jours</small></h3>
+      ${pf.n ? `<div class="gros-chiffre">${nf1.format((pf.pret_median || 0) / 1000)} s<small> pour ouvrir l’app</small></div>
+        <p class="note" style="margin-top:4px">1 client sur 4 attend plus de ${nf1.format((pf.pret_p75 || 0) / 1000)} s · page lue en ${nf1.format((pf.page_median || 0) / 1000)} s · serveur ${n(pf.serveur_median || 0)} ms</p>
+        ${hbars((pf.par_appareil || []).map((x) => ({ k: x.k, n: x.pret || 0 })), { fmt: (v) => nf1.format(v / 1000) + ' s', couleur: 'var(--s3)' })}`
+      : '<div class="vide">Les mesures arrivent avec les prochaines ouvertures de l’app.</div>'}
+    </div>
+    <div class="carte"><h3>Création par l’IA <small>30 jours</small></h3>
+      ${ia.n ? `<div class="gros-chiffre">${duree(ia.median_s)}<small> en moyenne</small></div>
+        <p class="note" style="margin-top:4px">${plur(ia.n, 'procédure créée', 'procédures créées')} · 1 sur 10 prend plus de ${duree(ia.p90_s)}</p>
+        <div class="liste">${(ia.plus_lentes || []).map((x) => `<div class="ligne"><div class="t"><b>${echap(x.titre || 'Sans titre')}</b><span>${ilya(x.created_at)}</span></div><span class="n">${duree(x.s)}</span></div>`).join('')}</div>`
+      : '<div class="vide">Aucune procédure créée par l’IA sur 30 jours.</div>'}
+    </div>
+    <div class="carte"><h3>Versions de l’app <small>7 jours</small></h3>
+      ${VERSION_EN_LIGNE ? ligneEtat(true, 'Version en ligne', '<span class="code">' + echap(VERSION_EN_LIGNE) + '</span>') : ''}
+      ${totV ? `${aJour !== null ? ligneEtat(aJour === totV ? true : null, aJour === totV ? 'Tout le monde est à jour' : 'Certains utilisent une ancienne version', plur(aJour, 'connexion', 'connexions') + ' à jour sur ' + totV) : ''}
+        ${hbars(versions.map((v) => ({ k: v.version + (v.version === VERSION_EN_LIGNE ? ' · en ligne' : ''), n: v.sessions })), { couleur: 'var(--s3)' })}`
+      : '<div class="vide">Les versions apparaîtront avec les prochaines utilisations.</div>'}
+    </div>
+  </div>`
+}
+
+/* ─── Anti-piratage ─── */
+function blocBouclier() {
+  if (!BO) return `<div class="section" style="margin-top:0"><h2>Protection anti-piratage</h2>${aActiver('La protection anti-piratage')}</div>`
+  const f = BO.fichiers || [], ml = BO.mises_en_ligne || []
+  const modifies = f.filter((x) => x.empreinte_validee && x.empreinte_actuelle !== x.empreinte_validee)
+  const scripts = f.filter((x) => (x.scripts_inconnus || []).length)
+  const inconnus = ml.filter((m) => !m.connu)
+  const massives = (BO.journal || []).filter((j) => j.type === 'suppression_massive' && new Date(j.cree_le) > Date.now() - 30 * 86400e3)
+  const cptAdmin = (BO.journal || []).filter((j) => ['compte_admin_modifie', 'admin_ajoute', 'admin_retire'].includes(j.type) && new Date(j.cree_le) > Date.now() - 30 * 86400e3)
+  const toutVaBien = !modifies.length && !scripts.length && !inconnus.length && !massives.length && !cptAdmin.length && !BO.intrusions_7j
+  return `<div class="section" style="margin-top:0"><h2>Protection anti-piratage</h2>
+    <div class="carte bouclier ${toutVaBien ? 'ok' : 'alerte'}">
+      <div class="bq-haut"><span class="bq-ico">${ico('bouclier')}</span><div><b>${toutVaBien ? 'Aucun signe de piratage' : 'À vérifier tout de suite'}</b><span>Vérifié ${BO.dernier_passage ? ilya(BO.dernier_passage) : '— le veilleur démarre'} · toutes les 5 minutes, jour et nuit</span></div></div>
+      ${ligneEtat(!modifies.length, 'Fichiers du site et de l’app', modifies.length ? 'Modifié sans mise en ligne connue : ' + modifies.map((x) => echap(x.chemin)).join(', ') : plur(f.length, 'fichier identique', 'fichiers identiques') + ' à la dernière mise en ligne')}
+      ${ligneEtat(!scripts.length && !BO.intrusions_7j, 'Code étranger', scripts.length ? 'Script inconnu : ' + echap(scripts.flatMap((x) => x.scripts_inconnus).join(', ')) : BO.intrusions_7j ? plur(BO.intrusions_7j, 'signalement') + ' par des visiteurs (7 j) : voir « Activités suspectes »' : 'Aucun script inconnu dans les pages')}
+      ${ligneEtat(!inconnus.length, 'Mises en ligne', inconnus.length ? plur(inconnus.length, 'mise en ligne', 'mises en ligne') + ' par un auteur inconnu' : 'Toutes faites par ton compte GitHub')}
+      ${ligneEtat(!massives.length, 'Base de données', massives.length ? plur(massives.length, 'suppression massive', 'suppressions massives') + ' sur 30 jours' : 'Aucune suppression massive')}
+      ${ligneEtat(!cptAdmin.length, 'Comptes admin', cptAdmin.length ? plur(cptAdmin.length, 'changement', 'changements') + ' sur 30 jours : vérifie que c’est toi' : 'Aucun changement')}
+      <div class="bq-btns">
+        ${modifies.length || inconnus.length ? '<button class="btn btn-plein" data-action="valider-integrite">C’est moi qui ai mis en ligne</button>' : ''}
+        <button class="btn btn-grave" data-action="urgence">${ico('eclair')}Mode urgence</button>
+      </div>
+    </div></div>`
+}
+function blocMisesEnLigne() {
+  if (!BO) return ''
+  const ml = BO.mises_en_ligne || [], j = BO.journal || []
+  const NOMS = { suppression_massive: 'Suppression massive', admin_ajoute: 'Admin ajouté', admin_retire: 'Admin retiré', compte_admin_modifie: 'Compte admin modifié', mode_urgence: 'Mode urgence activé', compte_deconnecte: 'Compte déconnecté partout', integrite_validee: 'Mise en ligne validée', entreprise_supprimee: 'Entreprise supprimée' }
+  return `<div class="section grille g2">
+    <div class="carte"><h3>Dernières mises en ligne <small>dépôt GitHub</small></h3>
+      ${ml.length ? `<div class="liste">${ml.map((m) => `<div class="ligne"><span class="code">${echap(m.sha.slice(0, 7))}</span><div class="t"><b>${echap(m.message || '—')}</b><span>${echap(m.auteur || '?')} · ${ilya(m.quand)}${(m.fichiers || []).length ? ' · ' + echap(m.fichiers.slice(0, 3).join(', ')) : ''}</span></div>${m.connu ? '' : '<span class="badge grave">Inconnu</span>'}</div>`).join('')}</div>` : '<div class="vide">Apparaîtront au premier passage du veilleur</div>'}</div>
+    <div class="carte"><h3>Journal de sécurité</h3>
+      ${j.length ? `<div class="liste">${j.map((x) => `<div class="ligne"><div class="t"><b>${NOMS[x.type] || echap(x.type)}</b><span>${echap(x.detail?.email || x.detail?.nom || (x.detail?.table ? x.detail.n + ' ' + x.detail.table : '') || (x.detail?.sessions != null ? x.detail.sessions + ' session(s) fermée(s)' : ''))} · ${ilya(x.cree_le)}</span></div></div>`).join('')}</div>` : '<div class="vide">Rien à signaler</div>'}</div>
+  </div>`
+}
+function ouvrirUrgence() {
+  ouvrirFeuille(`<div class="feuille-corps urgence">
+    <div class="guide-haut"><span class="pi grand" style="--c:#E5484D">${ico('eclair')}</span><div><div class="ent-groupe" style="color:var(--grave)">En cas de piratage</div><div class="feuille-titre" style="margin:2px 0 0">Mode urgence</div></div></div>
+    <p class="guide-role">Déconnecte immédiatement <b>tous les comptes</b> de l’app (sauf les 3 comptes du Dashboard). Chacun devra se reconnecter avec son mot de passe.</p>
+    <div class="titre-bloc">Ensuite, dans cet ordre</div>
+    <div class="groupe">${[
+      ['Change ton mot de passe', 'Sur le compte du Dashboard, et celui de GitHub.'],
+      ['Change les clés Supabase', 'Supabase → Project Settings → API → « Roll » la clé secrète (service role).'],
+      ['Change la clé Stripe', 'Stripe → Développeurs → Clés API → renouveler la clé secrète, puis la remettre dans Supabase (secret STRIPE_SECRET_KEY).'],
+      ['Vérifie GitHub', 'Dépôt Standix → Commits : supprime toute modification qui ne vient pas de toi.'],
+      ['Préviens tes clients si des données ont fuité', 'C’est obligatoire sous 72 h (RGPD). Écris à contact@standix.app avant d’agir si tu as un doute.'],
+    ].map(([t, d], i) => `<div class="guide-ligne"><span class="num" style="--c:var(--grave)">${i + 1}</span><div><b>${t}</b><span>${d}</span></div></div>`).join('')}</div>
+    <div class="champ-feuille"><label for="urgence-mot">Pour confirmer, écris URGENCE</label><input id="urgence-mot" autocomplete="off" autocapitalize="characters"></div>
+    <button class="gros-btn rouge-plein" data-action="urgence-ok">Déconnecter tout le monde</button>
+  </div>`)
+}
+async function lancerUrgence() {
+  if (($('#urgence-mot')?.value || '').trim().toUpperCase() !== 'URGENCE') return toast('Écris URGENCE pour confirmer')
+  const { data, error } = await sb.rpc('admin_mode_urgence')
+  if (error) return toast('Échec : ' + error.message)
+  fermerPanneau(); toast(plur(data || 0, 'session fermée', 'sessions fermées') + ' · suis maintenant les étapes'); charger()
+}
+async function validerIntegrite() {
+  if (!confirm('Confirmer que c’est toi qui as mis en ligne ces modifications ?')) return
+  const { error } = await sb.rpc('admin_valider_integrite')
+  if (error) return toast('Échec : ' + error.message)
+  toast('Validé : cette version devient la référence'); charger()
+}
+async function deconnecterCompte(uid) {
+  if (!confirm('Déconnecter ce compte sur tous ses appareils ? La personne devra se reconnecter.')) return
+  const { data, error } = await sb.rpc('admin_deconnecter_compte', { p_user: uid })
+  if (error) return toast('Échec : ' + error.message)
+  fermerPanneau(); toast(plur(data || 0, 'session fermée', 'sessions fermées'))
+}
+
 /* ═══ EXPLICATIONS ═══
    Une phrase sous chaque bloc (graphique, liste) : ce qu'il montre et à
    quoi il sert. Repérée par le titre du bloc. */
@@ -1376,6 +1848,22 @@ const LEGENDES = {
   'Avertissements envoyés': 'Les messages envoyés aux responsables, et s’ils les ont lus dans l’app.',
   'Connexions au Dashboard': 'Chaque ouverture de ce Dashboard. Un « nouvel appareil » que tu ne reconnais pas doit t’alerter.',
   'Changements de rôle récents': 'Arrivées, départs et promotions dans les équipes de tes clients.',
+  'Fil d’activité': 'Tout ce qui s’est passé récemment : inscriptions, paiements, erreurs, alertes, messages. Touche une ligne pour aller voir.',
+  'Parcours des clients': 'Les 5 étapes d’un client, de l’inscription au paiement. La barre montre combien ont atteint chaque étape ; en rouge, combien se sont arrêtés juste avant. Touche une étape pour voir qui bloque.',
+  'À surveiller': 'Des clients qui paient mais n’utilisent plus Standix : ils risquent de résilier. Un message ou un appel peut les retenir.',
+  'Opportunités': 'Des clients proches de leur limite (membres, analyses IA) à qui proposer une offre supérieure, et des essais très actifs à convertir.',
+  'Évolution du revenu': 'Ce que tu as gagné et perdu en abonnements ce mois, et ce que vaut un client sur toute sa durée.',
+  'Revenu mensuel, 12 mois + prévision': 'Le revenu mensuel récurrent à la fin de chaque mois. Les 3 barres claires à droite : ce qui arrivera si la tendance des 3 derniers mois continue.',
+  'Coûts réels de l’IA': 'Les vraies factures de Claude et d’Azure, lues directement chez eux. Tant qu’ils ne sont pas connectés, les coûts restent estimés.',
+  'Disponibilité 24h/24': 'Le veilleur visite le site et l’app toutes les 5 minutes, même quand le Dashboard est fermé. Chaque case est une heure : verte en ligne, rouge en panne.',
+  'Sauvegardes des vidéos': 'Chaque heure, les nouvelles vidéos sont copiées en lieu sûr. « En attente » doit revenir à 0.',
+  'Vitesse chez les clients': 'Le temps réel, sur leurs téléphones, entre l’ouverture de l’app et son affichage complet. Sous 3 s, c’est très bien.',
+  'Création par l’IA': 'Combien de temps l’IA met à transformer une vidéo en procédure, mesuré chez les clients.',
+  'Versions de l’app': 'Après une mise à jour, la nouvelle version doit remplacer l’ancienne chez tout le monde. Si une ancienne reste longtemps, les clients gardent l’app en cache.',
+  'Protection anti-piratage': 'Le veilleur compare chaque fichier du site et de l’app à ta dernière mise en ligne, cherche le code étranger, et surveille la base et les comptes admin.',
+  'Dernières mises en ligne': 'Chaque modification publiée sur GitHub, avec son auteur. Un auteur inconnu = alerte.',
+  'Journal de sécurité': 'Les événements sensibles : suppressions massives, comptes admin modifiés, mode urgence…',
+  'Alertes sur ce téléphone': 'Active-les sur chaque appareil où tu veux être prévenu (iPhone : ajoute d’abord le Dashboard à l’écran d’accueil).',
 }
 function ajouterLegendes() {
   $$('#principal .section > h2, #principal .carte > h3').forEach((h) => {
@@ -1388,9 +1876,16 @@ function ajouterLegendes() {
 /* « Comment lire cette page » : à quoi sert la page, chaque partie
    expliquée, et quoi faire quand quelque chose ne va pas. */
 const GUIDES = {
+  messages: {
+    role: 'Lire, sans quitter le Dashboard, les e-mails envoyés à contact@standix.app.',
+    parties: [['La boîte de réception', 'Les messages les plus récents en haut. Un point bleu = pas encore lu.'], ['Le message', 'Touche-le pour le lire en entier. « Répondre » ouvre ton application Mail avec la réponse déjà préparée.'], ['Archivés', 'Les messages rangés, pour garder la boîte propre.']],
+    si: [['Un nouveau message arrive', 'Tu reçois une notification sur ton téléphone (si activée) et une pastille bleue apparaît. Il reste « non lu » dans ta messagerie habituelle : le Dashboard ne fait que lire.'],
+      ['Brancher la boîte (une seule fois)', 'Supabase → Edge Functions → Secrets → ajoute IMAP_HOTE (le serveur de ta messagerie, ex. imap.gmail.com, mail.infomaniak.com, ssl0.ovh.net, imap.mail.me.com), IMAP_UTILISATEUR (contact@standix.app) et IMAP_MOT_DE_PASSE (de préférence un « mot de passe d’application » créé chez ton hébergeur). Les messages arrivent dans les 5 minutes.'],
+      ['« La boîte ne peut pas être relevée »', 'Le mot de passe a changé ou n’est pas accepté : recrée un mot de passe d’application et remplace IMAP_MOT_DE_PASSE.']],
+  },
   vue: {
     role: 'C’est l’accueil : il résume tout Standix et te dit par où commencer.',
-    parties: [['Le point sur Standix', 'Une analyse automatique de tous les chiffres. « – » : ce qui ne va pas, du plus grave au moins grave. « ✓ » : ce qui va bien. Touche une ligne pour aller à la bonne page.'],
+    parties: [['Alertes sur ce téléphone', 'Active-les une fois : tu es prévenu même Dashboard fermé.'], ['Fil d’activité', 'Ce qui vient de se passer, en direct.'], ['Le point sur Standix', 'Une analyse automatique de tous les chiffres. « – » : ce qui ne va pas, du plus grave au moins grave. « ✓ » : ce qui va bien. Touche une ligne pour aller à la bonne page.'],
       ['Les 4 grands chiffres', 'Ce que Standix rapporte chaque mois, le bénéfice du mois, les erreurs à corriger et les entreprises qui utilisent vraiment l’app.'],
       ['30 derniers jours', 'L’activité du mois : inscriptions, procédures créées et lues, visiteurs du site.'],
       ['Dernières erreurs et inscriptions', 'Ce qui vient de se passer.']],
@@ -1401,12 +1896,14 @@ const GUIDES = {
     parties: [['Revenu mensuel récurrent', 'Ce que rapportent tous les abonnements chaque mois. C’est le chiffre clé d’un SaaS.'],
       ['Encaissé, coûts, bénéfice', 'L’argent vraiment reçu ce mois, ce que Standix a coûté, et la différence.'],
       ['Le graphique sur 12 mois', 'Pour voir si l’activité progresse.'],
-      ['Coûts fixes et variables', 'Tu peux les modifier directement : tout est enregistré et recalculé.']],
+      ['Coûts fixes et variables', 'Tu peux les modifier directement : tout est enregistré et recalculé.'],
+      ['Évolution du revenu', 'Ce qui arrive et part chaque mois, le taux de départ, la valeur d’un client et une prévision sur 3 mois.'],
+      ['Coûts réels de l’IA', 'Les vraies factures Claude et Azure. Pour les connecter : ajoute dans Supabase (Edge Functions → Secrets) la clé ANTHROPIC_ADMIN_KEY (console Anthropic → Admin keys) et, pour Azure, AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_SUBSCRIPTION_ID.']],
     si: [['Bénéfice en rouge', 'Les coûts dépassent les revenus ce mois. Vérifie les coûts fixes, ou relance les essais terminés (page Clients).'], ['Un client « Impayé »', 'Sa carte a été refusée : Stripe réessaie automatiquement, mais un petit message au client aide.'], ['« Stripe ne répond pas »', 'Les revenus affichés sont estimés. Réessaie plus tard.']],
   },
   clients: {
     role: 'Suivre chaque entreprise inscrite, du premier jour d’essai jusqu’à l’abonnement.',
-    parties: [['Les 4 chiffres', 'Entreprises inscrites, clients qui paient, essais en cours, impayés.'], ['Essais en cours / terminés', 'Les entreprises à contacter maintenant pour les convertir.'], ['Toutes les entreprises', 'La liste complète. Filtre-la (Essai, Abonnés, À relancer) ou cherche un nom. Touche une entreprise pour ouvrir sa fiche.']],
+    parties: [['Les 4 chiffres', 'Entreprises inscrites, clients qui paient, essais en cours, impayés.'], ['Parcours des clients', 'Les 5 étapes de l’inscription au paiement, et combien s’arrêtent à chacune. Touche une étape pour voir qui bloque.'], ['À surveiller / Opportunités', 'Les clients qui risquent de partir, et ceux à qui proposer plus.'], ['Essais en cours / terminés', 'Les entreprises à contacter maintenant pour les convertir.'], ['Toutes les entreprises', 'La liste complète. Filtre-la (Essai, Abonnés, À relancer) ou cherche un nom. Touche une entreprise pour ouvrir sa fiche.']],
     si: [['Un essai se termine bientôt', 'C’est le meilleur moment pour proposer une démo ou de l’aide.'], ['Beaucoup d’essais terminés sans abonnement', 'Contacte-les : c’est souvent un détail qui bloque.'], ['Envoyer un message à un gérant', 'Ouvre la fiche de l’entreprise → « Envoyer un avertissement ».']],
   },
   usage: {
@@ -1426,13 +1923,13 @@ const GUIDES = {
   },
   sante: {
     role: 'Vérifier que tout ce qui fait tourner Standix fonctionne.',
-    parties: [['Services', 'Base de données, serveur, paiements, site et app : testés à chaque ouverture de la page, avec leur temps de réponse.'], ['Intelligence artificielle', 'La part de procédures réussies par l’IA.'], ['Stockage', 'La place utilisée sur ton abonnement Supabase.']],
+    parties: [['Services', 'Base de données, serveur, paiements, site et app : testés à chaque ouverture de la page, avec leur temps de réponse.'], ['Disponibilité 24h/24', 'Le veilleur vérifie le site et l’app toutes les 5 minutes, jour et nuit, et te prévient sur ton téléphone en cas de panne.'], ['Sauvegardes, vitesse, versions', 'Les vidéos sont-elles copiées ? L’app est-elle rapide chez les clients ? Ont-ils la dernière version ?'], ['Intelligence artificielle', 'La part de procédures réussies par l’IA.'], ['Stockage', 'La place utilisée sur ton abonnement Supabase.']],
     si: [['Un service « En panne »', 'Recharge la page. Si ça persiste, regarde status.supabase.com ou status.stripe.com.'], ['Stockage au-dessus de 80 %', 'Prévoir un plan Supabase plus grand ou supprimer d’anciennes vidéos.']],
   },
   securite: {
     role: 'Protéger Standix et tes clients : connexions, comptes partagés, comportements anormaux.',
-    parties: [['Activités suspectes', 'Tout ce qui sort de l’ordinaire, du plus grave au moins grave.'], ['Comptes partagés', 'Les comptes utilisés par plusieurs personnes. « Probable » en rouge : à traiter.'], ['Points de contrôle', 'Les réglages de sécurité essentiels.'], ['Avertissements envoyés', 'Les messages envoyés aux gérants, et s’ils les ont lus.'], ['Connexions au Dashboard', 'Qui a ouvert ce Dashboard, et sur quel appareil.']],
-    si: [['Un compte partagé « Probable »', 'Ouvre-le → « Envoyer un avertissement ». Si ça continue, envoie un « Dernier avertissement ».'], ['Une alerte vérifiée', 'Touche « Vu » pour la ranger.'], ['Un nouvel appareil inconnu sur le Dashboard', 'Change ton mot de passe et vérifie ton code à 6 chiffres.']],
+    parties: [['Protection anti-piratage', 'Le veilleur vérifie toutes les 5 minutes que le site et l’app n’ont pas été modifiés par quelqu’un d’autre, qu’aucun code étranger n’y a été glissé, et surveille la base et les comptes admin.'], ['Mode urgence', 'En cas de piratage : déconnecte tout le monde d’un geste, puis te guide étape par étape.'], ['Activités suspectes', 'Tout ce qui sort de l’ordinaire, du plus grave au moins grave.'], ['Comptes partagés', 'Les comptes utilisés par plusieurs personnes. « Probable » en rouge : à traiter.'], ['Points de contrôle', 'Les réglages de sécurité essentiels.'], ['Avertissements envoyés', 'Les messages envoyés aux gérants, et s’ils les ont lus.'], ['Connexions au Dashboard', 'Qui a ouvert ce Dashboard, et sur quel appareil.']],
+    si: [['« Fichier modifié » alors que tu viens de mettre en ligne', 'Touche « C’est moi qui ai mis en ligne » : cette version devient la référence.'], ['« Fichier modifié » sans que tu aies rien fait', 'Probable piratage : touche « Mode urgence » et suis les étapes.'], ['Un compte partagé « Probable »', 'Ouvre-le → « Envoyer un avertissement ». Si ça continue, envoie un « Dernier avertissement ».'], ['Une alerte vérifiée', 'Touche « Vu » pour la ranger.'], ['Un nouvel appareil inconnu sur le Dashboard', 'Change ton mot de passe et vérifie ton code à 6 chiffres.']],
   },
 }
 function ouvrirGuide() {
@@ -1510,6 +2007,12 @@ function pageVue() {
 
 
 
+  ${carteNotifs(true) ? `<div class="section">${carteNotifs(true)}</div>` : ''}
+
+  <div class="section"><h2>Fil d’activité <small>ce qui vient de se passer</small></h2>
+    <div class="carte">${filActivite(8)}</div>
+  </div>
+
   <div class="section"><h2>30 derniers jours</h2>
     <div class="grille g4">
       ${tuile('Inscriptions', n(somme(inscr30)), 'nouvelles entreprises', { spark: inscr30 })}
@@ -1580,6 +2083,37 @@ function analyse() {
   if (stock >= 0.8) ajoute(false, 'Stockage presque plein : ' + pct(stock), 'sante', 2)
   if (S.securite?.mfa_admin) ajoute(true, 'Dashboard protégé par code à 6 chiffres', 'securite')
   if (!(SU.alertes || []).some((x) => !x.vue)) ajoute(true, 'Aucune activité suspecte à vérifier', 'securite')
+  // Version 2 : disponibilité, sauvegardes, piratage, clients, messages, vitesse
+  if (SA) {
+    const dsp = SA.disponibilite || {}
+    const enPanne = Object.entries(dsp).filter(([, d]) => d.dernier && !d.dernier.ok).map(([c]) => c === 'site' ? 'le site' : 'l’app')
+    if (enPanne.length) ajoute(false, enPanne.join(' et ') + ' ne répond' + (enPanne.length > 1 ? 'ent' : '') + ' plus', 'sante', 3)
+    else if (dsp.site) ajoute(true, 'Site et app en ligne · ' + (dsp.site.ok_24h ?? 100) + ' % du temps sur 24 h', 'sante')
+    const sv = SA.sauvegardes || {}
+    if ((sv.derniere_reponse?.echecs || []).length) ajoute(false, 'Sauvegarde : ' + sv.derniere_reponse.echecs.length + ' vidéo(s) non copiée(s)', 'sante', 2)
+    else if (sv.derniere_verif && Date.now() - new Date(sv.derniere_verif) > 3 * 3600e3) ajoute(false, 'Sauvegarde : pas de vérification depuis ' + ilya(sv.derniere_verif).replace('il y a ', ''), 'sante', 2)
+    else if (sv.derniere_verif) ajoute(true, 'Toutes les vidéos sont sauvegardées', 'sante')
+    if (SA.perf?.pret_median > 4000) ajoute(false, 'L’app met ' + nf1.format(SA.perf.pret_median / 1000) + ' s à s’ouvrir chez les clients', 'sante', 2)
+    else if (SA.perf?.pret_median) ajoute(true, 'L’app s’ouvre en ' + nf1.format(SA.perf.pret_median / 1000) + ' s chez les clients', 'sante')
+  }
+  if (BO) {
+    const modifies = (BO.fichiers || []).filter((f) => f.empreinte_validee && f.empreinte_actuelle !== f.empreinte_validee)
+    const inconnus = (BO.mises_en_ligne || []).filter((m) => !m.connu)
+    if (modifies.length || inconnus.length) ajoute(false, 'Piratage possible : ' + (modifies.length ? plur(modifies.length, 'fichier modifié', 'fichiers modifiés') : plur(inconnus.length, 'mise en ligne inconnue', 'mises en ligne inconnues')), 'securite', 3)
+    else if ((BO.fichiers || []).length) ajoute(true, 'Site et app intacts · ' + plur(BO.fichiers.length, 'fichier vérifié', 'fichiers vérifiés'), 'securite')
+  }
+  if (CA) {
+    const ins = CA.etapes?.[0]?.n || 0, proc = CA.etapes?.[1]?.n || 0
+    if (ins >= 5 && proc / ins < 0.5) ajoute(false, (ins - proc) + ' entreprises sur ' + ins + ' n’ont jamais créé de procédure', 'clients', 2)
+    const risques = (CA.risques || []).filter((x) => x.raison !== 'impaye')
+    if (risques.length) ajoute(false, plur(risques.length, 'client payant à risque', 'clients payants à risque') + ' de partir', 'clients', 2)
+    if ((CA.opportunites || []).length) ajoute(true, plur(CA.opportunites.length, 'opportunité de vente', 'opportunités de vente') + ' à saisir', 'clients')
+  }
+  if (ME) {
+    if (ME.non_lus) ajoute(false, plur(ME.non_lus, 'message non lu', 'messages non lus') + ' sur contact@standix.app', 'messages', 2)
+    else if (ME.branche) ajoute(true, 'Aucun message en attente', 'messages')
+    if (ME.branche && ME.releve?.erreur) ajoute(false, 'La boîte contact ne peut pas être relevée', 'messages', 2)
+  }
 
   mal.sort((x, y) => y.poids - x.poids)
   return { mal, bien }
@@ -1638,6 +2172,7 @@ function pageArgent() {
     ${tuile('Coûts ce mois', eur2(a.couts.total), `${eur2(a.couts.fixes)} fixes + ${eur2(a.couts.ia + a.couts.trad)} d’IA`, { heros: 1 })}
     ${tuile('Bénéfice ce mois', eur2(a.benefice), a.revenuMois > 0 ? 'Marge ' + pct(a.benefice / a.revenuMois) : 'Pas encore de revenu ce mois', { heros: 1, ton: a.benefice >= 0 ? 'ok' : 'grave' })}
   </div>
+  ${blocEvolution()}
 
   <div class="section carte">
     <h3>Encaissé et dépensé, 12 derniers mois <small>Coûts IA estimés</small></h3>
@@ -1661,6 +2196,7 @@ function pageArgent() {
     </div>
   </div>
 
+  <div class="section">${blocCoutsReels()}</div>
   <div class="section carte">
     <h3>Coûts fixes <small><span class="seul-pc">Modifie directement : c’est enregistré</span><span class="seul-mobile">Touche une ligne pour la modifier</span></small></h3>
     <div id="couts">${(S.couts_fixes || []).map(ligneCout).join('')}</div>
@@ -1872,6 +2408,7 @@ function pageSante() {
       ${ligne(S.echecs_ia.length ? null : true, 'Échecs à revoir', 'voir la page Erreurs', n(S.echecs_ia.length))}
     </div>
   </div>
+  ${blocsSante()}
   <div class="section grille g2">
     <div class="carte"><h3>Stockage <small>Supabase Pro</small></h3>
       <div class="sante"><div class="t"><b>Base de données</b><span>${octets(t.base_octets)} sur 8 Go inclus</span><div class="jauge"><div style="width:${Math.max(1, t.base_octets / LIM_BASE * 100)}%"></div></div></div><span class="n">${pct(t.base_octets / LIM_BASE)}</span></div>
@@ -1905,6 +2442,8 @@ function pageClients() {
     ${tuile('Essais en cours', n(k.essais_en_cours), n(k.essais_expires) + ' essais terminés sans abonnement')}
     ${tuile('Impayés · résiliés', `${n(k.impayes)} <small>· ${n(k.resilies)}</small>`, 'à relancer', { ton: k.impayes ? 'grave' : '' })}
   </div>
+  <div class="section"><h2>Parcours des clients <small>où ils s’arrêtent</small></h2>${blocParcours()}</div>
+  ${blocRisquesOpportunites()}
   <div class="section grille g2">
     <div class="carte"><h3>Essais en cours <small>du plus urgent au moins urgent</small></h3>
       ${bientot.length ? `<div class="liste">${bientot.map((e) => `<div class="ligne"><div class="t"><b>${echap(e.nom)}</b><span>${e.membres} membre${e.membres > 1 ? 's' : ''} · ${e.procedures} procédure${e.procedures > 1 ? 's' : ''} · actif ${ilya(e.derniere_activite)}</span></div><span class="badge ${new Date(e.essai_fin) - Date.now() < 3 * 86400e3 ? 'alerte' : 'accent'}">Fin ${ilya(e.essai_fin)}</span></div>`).join('')}</div>` : '<div class="vide">Aucun essai en cours</div>'}
@@ -2163,7 +2702,7 @@ async function ouvrirPartage(uid) {
     ${(d.appareils || []).length ? `<div class="groupe">${d.appareils.map((a) => `<div class="occ-ligne"><b>${echap(a.nom)}</b><span>${(a.reseaux || []).map(res).join(', ') || 'réseau inconnu'} · ${a.connexions} connexion${a.connexions > 1 ? 's' : ''} · dernière activité ${ilya(a.derniere)}</span></div>`).join('')}</div>` : '<div class="vide">Pas d\u2019activité enregistrée sur 14 jours</div>'}
     ${(d.presences || []).length ? `<h3 class="titre-bloc">Appareils vus par l\u2019app</h3><div class="groupe">${d.presences.map((a) => `<div class="occ-ligne"><b>${echap(a.nom || 'Appareil')}${a.revoquee ? ' · révoqué' : ''}</b><span>${echap(a.reseau || '—')} · vu de ${dateC(a.premiere_fois)} à ${ilya(a.derniere_fois)}</span></div>`).join('')}</div>` : ''}
     <p class="note">Les réseaux sont tronqués (85.2.14.x) : l\u2019adresse complète n\u2019est jamais enregistrée.</p>`
-  if (!$('.panneau-pied', pan)) pan.insertAdjacentHTML('beforeend', `<div class="panneau-pied"><button class="btn btn-plein" data-avertir-compte="${uid}">${ico('avertir')}Envoyer un avertissement</button></div>`)
+  if (!$('.panneau-pied', pan)) pan.insertAdjacentHTML('beforeend', `<div class="panneau-pied"><button class="btn btn-plein" data-avertir-compte="${uid}">${ico('avertir')}Envoyer un avertissement</button><button class="btn btn-grave" data-deconnecter="${uid}">Déconnecter partout</button></div>`)
 }
 
 function pageSecurite() {
@@ -2173,9 +2712,9 @@ function pageSecurite() {
   const toutes = SU.alertes || []
   const nouvelles = toutes.filter((x) => !x.vue)
   const liste = toutes.filter((x) => filtreSuspects === 'toutes' || (filtreSuspects === 'nouvelles' ? !x.vue : x.vue))
-  const ICO_FAMILLE = { connexion: 'securite', compte: 'clients', dashboard: 'vue', essai: 'horloge', cout: 'argent', site: 'site', role: 'clients' }
-  return entete('Sécurité', 'Comptes, connexions et activités suspectes') + `
-  <div class="section" style="margin-top:0">
+  const ICO_FAMILLE = { connexion: 'securite', compte: 'clients', dashboard: 'vue', essai: 'horloge', cout: 'argent', site: 'site', role: 'clients', piratage: 'bouclier', panne: 'sante' }
+  return entete('Sécurité', 'Comptes, connexions et activités suspectes') + blocBouclier() + `
+  <div class="section">
     <h2>Activités suspectes <small>30 derniers jours · mises à jour en continu</small></h2>
     ${SU.erreur ? `<div class="encart">Détection indisponible : ${echap(SU.erreur)}</div>` : ''}
     ${SU.hooks_actifs === false ? '<div class="encart info">La surveillance des mots de passe et des codes n\u2019est pas encore active : il reste à activer les 2 « hooks » dans Supabase.</div>' : ''}
@@ -2195,6 +2734,8 @@ function pageSecurite() {
     <h2>Comptes partagés <small>un même compte utilisé par plusieurs personnes · 14 jours</small></h2>
     ${carteComptesPartages()}
   </div>
+  ${blocMisesEnLigne()}
+  <div class="section"><h2>Alertes sur ce téléphone</h2>${carteNotifs()}</div>
 
   <div class="section grille g4">
     ${tuile('Comptes', n(s.comptes), n(s.comptes_30j) + ' créés en 30 jours')}
@@ -2233,6 +2774,15 @@ function brancherPage() {
   $$('[data-action="actualiser"]', P).forEach((b) => b.onclick = async () => { b.disabled = true; await charger(); toast('Chiffres à jour') })
   $$('[data-aller]', P).forEach((b) => b.onclick = () => aller(b.dataset.aller))
   $$('[data-action="guide"]', P).forEach((b) => b.onclick = ouvrirGuide)
+  $$('[data-action="notifs"]', P).forEach((b) => b.onclick = activerNotifs)
+  $$('[data-action="notifs-off"]', P).forEach((b) => b.onclick = desactiverNotifs)
+  $$('[data-action="notifs-test"]', P).forEach((b) => b.onclick = testerNotifs)
+  $$('[data-action="urgence"]', P).forEach((b) => b.onclick = ouvrirUrgence)
+  $$('[data-action="valider-integrite"]', P).forEach((b) => b.onclick = validerIntegrite)
+  $$('[data-etape]', P).forEach((b) => b.onclick = () => ouvrirEtape(b.dataset.etape))
+  $$('[data-ouvrir-ent]', P).forEach((b) => b.onclick = () => ouvrirEntreprise(b.dataset.ouvrirEnt))
+  $$('[data-msg]', P).forEach((b) => b.onclick = () => ouvrirMessage(b.dataset.msg))
+  $$('[data-fm]', P).forEach((b) => b.onclick = () => { filtreMessages = b.dataset.fm; afficher() })
   $$('[data-erreur]', P).forEach((b) => b.onclick = () => ouvrirErreur(b.dataset.erreur))
   $$('[data-filtre]', P).forEach((b) => b.onclick = () => { filtreErreurs = b.dataset.filtre; afficher() })
   $$('[data-source]', P).forEach((b) => b.onclick = () => { filtreSource = b.dataset.source; afficher() })
@@ -2310,6 +2860,14 @@ $('#panneau').addEventListener('click', (ev) => {
   if (b.dataset.avertirCompte) { const p = (SU.partages || []).find((x) => x.user_id === b.dataset.avertirCompte); composerAvertissement({ compte_vise: b.dataset.avertirCompte, entreprise: p?.entreprise, contexte: 'partage', qui: p?.membre || p?.email }) }
   if (b.dataset.avertirEntreprise) { const e = S.entreprises.find((x) => x.id === b.dataset.avertirEntreprise); composerAvertissement({ entreprise_id: e?.id, entreprise: e?.nom, contexte: 'general' }) }
   if (b.dataset.retirerAv) retirerAvertissement(b.dataset.retirerAv)
+  if (b.dataset.deconnecter) deconnecterCompte(b.dataset.deconnecter)
+  if (b.dataset.action === 'notifs') activerNotifs()
+  if (b.dataset.action === 'guide-notifs') toast((TEXTE_PUSH[etatPush] || TEXTE_PUSH.inconnu)[1])
+  if (b.dataset.action === 'notifs-off') desactiverNotifs()
+  if (b.dataset.action === 'notifs-test') testerNotifs()
+  if (b.dataset.action === 'urgence-ok') lancerUrgence()
+  if (b.dataset.etape) ouvrirEtape(b.dataset.etape)
+  if (b.dataset.msgAction) actionMessage(b.dataset.msgId, b.dataset.msgAction)
   if (b.dataset.action === 'sortir') sortir()
   if (b.dataset.pageFeuille) { fermerPanneau(); aller(b.dataset.pageFeuille) }
   if (b.dataset.action === 'copier') copierPourClaude()
@@ -2450,11 +3008,11 @@ function barres(el, cfg, w) {
   const larg = w - g, pas = larg / d.length, bw = Math.max(2, Math.min(28, pas - 2))
   const Y = (v) => haut + (h - haut - bas) * (1 - v / max)
   const couleur = cfg.couleur || 'var(--s1)'
-  const etiquettes = d.length > 45 ? 6 : d.length > 20 ? 5 : d.length
+  const etiquettes = Math.max(2, Math.min(d.length > 45 ? 6 : d.length > 20 ? 5 : d.length, Math.floor(larg / 48)))
   const tous = Math.max(1, Math.round(d.length / etiquettes))
   el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" height="${h}">
     ${lignes.map((v) => `<line x1="${g}" x2="${w}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grille)"/><text x="${g - 8}" y="${Y(v) + 4}" text-anchor="end">${court(v, cfg.fmt)}</text>`).join('')}
-    ${d.map((p, i) => { const bh = (h - haut - bas) * (p.y / max); return p.y ? `<path d="${arrondi(g + i * pas + (pas - bw) / 2, Y(p.y), bw, bh, 3)}" fill="${couleur}" data-i="${i}"/>` : '' }).join('')}
+    ${d.map((p, i) => { const bh = (h - haut - bas) * (p.y / max); return p.y ? `<path d="${arrondi(g + i * pas + (pas - bw) / 2, Y(p.y), bw, bh, 3)}" fill="${couleur}" data-i="${i}"${p.prev ? ' fill-opacity=".35"' : ''}/>` : '' }).join('')}
     ${d.map((p, i) => (i % tous === 0 || i === d.length - 1) && !(i !== d.length - 1 && d.length - 1 - i < tous * .6) ? `<text x="${g + i * pas + pas / 2}" y="${h - 5}" text-anchor="middle">${/^\d{4}-/.test(p.x) ? jourLib(p.x) : echap(p.x)}</text>` : '').join('')}
     <rect x="${g}" y="0" width="${larg}" height="${h}" fill="transparent"/>
   </svg>`

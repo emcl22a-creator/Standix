@@ -136,8 +136,6 @@
      lecture de l'en-tête fait gagner la poignée de main réseau (DNS, TLS) sur
      chacun — c'est du temps mort pur, avant même la première requête. -->
 <link rel="preconnect" href="https://tlrtsoahwqhtvtkhssbm.supabase.co" crossorigin="">
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin=""><!-- QR code, chargé à la demande -->
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <!-- La bibliothèque Supabase est indispensable pour afficher quoi que ce soit :
      on la télécharge en parallèle du reste au lieu d'attendre la fin du script. -->
 <!-- La bibliothèque Supabase est servie depuis le même dépôt que cette page :
@@ -145,8 +143,10 @@
      visite à l'autre. Elle était auparavant téléchargée depuis jsDelivr, ce qui
      coûtait entre 30 ms et 2 secondes selon l'humeur du réseau. -->
 <link rel="modulepreload" href="./supabase.js">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
+<!-- Les polices sont servies par Standix (26 octobre 2026), plus par Google
+     Fonts : aucune visite ne contacte un serveur tiers. Voir /polices.css. -->
+<link rel="preload" href="/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/polices.css">
 <link rel="stylesheet" href="style.css?v=21d636a9">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
@@ -5301,7 +5301,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=c6b5c6fe" onerror="window.__appJsEchec && window.__appJsEchec()"></script>
+<script type="module" src="app.js?v=cf5a7598" onerror="window.__appJsEchec && window.__appJsEchec()"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

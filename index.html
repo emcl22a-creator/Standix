@@ -2,6 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<!-- Dashboard privé : erreurs et visites (sans cookie, sans IP). Voir /suivi.js
+     ⚠ Retiré par erreur le 25 octobre 2026 à 22 h 27 (une version plus ancienne
+     de la page avait été redéposée), remis le 26 octobre : la politique de
+     confidentialité (annexe B de cgu.html) annonce cette mesure. -->
+<script src="/suivi.js?v=3"></script>
 <!-- ⚠ `user-scalable=no` NE SUFFIT PAS : Safari sur iOS l'ignore depuis 2016,
      précisément pour ne pas priver de zoom ceux qui en ont besoin. Il n'agit
      que sur Chrome Android. Le reste est fait plus bas, en CSS et en code. -->
@@ -1632,6 +1637,8 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   border-top:1px solid rgba(255,255,255,.08);
 }
 .pied-bas p{margin:0; font-size:12px; line-height:1.4; color:rgba(235,235,245,.42)}
+/* La mention des marques de tiers (SAP, carte VA01) : seule sur sa ligne. */
+.pied-bas .pied-marques{flex-basis:100%}
 @media (max-width:980px){
   .pied{--m:28px}
   .pied-in{margin-left:28px; margin-right:28px}
@@ -6215,7 +6222,7 @@ body.pret .barre-hote{animation-play-state:running}
         <h3>Informations légales</h3>
         <a href="/cgu.html">Conditions d'utilisation</a>
         <a href="/cgu.html#a1">Mentions légales</a>
-        <a href="/cgu.html#a8">Données personnelles</a>
+        <a href="/cgu.html#annexe-b">Données personnelles</a>
       </div>
       <div class="pied-col">
         <h3>Contact</h3>
@@ -6225,6 +6232,7 @@ body.pret .barre-hote{animation-play-state:running}
     <div class="pied-bas">
       <p>© 2026 Standix. Tous droits réservés.</p>
       <p>Prix indiqués hors taxes.</p>
+      <p class="pied-marques">SAP et VA01 sont des marques ou des désignations de SAP SE. Standix n’est ni affilié à SAP SE, ni approuvé ou soutenu par elle. Les autres marques citées appartiennent à leurs titulaires.</p>
     </div>
   </div>
 </footer>

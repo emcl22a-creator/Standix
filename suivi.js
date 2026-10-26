@@ -9,7 +9,13 @@
      `signaler_erreur` ; le serveur y ajoute lui-même la personne et
      l'entreprise (impossible à falsifier depuis le navigateur).
 
-   ② LES VISITES (site seulement) — page vue, clics sur les liens et
+   ② L'ACTIVITÉ (app seulement) — un signal toutes les 5 minutes pendant
+     l'utilisation, pour repérer un compte utilisé par plusieurs personnes.
+
+   ③ LES MESSAGES aux responsables (app seulement) — avertissements envoyés
+     depuis le Dashboard, affichés dans une fenêtre « J'ai compris ».
+
+   ④ LES VISITES (site seulement) — page vue, clics sur les liens et
      boutons, durée de la visite. Sans cookie, sans adresse IP : un
      identifiant au hasard, oublié à la fermeture de l'onglet.
 
@@ -121,7 +127,7 @@
       try {
         message = String(message || '').trim()
         if (!message || BRUIT.test(message)) return
-        if (/signaler_erreur|noter_visite/.test(message)) return
+        if (/signaler_erreur|noter_visite|noter_activite/.test(message)) return
         var cle = genre + '|' + message.slice(0, 120)
         var maintenant = Date.now()
         if (vues[cle] && maintenant - vues[cle] < 10000) return
@@ -212,7 +218,7 @@
     window.fetch = function (entree, options) {
       var u = ''
       try { u = typeof entree === 'string' ? entree : (entree && entree.url) || String(entree) } catch (e) {}
-      var surveille = /supabase\.co|\/functions\/v1\//.test(u) && !/rpc\/(signaler_erreur|noter_visite)/.test(u)
+      var surveille = /supabase\.co|\/functions\/v1\//.test(u) && !/rpc\/(signaler_erreur|noter_visite|noter_activite|mes_avertissements|lire_avertissement)/.test(u)
       var p = fetchOrigine(entree, options)
       if (!surveille) return p
       return p.then(function (rep) {
@@ -247,7 +253,105 @@
       })
     }
 
-    /* ═══ ② LES VISITES (site seulement) ══════════════════════════════════ */
+    /* ═══ ② L'ACTIVITÉ (app seulement) ═════════════════════════════════
+       Toutes les 5 minutes pendant que l'app est ouverte et visible : sert à
+       repérer un même compte utilisé EN MÊME TEMPS sur plusieurs appareils
+       (compte partagé). Le serveur lit lui-même le compte, la connexion,
+       l'appareil et le réseau. Sans connexion, rien n'est envoyé. */
+    if (SOURCE === 'app') {
+      var derniereActivite = 0
+      var activite = function () {
+        try {
+          if (document.visibilityState !== 'visible' || !jeton()) return
+          if (Date.now() - derniereActivite < 4 * 60 * 1000) return
+          derniereActivite = Date.now()
+          envoyer('noter_activite', {})
+        } catch (e) {}
+      }
+      setTimeout(activite, 4000)
+      setInterval(activite, 5 * 60 * 1000)
+      document.addEventListener('visibilitychange', activite)
+    }
+
+    /* ═══ ③ LES MESSAGES DE STANDIX AUX RESPONSABLES (app seulement) ════
+       Envoyés depuis le Dashboard privé (« Envoyer un avertissement »).
+       À l'ouverture de l'app, un responsable (rôle gestion) de l'entreprise
+       voit chaque message non lu dans une fenêtre, et doit toucher
+       « J'ai compris ». Le serveur ne renvoie que les messages destinés à
+       cette personne. Textes de l'interface en FR / EN / DE ; le message
+       lui-même est celui écrit dans le Dashboard. */
+    if (SOURCE === 'app') {
+      var TXT = {
+        fr: { ok: 'J’ai compris', source: 'Message de Standix', info: 'Information', avertissement: 'Avertissement', dernier: 'Dernier avertissement' },
+        en: { ok: 'I understand', source: 'Message from Standix', info: 'Information', avertissement: 'Warning', dernier: 'Final warning' },
+        de: { ok: 'Verstanden', source: 'Nachricht von Standix', info: 'Information', avertissement: 'Warnung', dernier: 'Letzte Warnung' },
+      }
+      var langue = function () { try { var l = localStorage.getItem('procedo_langue') || document.documentElement.lang || 'fr'; return TXT[l] ? l : 'fr' } catch (e) { return 'fr' } }
+      var enCoursMsg = false, dernierControle = 0
+      var appelRpc = function (nom, corps) {
+        var t = jeton(); if (!t) return Promise.reject(new Error('pas de session'))
+        return fetchOrigine(URL_SB + '/rest/v1/rpc/' + nom, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', apikey: CLE, Authorization: 'Bearer ' + t },
+          body: JSON.stringify(corps || {}),
+        }).then(function (r) { return r.ok ? r.text().then(function (x) { return x ? JSON.parse(x) : null }) : null })
+      }
+      var COULEURS = { info: ['#3A78EE', 'rgba(58,120,238,.12)'], avertissement: ['#D97706', 'rgba(217,119,6,.13)'], dernier: ['#DC2626', 'rgba(220,38,38,.12)'] }
+      var ICONES = {
+        info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+        avertissement: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/>',
+        dernier: '<circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/>',
+      }
+      var montrer = function (liste) {
+        if (!liste || !liste.length) { enCoursMsg = false; return }
+        var m = liste[0], T = TXT[langue()], c = COULEURS[m.niveau] || COULEURS.avertissement
+        var sombre = matchMedia && matchMedia('(prefers-color-scheme: dark)').matches
+        var fond = sombre ? '#16171C' : '#FFFFFF', texte = sombre ? '#F2F2F4' : '#0B0C10', gris = sombre ? '#A9ABB3' : '#6B6E76'
+        var date = ''
+        try { date = new Date(m.cree_le).toLocaleDateString(langue() === 'en' ? 'en-GB' : langue() === 'de' ? 'de-CH' : 'fr-FR', { day: 'numeric', month: 'long' }) } catch (e) {}
+        var voile = document.createElement('div')
+        voile.setAttribute('role', 'alertdialog'); voile.setAttribute('aria-modal', 'true')
+        voile.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .25s;font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;touch-action:none'
+        var echapper = function (x) { return String(x || '').replace(/[&<>"']/g, function (k) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[k] }) }
+        voile.innerHTML =
+          '<div style="width:100%;max-width:440px;margin:0 auto;background:' + fond + ';color:' + texte + ';border-radius:24px 24px 0 0;padding:26px 22px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.25);transform:translateY(30px);transition:transform .3s cubic-bezier(.2,.8,.2,1);max-height:88vh;display:flex;flex-direction:column">' +
+            '<div style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:' + c[1] + ';color:' + c[0] + ';margin-bottom:14px;flex:none"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICONES[m.niveau] || ICONES.avertissement) + '</svg></div>' +
+            '<div style="font-size:13px;font-weight:600;color:' + c[0] + ';margin-bottom:4px">' + T[m.niveau] + '</div>' +
+            '<div style="font-size:21px;font-weight:700;letter-spacing:-.015em;line-height:1.25;margin-bottom:6px">' + echapper(m.titre) + '</div>' +
+            '<div style="font-size:13px;color:' + gris + ';margin-bottom:14px">' + T.source + (date ? ' · ' + date : '') + '</div>' +
+            '<div style="font-size:15.5px;line-height:1.55;white-space:pre-wrap;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;margin-bottom:20px">' + echapper(m.message) + '</div>' +
+            '<button type="button" style="flex:none;width:100%;height:52px;border:0;border-radius:14px;background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);color:#fff;font:600 16px/1 Inter,-apple-system,sans-serif;cursor:pointer">' + T.ok + '</button>' +
+          '</div>'
+        if (innerWidth >= 700) { voile.style.alignItems = 'center'; voile.firstChild.style.borderRadius = '24px' }
+        document.body.appendChild(voile)
+        requestAnimationFrame(function () { voile.style.opacity = '1'; voile.firstChild.style.transform = 'none' })
+        voile.querySelector('button').onclick = function (ev) {
+          var b = ev.currentTarget; b.disabled = true; b.style.opacity = '.7'
+          appelRpc('lire_avertissement', { p_id: m.id }).catch(function () {}).then(function () {
+            voile.style.opacity = '0'
+            setTimeout(function () { voile.remove(); montrer(liste.slice(1)) }, 260)
+          })
+        }
+      }
+      var verifierMessages = function () {
+        try {
+          if (enCoursMsg || document.visibilityState !== 'visible' || !jeton()) return
+          if (Date.now() - dernierControle < 60 * 1000) return
+          dernierControle = Date.now()
+          enCoursMsg = true
+          appelRpc('mes_avertissements').then(function (l) {
+            if (Array.isArray(l) && l.length) montrer(l); else enCoursMsg = false
+          }, function () { enCoursMsg = false })
+        } catch (e) { enCoursMsg = false }
+      }
+      /* Après le démarrage de l'app (l'écran de chargement d'abord), puis
+         au retour dans l'app et toutes les 10 minutes. */
+      setTimeout(verifierMessages, 3500)
+      setInterval(verifierMessages, 10 * 60 * 1000)
+      document.addEventListener('visibilitychange', function () { setTimeout(verifierMessages, 800) })
+    }
+
+    /* ═══ ④ LES VISITES (site seulement) ══════════════════════════════════ */
 
     if (SOURCE !== 'site') return
 

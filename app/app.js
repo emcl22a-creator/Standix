@@ -849,6 +849,7 @@ const DICO = {
     "jours": "days",
     "Jours actifs": "Active days",
     "Jusqu’à <b>{max} membres</b>": "Up to <b>{max} members</b>",
+    "J’accepte": "I accept",
     "J’accepte et je continue": "I accept and continue",
     "J’ai compris": "Got it",
     "J’ai ma vidéo — l’utiliser": "I have my video — use it",
@@ -928,6 +929,7 @@ const DICO = {
     "Le compte n’a pas pu être lu.": "The account could not be read.",
     "Le compteur tourne quand une procédure est OUVERTE à l'écran, et seulement là. • Il s'arrête dès que l'app passe en arrière-plan ou que l'écran s'éteint. • Après deux minutes sans le moindre geste, il demande « vous en êtes où ? » et cesse de compter tant que personne ne répond — un téléphone posé sur le plan de travail n'accumule pas des heures. • Sous trois secondes, rien n'est retenu : c'est un passage, pas une lecture. Les temps s'additionnent à chaque visite.": "The timer runs while a procedure is OPEN on screen, and only then. • It stops as soon as the app goes to the background or the screen turns off. • After two minutes without any touch, it asks “where are you at?” and stops counting until someone answers — a phone left on the counter does not pile up hours. • Under three seconds, nothing is kept: that is a glance, not a read. Times add up with each visit.",
     "Le dernier paiement n'a pas pu être effectué. Mettez à jour votre moyen de paiement pour rouvrir l'accès de toute votre équipe.": "The last payment could not be made. Update your payment method to restore access for your whole team.",
+    "Le dernier paiement n’a pas pu être effectué. Mettez à jour votre moyen de paiement d’ici le {date} inclus pour que votre équipe garde l’accès à Standix.": "The last payment could not be made. Update your payment method by {date} at the latest so your team keeps access to Standix.",
     "Le démarrage a échoué": "Starting failed",
     "Le fichier se télécharge sur votre appareil. Le PDF s’imprime sur une page A4.": "The file downloads to your device. The PDF prints on an A4 page.",
     "Le micro est allumé : les étapes sont rédigées à partir de ce que vous dites.": "The microphone is on: the steps are written from what you say.",
@@ -971,6 +973,7 @@ const DICO = {
     "Les arrivées, les départs et les changements de rang s’afficheront ici.": "Arrivals, departures and access changes will show up here.",
     "Les autres procédures ne vous sont pas accessibles": "You cannot open the other procedures",
     "Les catégories se créent toutes seules à mesure que vous ajoutez des procédures — Cuisine, Salle, Bar…": "Folders appear on their own as you add procedures — Kitchen, Dining room, Bar…",
+    "Les conditions d’utilisation de Standix ont été mises à jour. Merci de les lire et de les accepter pour continuer à utiliser l’app.": "The Standix terms of use have been updated. Please read and accept them to keep using the app.",
     "Les fichiers .doc (ancien format Word) ne peuvent pas être lus. Enregistrez-le en .docx, ou copiez son texte ci-dessus.": ".doc files (old Word format) cannot be read. Save it as .docx, or copy its text above.",
     "Les membres de l’espace utilisateur": "The people in the User area",
     "Les moins actifs": "Least active",
@@ -1061,6 +1064,7 @@ const DICO = {
     "Non ajoutée : {liste} — durée illisible.": "Not added: {liste} — length unreadable.",
     "Non ajoutées : {liste} — durée illisible.": "Not added: {liste} — length unreadable.",
     "Non défini": "Not set",
+    "Nos conditions évoluent": "Our terms have changed",
     "Nous contacter": "Contact us",
     "Nous écrire": "Write to us",
     "Nouveau mot de passe": "New password",
@@ -2219,6 +2223,7 @@ const DICO = {
     "jours": "Tage",
     "Jours actifs": "Aktive Tage",
     "Jusqu’à <b>{max} membres</b>": "Bis zu <b>{max} Mitglieder</b>",
+    "J’accepte": "Ich akzeptiere",
     "J’accepte et je continue": "Akzeptieren und weiter",
     "J’ai compris": "Verstanden",
     "J’ai ma vidéo — l’utiliser": "Video ist fertig — verwenden",
@@ -2298,6 +2303,7 @@ const DICO = {
     "Le compte n’a pas pu être lu.": "Das Konto konnte nicht gelesen werden.",
     "Le compteur tourne quand une procédure est OUVERTE à l'écran, et seulement là. • Il s'arrête dès que l'app passe en arrière-plan ou que l'écran s'éteint. • Après deux minutes sans le moindre geste, il demande « vous en êtes où ? » et cesse de compter tant que personne ne répond — un téléphone posé sur le plan de travail n'accumule pas des heures. • Sous trois secondes, rien n'est retenu : c'est un passage, pas une lecture. Les temps s'additionnent à chaque visite.": "Die Zeit läuft, solange eine Anleitung auf dem Bildschirm OFFEN ist, und nur dann. • Sie stoppt, sobald die App in den Hintergrund geht oder der Bildschirm ausgeht. • Nach zwei Minuten ohne Berührung fragt sie „Wie weit sind Sie?“ und zählt nicht weiter, bis jemand antwortet — ein Handy auf der Arbeitsfläche sammelt keine Stunden. • Unter drei Sekunden zählt nichts: Das ist ein Vorbeischauen, kein Lesen. Die Zeiten addieren sich bei jedem Besuch.",
     "Le dernier paiement n'a pas pu être effectué. Mettez à jour votre moyen de paiement pour rouvrir l'accès de toute votre équipe.": "Die letzte Zahlung konnte nicht durchgeführt werden. Aktualisieren Sie Ihre Zahlungsmethode, um den Zugang für Ihr ganzes Team wiederherzustellen.",
+    "Le dernier paiement n’a pas pu être effectué. Mettez à jour votre moyen de paiement d’ici le {date} inclus pour que votre équipe garde l’accès à Standix.": "Die letzte Zahlung konnte nicht durchgeführt werden. Aktualisieren Sie Ihre Zahlungsmethode bis spätestens {date}, damit Ihr Team den Zugang zu Standix behält.",
     "Le démarrage a échoué": "Der Start ist fehlgeschlagen",
     "Le fichier se télécharge sur votre appareil. Le PDF s’imprime sur une page A4.": "Die Datei wird auf Ihr Gerät heruntergeladen. Das PDF lässt sich auf einer A4-Seite drucken.",
     "Le micro est allumé : les étapes sont rédigées à partir de ce que vous dites.": "Das Mikrofon ist an: Die Schritte entstehen aus dem, was Sie sagen.",
@@ -2341,6 +2347,7 @@ const DICO = {
     "Les arrivées, les départs et les changements de rang s’afficheront ici.": "Neuzugänge, Abgänge und Zugriffsänderungen erscheinen hier.",
     "Les autres procédures ne vous sont pas accessibles": "Die anderen Anleitungen können Sie nicht öffnen",
     "Les catégories se créent toutes seules à mesure que vous ajoutez des procédures — Cuisine, Salle, Bar…": "Ordner entstehen von selbst, wenn Sie Anleitungen hinzufügen — Küche, Gastraum, Bar…",
+    "Les conditions d’utilisation de Standix ont été mises à jour. Merci de les lire et de les accepter pour continuer à utiliser l’app.": "Die Nutzungsbedingungen von Standix wurden aktualisiert. Bitte lesen und akzeptieren Sie sie, um die App weiter zu nutzen.",
     "Les fichiers .doc (ancien format Word) ne peuvent pas être lus. Enregistrez-le en .docx, ou copiez son texte ci-dessus.": ".doc-Dateien (altes Word-Format) können nicht gelesen werden. Speichern Sie sie als .docx oder kopieren Sie den Text oben hinein.",
     "Les membres de l’espace utilisateur": "Die Personen im Nutzerbereich",
     "Les moins actifs": "Am wenigsten aktiv",
@@ -2431,6 +2438,7 @@ const DICO = {
     "Non ajoutée : {liste} — durée illisible.": "Nicht hinzugefügt: {liste} — Dauer nicht lesbar.",
     "Non ajoutées : {liste} — durée illisible.": "Nicht hinzugefügt: {liste} — Dauer nicht lesbar.",
     "Non défini": "Nicht festgelegt",
+    "Nos conditions évoluent": "Unsere Bedingungen haben sich geändert",
     "Nous contacter": "Kontakt",
     "Nous écrire": "Schreiben Sie uns",
     "Nouveau mot de passe": "Neues Passwort",
@@ -5637,9 +5645,18 @@ document.addEventListener('click', (e) => {
 })
 
 // ═══ CRÉATION DE COMPTE ═══
+/* La version des conditions d'utilisation en vigueur (voir
+   `verifierAcceptationCgu`, plus bas) : à changer à chaque modification
+   importante de `cgu.html`. */
+const CGU_VERSION = '2026-10-25'
+
 document.getElementById('signup-btn')?.addEventListener('click', async () => {
   /* Même garde que la connexion : un double appui créait deux fois la suite. */
   if (document.getElementById('signup-btn')?.dataset.loading === 'true') return
+  /* L'appui vaut acceptation des conditions (la phrase est sous le bouton). On
+     le note ici ; la base l'enregistre dès que la session existe
+     (`verifierAcceptationCgu`). */
+  try { localStorage.setItem('standix_cgu_inscription', CGU_VERSION) } catch (e) {}
   const prenom = document.getElementById('signup-prenom').value.trim()
   const nom = document.getElementById('signup-nom').value.trim()
   const email = document.getElementById('signup-email').value.trim()
@@ -6130,6 +6147,64 @@ document.getElementById('alerte-classer')?.addEventListener('click', async () =>
 
 /* Se signale au serveur. Renvoie `false` si cet appareil-ci vient d'être
    déconnecté parce qu'il dépassait la limite. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PREUVE D'ACCEPTATION DES CONDITIONS (25 octobre 2026)
+
+   Une phrase sous un bouton ne prouve rien si personne ne note qui a accepté
+   quoi, et quand. La table `acceptations_cgu` garde, par compte : la version
+   des conditions, la date, et l'occasion (inscription, mise à jour, paiement).
+
+   ⚠ CHANGER `CGU_VERSION` À CHAQUE MODIFICATION IMPORTANTE de `cgu.html` :
+     chaque utilisateur verra alors une fois la fenêtre « Nos conditions
+     évoluent » et devra les accepter — c'est le préavis promis à l'article 11.
+   ⚠ JAMAIS BLOQUANT. Sans la table (SQL pas encore passé) ou sans réseau, on
+     ne dit rien et on réessaiera à la prochaine ouverture.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function noterAcceptationCgu(contexte) {
+  try {
+    const { data: u } = await supabase.auth.getUser()
+    const uid = u?.user?.id
+    if (!uid) return false
+    const { error } = await supabase.from('acceptations_cgu')
+      .upsert({ user_id: uid, version: CGU_VERSION, contexte },
+              { onConflict: 'user_id,version,contexte', ignoreDuplicates: true })
+    return !error
+  } catch (e) { return false }
+}
+
+let cguVerifiee = false
+async function verifierAcceptationCgu(membre) {
+  if (cguVerifiee || !membre?.user_id || membre.role === 'visiteur') return
+  try {
+    const { data, error } = await supabase.from('acceptations_cgu')
+      .select('id').eq('user_id', membre.user_id).eq('version', CGU_VERSION).limit(1)
+    if (error) return                       // table absente : on ne dit rien
+    if (data?.length) { cguVerifiee = true; return }
+
+    /* Inscription toute récente : le bouton « Créer mon compte » valait
+       acceptation. */
+    let enAttente = null
+    try { enAttente = localStorage.getItem('standix_cgu_inscription') } catch (e) {}
+    if (enAttente === CGU_VERSION) {
+      if (await noterAcceptationCgu('inscription')) {
+        try { localStorage.removeItem('standix_cgu_inscription') } catch (e) {}
+        cguVerifiee = true
+      }
+      return
+    }
+
+    const ok = await confirmDialog({
+      titre: tLang('Nos conditions évoluent'),
+      message: tLang('Les conditions d’utilisation de Standix ont été mises à jour. Merci de les lire et de les accepter pour continuer à utiliser l’app.'),
+      confirmer: tLang('J’accepte'),
+      annuler: tLang('Lire les conditions'),
+      danger: false,
+    })
+    if (ok) { if (await noterAcceptationCgu('mise_a_jour')) cguVerifiee = true }
+    else window.open('/cgu.html', '_blank', 'noopener')
+  } catch (e) { /* on réessaiera à la prochaine ouverture */ }
+}
+
 /* L'empreinte de CET appareil, telle que le serveur la calcule : c'est elle
    qui permet de reconnaître sa propre ligne dans « Vos appareils ». Et la
    raison d'un refus : « retire » (retiré depuis cette page) ou « trop ». */
@@ -6742,6 +6817,12 @@ async function enterApp(membre) {
     return
   }
   lancerSuiviPresence(membre)
+  /* La preuve d'acceptation des conditions : après l'affichage, sans retarder
+     l'entrée. */
+  setTimeout(async () => {
+    await verifierAcceptationCgu(membre)
+    await avertirPaiementEnRetard(membre)
+  }, 2500)
 
   /* Les deux espaces s'excluent. On masque LES DEUX avant d'en montrer un :
      quelqu'un qui passe de l'équipe à la gestion — une promotion, par exemple —
@@ -23503,6 +23584,38 @@ function phraseSuppression() {
   return tLang('Vos données seront supprimées définitivement le {date}. Abonnez-vous pour les garder.', { date })
 }
 
+/* ═══ PAIEMENT REFUSÉ : TROIS JOURS DE DÉLAI (demande d'Em, 26 octobre 2026) ═══
+
+   Après un prélèvement refusé, le serveur garde l'accès ouvert jusqu'à la fin
+   du troisième jour (heure de Paris) : `etat_abonnement` répond « actif » et
+   donne la limite dans `paiement_avant`. L'équipe ne voit rien.
+
+   Seul le FONDATEUR est prévenu, à chaque ouverture de l'app : c'est lui qui
+   paie, et le portail Stripe lui est réservé (un gérant promu y recevrait un
+   refus). Passé le délai, l'accès se ferme comme avant (« Paiement non
+   abouti »). */
+let paiementAverti = false
+async function avertirPaiementEnRetard(membre) {
+  if (paiementAverti || membre?.role !== 'gestion' || membre.promu_par || membre.promu_le) return
+  try {
+    await lireEtatAbonnementSiAncien()
+    const fin = etatAbo?.paiement_avant ? new Date(etatAbo.paiement_avant) : null
+    if (!fin || isNaN(fin) || fin <= Date.now()) return
+    paiementAverti = true
+    /* La limite tombe à minuit : le dernier jour d'accès est la veille. */
+    const date = new Date(fin.getTime() - 1)
+      .toLocaleDateString(localeApp(), { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' })
+    const ok = await confirmDialog({
+      titre: tLang('Paiement non abouti'),
+      message: tLang('Le dernier paiement n’a pas pu être effectué. Mettez à jour votre moyen de paiement d’ici le {date} inclus pour que votre équipe garde l’accès à Standix.', { date }),
+      confirmer: tLang('Mettre à jour le paiement'),
+      annuler: tLang('Plus tard'),
+      danger: false,
+    })
+    if (ok) await ouvrirPortailStripe()
+  } catch (e) { /* on préviendra à la prochaine ouverture */ }
+}
+
 async function lireEtatAbonnementReseau() {
   if (!currentMembre?.entreprise_id) return null
   const { data, error } = await supabase
@@ -35878,6 +35991,7 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
   /* Chemin ABSOLU, comme les trois liens du balisage : `cgu.html` cherchait le
      fichier dans `app/`, où il n'est pas. */
   if (!accepte) { window.open('/cgu.html', '_blank', 'noopener'); return }
+  noterAcceptationCgu('paiement')
 
   b.disabled = true
   const libelle = b.textContent

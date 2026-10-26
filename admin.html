@@ -161,7 +161,7 @@ button { cursor: pointer; }
 .nav button[aria-current="page"] { background: var(--accent-doux); color: var(--accent); }
 .pastille {
   margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px;
-  background: var(--grave); color: #fff; font-size: 11.5px; font-weight: 600;
+  background: #3A78EE; color: #fff; font-size: 11.5px; font-weight: 600;
   display: inline-grid; place-items: center;
 }
 .cote-bas { margin-top: auto; display: grid; gap: 10px; padding: 0 8px; font-size: 12.5px; color: var(--texte-3); }
@@ -190,12 +190,53 @@ button { cursor: pointer; }
 /* Barre du haut + onglets (téléphone) */
 .haut-mobile, .tabbar, .tirer, .poignee, .cartes-clients, .couts-m { display: none; }
 .replie { display: none !important; }
+.pastille.rouge { background: var(--grave); }
+.ligne-cliquable { cursor: pointer; }
+.ligne-cliquable:hover td { background: var(--carte-2); }
+.carte-client { cursor: pointer; }
+.carte-client:active { transform: scale(.985); }
+.champ-feuille textarea { border-radius: 12px; border: 1px solid var(--bord-fort); background: var(--carte); padding: 12px 14px; outline: none; width: 100%; resize: vertical; line-height: 1.5; font: inherit; font-size: 16px; }
+.champ-feuille textarea:focus { border-color: var(--accent); }
+.panneau-pied .btn-plein { background: var(--degrade); color: #fff; border: 0; }
+.feuille-corps .note b { color: var(--texte); }
+.le-point { padding: 6px 18px 10px; }
+.lp-haut { display: flex; align-items: center; gap: 12px; padding: 12px 0 10px; }
+.lp-haut b { display: block; font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+.lp-haut span:not(.lp-ico) { font-size: 13px; color: var(--texte-3); }
+.lp-ico { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; background: var(--degrade); color: #fff; flex: none; }
+.lp-ico svg { width: 19px; height: 19px; }
+.point-ligne { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 46px; padding: 9px 0; border: 0; border-top: 1px solid var(--bord); background: none; text-align: left; font-size: 14.5px; line-height: 1.35; }
+.point-ligne .txt { flex: 1; }
+.point-ligne > svg { width: 15px; height: 15px; color: var(--texte-3); flex: none; }
+.point-ligne .signe { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.point-ligne.ok .signe { background: var(--ok-doux); color: var(--ok); }
+.point-ligne.ok .signe svg { width: 13px; height: 13px; stroke-width: 3; }
+.point-ligne .signe i { width: 10px; height: 2.5px; border-radius: 2px; background: currentColor; }
+.point-ligne.mal .signe { background: var(--alerte-doux); color: var(--alerte); }
+.point-ligne.grave .signe { background: var(--grave-doux); color: var(--grave); }
+.point-ligne.grave .txt { font-weight: 600; }
+.point-ligne.ok .txt { color: var(--texte-2); }
+.le-point .voir-tout { margin-top: 0; }
 .ico-suspect { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex: none; }
 .ico-suspect svg { width: 16px; height: 16px; }
 .ico-suspect.grave { background: var(--grave-doux); color: var(--grave); }
 .ico-suspect.surveiller { background: var(--alerte-doux); color: var(--alerte); }
 .niveau { display: inline !important; font-weight: 600; }
 .niveau.grave { color: var(--grave); } .niveau.surveiller { color: var(--alerte); }
+.ligne-bouton { width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; text-align: left; cursor: pointer; }
+.ligne-bouton:first-child { border-top: 0; }
+.ico-suspect.calme { background: var(--carte-2); color: var(--texte-3); }
+.puces { display: flex !important; flex-wrap: wrap; gap: 5px; margin-top: 6px; white-space: normal !important; }
+.puce { font-size: 11.5px; font-weight: 600; color: var(--texte-2); background: var(--carte-2); padding: 3px 8px; border-radius: 6px; }
+.puce.forte { color: var(--grave); background: var(--grave-doux); }
+.mini-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 4px; }
+.mini-stats div { background: var(--carte); border: 1px solid var(--bord); border-radius: 12px; padding: 9px 10px; display: flex; flex-direction: column; }
+.mini-stats b { font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+.mini-stats span { font-size: 11.5px; color: var(--texte-3); }
+.titre-bloc { font-size: 13px; font-weight: 600; color: var(--texte-2); text-transform: uppercase; letter-spacing: .03em; margin: 6px 4px 8px; }
+.occ-ligne { padding: 12px 14px; border-top: 1px solid var(--bord); display: grid; gap: 3px; font-size: 14px; }
+.occ-ligne:first-child { border-top: 0; }
+.occ-ligne span { color: var(--texte-3); font-size: 12.5px; line-height: 1.5; }
 .btn-petit { height: 30px; padding: 0 11px; font-size: 12.5px; flex: none; }
 .seul-mobile { display: none; }
 .coque.cache ~ .tabbar, .coque.cache ~ .tirer { display: none !important; }
@@ -216,6 +257,8 @@ button { cursor: pointer; }
 .groupe-ligne .gi { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--accent-doux); color: var(--accent); flex: none; }
 .groupe-ligne .gi svg { width: 17px; height: 17px; }
 .groupe-ligne > svg:last-child { width: 16px; height: 16px; margin-left: auto; color: var(--texte-3); }
+.groupe-ligne > .pastille { margin-left: auto; }
+.groupe-ligne > .pastille:not(.cache) + svg { margin-left: 0; }
 .groupe-ligne.rouge { color: var(--grave); justify-content: center; }
 .groupe-ligne.statique { color: var(--texte-2); font-size: 14px; font-weight: 400; }
 .champ-feuille { display: grid; gap: 6px; margin-bottom: 14px; }
@@ -679,6 +722,8 @@ const I = {
   poubelle: '<path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   horloge: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  etincelle: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
+  avertir: '<path d="M3 11l18-8-8 18-2-8-8-2z"/>',
   plus3: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
 }
 const ico = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`
@@ -700,6 +745,7 @@ const PAGES = [
 let S = null          // admin_stats()
 let ST = null         // admin-stripe (ou { erreur })
 let SU = { alertes: [], acces: [] }   // admin_suspects()
+let AV = []                            // admin_avertissements()
 let filtreSuspects = 'nouvelles'
 let page = (location.hash.slice(1) || 'vue')
 if (!PAGES.some((p) => p.id === page)) page = 'vue'
@@ -863,6 +909,7 @@ async function charger(premier = false) {
   const t1 = performance.now()
   const stripe = sb.functions.invoke('admin-stripe', { body: {} }).then((r) => { mesures.fonctions = Math.round(performance.now() - t1); return r })
   const suspects = sb.rpc('admin_suspects')
+  sb.rpc('admin_avertissements').then(({ data }) => { if (Array.isArray(data)) AV = data }, () => {})
   const [rs, rst, rsu] = await Promise.allSettled([stats, stripe, suspects])
   if (rsu.status === 'fulfilled' && !rsu.value.error && rsu.value.data) SU = rsu.value.data
   else SU = { alertes: [], acces: [], erreur: rsu.reason?.message || rsu.value?.error?.message || 'inconnue' }
@@ -944,12 +991,13 @@ function ouvrirPlus() {
   const t = S?.genere_le ? new Date(S.genere_le).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—'
   ouvrirFeuille(`<div class="feuille-corps">
     <div class="feuille-titre">Plus</div>
-    <div class="groupe">${DANS_PLUS.map((id) => { const p = PAGES.find((x) => x.id === id); return `<button class="groupe-ligne" data-page-feuille="${id}"><span class="gi">${ico(p.icone)}</span><span>${p.nom}</span>${ico('fleche')}</button>` }).join('')}</div>
+    <div class="groupe">${DANS_PLUS.map((id) => { const p = PAGES.find((x) => x.id === id); return `<button class="groupe-ligne" data-page-feuille="${id}"><span class="gi">${ico(p.icone)}</span><span>${p.nom}</span><span class="pastille cache" data-pastille="${id}" style="margin-right:6px"></span>${ico('fleche')}</button>` }).join('')}</div>
     <div class="groupe">
       <div class="groupe-ligne statique sans-icone"><span class="point${enDirect ? ' vivant' : ''}"></span>${enDirect ? 'En direct' : 'Hors direct'} · mis à jour à ${t}</div>
       <button class="groupe-ligne rouge sans-icone" data-action="sortir">Se déconnecter</button>
     </div>
   </div>`)
+  majPastilles()
 }
 
 /* ─── Grand titre qui passe dans la barre du haut au défilement ─── */
@@ -992,13 +1040,68 @@ document.addEventListener('touchend', async () => {
   actualisation = false
   toast('Chiffres à jour')
 })
+/* ═══ NOUVEAUTÉS PAR PAGE ═══
+   Chaque page a sa liste d'éléments (une clé chacun, et « grave » ou non).
+   Ce qui n'a pas encore été vu sur CET appareil donne la pastille :
+   bleue avec le nombre, rouge si au moins une nouveauté est grave. Ouvrir
+   la page marque tout comme vu. Au tout premier lancement, l'existant est
+   considéré comme déjà vu (sinon tout serait « nouveau »). */
+function elementsParPage() {
+  const el = { erreurs: [], clients: [], argent: [], securite: [], sante: [], usage: [], site: [] }
+  if (!S) return el
+  const maintenant = Date.now()
+  ;(S.erreurs || []).filter((e) => e.statut === 'nouveau').forEach((e) =>
+    el.erreurs.push({ cle: 'e:' + e.empreinte + ':' + e.n, grave: e.n_24h >= 5 || e.nb_entreprises >= 2 }))
+  ;(S.echecs_ia || []).forEach((e) => el.erreurs.push({ cle: 'ia:' + e.id, grave: false }))
+  ;(S.entreprises || []).forEach((e) => {
+    el.clients.push({ cle: 'c:' + e.id, grave: false })
+    if (e.statut === 'impaye') el.clients.push({ cle: 'imp:' + e.id, grave: true })
+    if (e.statut === 'actif') el.clients.push({ cle: 'abo:' + e.id + ':' + e.palier, grave: false })
+    if (e.statut === 'essai' && e.essai_fin && new Date(e.essai_fin) > maintenant && new Date(e.essai_fin) - maintenant < 3 * 86400e3)
+      el.clients.push({ cle: 'fin:' + e.id, grave: false })
+  })
+  if (ST && !ST.erreur) (ST.clients || []).forEach((c) =>
+    el.argent.push({ cle: 'st:' + c.nom + ':' + c.statut + ':' + c.debut, grave: c.statut === 'past_due' || c.statut === 'unpaid' }))
+  ;(SU.alertes || []).filter((a) => !a.vue).forEach((a) => el.securite.push({ cle: 's:' + a.cle, grave: a.niveau === 'grave' }))
+  ;(SU.partages || []).filter((p) => p.niveau).forEach((p) => el.securite.push({ cle: 'p:' + p.user_id + ':' + p.niveau, grave: p.niveau === 'grave' }))
+  ;(AV || []).forEach((a) => (a.lectures || []).forEach((l) => el.securite.push({ cle: 'lu:' + a.id + ':' + l.nom, grave: false })))
+  if (mesures.baseOk === false) el.sante.push({ cle: 'panne:base', grave: true })
+  if (mesures.fonctionsOk === false) el.sante.push({ cle: 'panne:fonctions', grave: true })
+  ;(S.usage?.top_procedures || []).forEach((p) => el.usage.push({ cle: 'u:' + p.titre + ':' + p.entreprise, grave: false }))
+  ;(S.site?.referents || []).forEach((x) => el.site.push({ cle: 'r:' + x.k, grave: false }))
+  return el
+}
+const CLE_VU = 'stx_vu_v1'
+function lireVu() { try { return JSON.parse(localStorage.getItem(CLE_VU) || 'null') } catch (e) { return null } }
+function ecrireVu(v) { try { localStorage.setItem(CLE_VU, JSON.stringify(v)) } catch (e) {} }
+function marquerVu(pageId) {
+  const el = elementsParPage()
+  let vu = lireVu() || {}
+  const pages = pageId === '*' ? Object.keys(el) : [pageId]
+  pages.forEach((p) => { if (el[p]) vu[p] = el[p].map((x) => x.cle) })
+  ecrireVu(vu)
+}
+function nouveautes() {
+  const el = elementsParPage()
+  let vu = lireVu()
+  if (!vu) { marquerVu('*'); vu = lireVu() || {} }
+  const res = {}
+  Object.entries(el).forEach(([p, l]) => {
+    const deja = new Set(vu[p] || [])
+    const nv = l.filter((x) => !deja.has(x.cle))
+    res[p] = { n: nv.length, grave: nv.some((x) => x.grave) }
+  })
+  res.plus = DANS_PLUS.reduce((a, p) => ({ n: a.n + (res[p]?.n || 0), grave: a.grave || !!res[p]?.grave }), { n: 0, grave: false })
+  return res
+}
 function majPastilles() {
-  const suspects = (SU.alertes || []).filter((a) => !a.vue).length
-  const nb = { erreurs: S?.kpi?.erreurs_ouvertes || 0, clients: S?.kpi?.impayes || 0, securite: suspects, plus: suspects }
+  if (S && DANS_PLUS.concat(['erreurs', 'clients', 'argent']).includes(page)) marquerVu(page)
+  const nv = nouveautes()
   $$('[data-pastille]').forEach((el) => {
-    const v = nb[el.dataset.pastille] || 0
-    el.textContent = v > 99 ? '99+' : v
-    el.classList.toggle('cache', !v)
+    const v = nv[el.dataset.pastille] || { n: 0 }
+    el.textContent = v.n > 99 ? '99+' : v.n
+    el.classList.toggle('cache', !v.n)
+    el.classList.toggle('rouge', !!v.grave)
   })
 }
 
@@ -1013,6 +1116,7 @@ function afficher() {
   dessinerGraphiques()
   brancherPage()
   surveillerTitre()
+  majPastilles()
 }
 
 function entete(titre, sous, actions = '') {
@@ -1098,11 +1202,10 @@ function pageVue() {
     alertes.splice(graves ? 0 : alertes.length, 0, { ton: graves ? 'grave' : 'alerte', ico: 'securite', t: `<b>${suspects.length} activité${suspects.length > 1 ? 's' : ''} suspecte${suspects.length > 1 ? 's' : ''}</b> <span>· ${graves ? graves + ' grave' + (graves > 1 ? 's' : '') : 'à vérifier'}</span>`, va: 'securite' })
   }
   if (!a.stripeOk) alertes.push({ ton: 'alerte', ico: 'argent', t: `<b>Stripe ne répond pas</b> <span>· revenus estimés</span>`, va: 'argent' })
-  if (!alertes.length) alertes.push({ ton: 'ok', ico: 'ok', t: '<b>Tout va bien</b> <span>· rien à traiter</span>' })
 
   const visites30 = serie('visites'), inscr30 = serie('entreprises'), proc30 = serie('procedures'), valid30 = serie('validations')
 
-  return entete('Vue d’ensemble', 'Standix en un coup d’œil') + `
+  return entete('Vue d’ensemble', 'Standix en un coup d’œil') + lePoint(alertes).replace('<div class="section">', '<div class="section" style="margin-top:0;margin-bottom:26px">') + `
   <div class="grille g4">
     ${tuile('Revenu mensuel récurrent', eur(a.mrr), a.stripeOk ? 'Stripe · ' + (ST.mode === 'réel' ? 'mode réel' : 'mode test') : 'Estimé (Stripe indisponible)', { heros: 1 })}
     ${tuile('Bénéfice ce mois', eur(a.benefice), `${eur(a.revenuMois)} encaissés − ${eur(a.couts.total)} de coûts`, { heros: 1, ton: a.benefice >= 0 ? 'ok' : 'grave' })}
@@ -1110,9 +1213,7 @@ function pageVue() {
     ${tuile('Entreprises actives', `${n(k.actives_7j)} <small>/ ${n(k.entreprises)}</small>`, `${n(k.actives_30j)} actives sur 30 jours`, { heros: 1 })}
   </div>
 
-  <div class="section"><h2>À traiter</h2>
-    <div class="a-traiter">${alertes.map((x) => `<button class="alerte-ligne ${x.ton}" ${x.va ? `data-aller="${x.va}"` : 'disabled'}><span class="ico">${ico(x.ico)}</span><span>${x.t}</span>${x.va ? `<span class="fl">${ico('fleche').replace('<svg', '<svg width="16" height="16"')}</span>` : ''}</button>`).join('')}</div>
-  </div>
+
 
   <div class="section"><h2>30 derniers jours</h2>
     <div class="grille g4">
@@ -1132,6 +1233,69 @@ function pageVue() {
         <div class="ligne"><div class="t"><b>${echap(e.nom)}</b><span>${ilya(e.cree_le)} · ${e.membres} membre${e.membres > 1 ? 's' : ''} · ${e.procedures} procédure${e.procedures > 1 ? 's' : ''}</span></div>${badgeStatut(e)}</div>`).join('')}</div>
     </div>
   </div>`
+}
+
+/* ═══ LE POINT SUR STANDIX ═══
+   Une analyse automatique de tous les chiffres, en phrases courtes :
+   « – » ce qui ne va pas (du plus grave au moins grave), « ✓ » ce qui va.
+   Reprend aussi tout ce que listait « À traiter ». */
+function lePoint(alertesBrutes) {
+  const k = S.kpi, a = argent(), mal = [], bien = []
+  const plur = (n, mot, pl = mot + 's') => n + ' ' + (n > 1 ? pl : mot)
+  const ajoute = (ok, texte, va, poids = 1) => (ok ? bien : mal).push({ texte, va, poids })
+
+  // Tout ce que listait « À traiter » (erreurs, impayés, essais, IA, sécurité, Stripe)
+  alertesBrutes.forEach((x) => mal.push({ texte: x.t.replace(/<[^>]+>/g, '').replace(/\s+·\s+/, ' · '), va: x.va, poids: x.ton === 'grave' ? 3 : 2 }))
+
+  // Erreurs
+  if (!k.erreurs_ouvertes) ajoute(true, k.erreurs_24h ? 'Aucune erreur nouvelle à corriger' : 'Aucune erreur depuis 24 h', 'erreurs')
+  // Argent
+  if (a.mrr > 0) ajoute(true, eur(a.mrr) + ' de revenu mensuel récurrent · ' + plur(k.abonnes, 'client payant', 'clients payants'), 'argent')
+  else ajoute(false, 'Aucun client payant pour l\u2019instant', 'argent', 2)
+  if (a.benefice >= 0) ajoute(true, 'Ce mois rapporte plus qu\u2019il ne coûte (' + eur(a.benefice) + ')', 'argent')
+  else ajoute(false, 'Ce mois coûte ' + eur(-a.benefice) + ' de plus qu\u2019il ne rapporte', 'argent', 2)
+  // Clients
+  const conv = k.entreprises ? k.abonnes / k.entreprises : 0
+  if (k.entreprises >= 5) ajoute(conv >= 0.1, 'Conversion essai → client : ' + pct(conv) + (conv >= 0.1 ? '' : ' (objectif 10 %)'), 'clients')
+  if (k.essais_expires >= 3) ajoute(false, plur(k.essais_expires, 'essai terminé', 'essais terminés') + ' sans abonnement : à relancer', 'clients')
+  const s7 = (S.serie || []).slice(-7), s14 = (S.serie || []).slice(-14, -7)
+  const sum = (l, c) => l.reduce((t, d) => t + (d[c] || 0), 0)
+  const ins7 = sum(s7, 'entreprises'), ins14 = sum(s14, 'entreprises')
+  if (ins7 || ins14) ajoute(ins7 >= ins14, plur(ins7, 'inscription') + ' cette semaine' + (ins14 ? ' (' + (ins7 >= ins14 ? '+' : '') + (ins7 - ins14) + ' vs semaine dernière)' : ''), 'clients')
+  else ajoute(false, 'Aucune inscription depuis 2 semaines', 'clients')
+  // Utilisation
+  const actif = k.entreprises ? k.actives_7j / k.entreprises : 0
+  ajoute(actif >= 0.3, plur(k.actives_7j, 'entreprise active', 'entreprises actives') + ' cette semaine sur ' + k.entreprises, 'clients')
+  const j = new Date().getDate(), jPrec = new Date(new Date().getFullYear(), new Date().getMonth(), 0).getDate()
+  const rythme = k.analyses_mois / j, rythmePrec = k.analyses_mois_dernier / jPrec
+  if (rythmePrec > 0) ajoute(rythme >= rythmePrec * 0.9, 'Analyses IA ' + (rythme >= rythmePrec ? 'en hausse' : 'en baisse') + ' : ' + nf1.format(rythme) + ' par jour contre ' + nf1.format(rythmePrec) + ' le mois dernier', 'usage')
+  if (k.validations_30j) ajoute(true, plur(k.validations_30j, 'procédure lue', 'procédures lues') + ' par les équipes en 30 jours', 'usage')
+  else ajoute(false, 'Aucune procédure lue par les équipes depuis 30 jours', 'usage')
+  const echec = k.procedures ? k.procedures_echec / k.procedures : 0
+  if (echec >= 0.1) ajoute(false, 'IA : ' + pct(echec) + ' des procédures en échec', 'erreurs')
+  else if (k.procedures) ajoute(true, 'IA fiable : ' + pct(1 - echec) + ' des procédures réussies', 'usage')
+  // Site
+  const v7 = sum(s7, 'visites'), v14 = sum(s14, 'visites')
+  if (v7 || v14) ajoute(v7 >= v14, plur(v7, 'visiteur') + ' sur le site cette semaine' + (v14 ? ' (' + (v7 >= v14 ? '+' : '') + Math.round((v7 - v14) / (v14 || 1) * 100) + ' %)' : ''), 'site')
+  // Technique et sécurité
+  if (mesures.baseOk !== false && mesures.fonctionsOk !== false) ajoute(true, 'Base de données et serveur en ligne', 'sante')
+  else ajoute(false, 'Un service technique ne répond pas', 'sante', 3)
+  const stock = (S.technique?.stockage || []).reduce((t, x) => t + Number(x.octets), 0) / (100 * 1024 ** 3)
+  if (stock >= 0.8) ajoute(false, 'Stockage presque plein : ' + pct(stock), 'sante', 2)
+  if (S.securite?.mfa_admin) ajoute(true, 'Dashboard protégé par code à 6 chiffres', 'securite')
+  if (!(SU.alertes || []).some((x) => !x.vue)) ajoute(true, 'Aucune activité suspecte à vérifier', 'securite')
+
+  mal.sort((x, y) => y.poids - x.poids)
+  const titre = !mal.length ? 'Tout va bien' : mal.length === 1 ? '1 point à surveiller' : mal.length + ' points à surveiller'
+  const ligne = (x, ok) => `<button class="point-ligne ${ok ? 'ok' : (x.poids >= 3 ? 'grave' : 'mal')}" ${x.va ? `data-aller="${x.va}"` : ''}>
+      <span class="signe">${ok ? ico('ok') : '<i></i>'}</span><span class="txt">${echap(x.texte)}</span>${x.va ? ico('fleche') : ''}</button>`
+  return `<div class="section">
+    <div class="carte le-point">
+      <div class="lp-haut"><span class="lp-ico">${ico('etincelle')}</span><div><b>Le point sur Standix</b><span>${titre} · ${plur(bien.length, 'point OK', 'points OK')}</span></div></div>
+      ${mal.map((x) => ligne(x, false)).join('')}
+      <div id="lp-bien" class="${mal.length ? 'replie' : ''}">${bien.map((x) => ligne(x, true)).join('')}</div>
+      ${mal.length ? `<button class="voir-tout" id="lp-voir">Voir les ${plur(bien.length, 'point OK', 'points OK')}</button>` : ''}
+    </div></div>`
 }
 
 function listeErreursCourte(nb) {
@@ -1478,9 +1642,9 @@ function tableClients() {
     return String(x || '').localeCompare(String(y || '')) * triClients.sens
   })
   return `<table><thead><tr>${cols.map(([c, t, num]) => `<th data-tri="${c}" class="${num ? 'num' : ''}">${t}${triClients.cle === c ? (triClients.sens > 0 ? ' ↑' : ' ↓') : ''}</th>`).join('')}</tr></thead><tbody>
-    ${l.map((e) => `<tr><td class="nom" title="${echap(e.nom)}">${echap(e.nom)}</td><td>${badgeStatut(e)}</td><td class="num">${e.membres}${e.membres_max ? '<span style="color:var(--texte-3)"> / ' + e.membres_max + '</span>' : ''}</td><td class="num">${n(e.procedures)}</td><td class="num">${n(e.analyses_mois)}</td><td class="num">${n(e.validations)}</td><td class="num">${n(e.scans)}</td><td class="num" style="${e.erreurs_7j ? 'color:var(--grave);font-weight:600' : ''}">${n(e.erreurs_7j)}</td><td>${ilya(e.derniere_activite)}</td><td>${dateC(e.cree_le)}</td></tr>`).join('')}
+    ${l.map((e) => `<tr data-entreprise="${e.id}" class="ligne-cliquable"><td class="nom" title="${echap(e.nom)}">${echap(e.nom)}</td><td>${badgeStatut(e)}</td><td class="num">${e.membres}${e.membres_max ? '<span style="color:var(--texte-3)"> / ' + e.membres_max + '</span>' : ''}</td><td class="num">${n(e.procedures)}</td><td class="num">${n(e.analyses_mois)}</td><td class="num">${n(e.validations)}</td><td class="num">${n(e.scans)}</td><td class="num" style="${e.erreurs_7j ? 'color:var(--grave);font-weight:600' : ''}">${n(e.erreurs_7j)}</td><td>${ilya(e.derniere_activite)}</td><td>${dateC(e.cree_le)}</td></tr>`).join('')}
   </tbody></table>
-  <div class="cartes-clients">${l.map((e) => `<div class="carte-client">
+  <div class="cartes-clients">${l.map((e) => `<div class="carte-client" data-entreprise="${e.id}" role="button" tabindex="0">
     <div class="cc-haut"><b>${echap(e.nom)}</b>${badgeStatut(e)}</div>
     <div class="cc-chiffres">
       <span><b>${e.membres}${e.membres_max ? '<small style="font-size:12px;color:var(--texte-3);font-weight:500">/' + e.membres_max + '</small>' : ''}</b>membres</span>
@@ -1551,6 +1715,156 @@ function pageSite() {
 }
 
 /* ─── Sécurité ─── */
+/* ═══ AVERTISSEMENTS AUX RESPONSABLES ═══
+   Écrits ici, affichés dans l'app au responsable (fenêtre « J'ai compris »,
+   voir /suivi.js). Textes neutres et vouvoyés, modifiables avant l'envoi. */
+const NIVEAUX_AV = { info: 'Information', avertissement: 'Avertissement', dernier: 'Dernier avertissement' }
+const MODELES_AV = {
+  partage: {
+    info: ['Utilisation de votre compte', 'Votre compte Standix est utilisé sur plusieurs appareils en même temps, depuis des lieux différents.\n\nChaque compte est personnel. Pour donner accès à d’autres personnes, ajoutez-les à votre équipe avec le code d’invitation, depuis l’espace gestion.'],
+    avertissement: ['Compte partagé détecté', 'Votre compte Standix est utilisé par plusieurs personnes en même temps.\n\nChaque compte est personnel. Sans changement, l’accès à ce compte pourra être bloqué.\n\nPour donner accès à d’autres personnes, ajoutez-les à votre équipe avec le code d’invitation, depuis l’espace gestion.'],
+    dernier: ['Dernier avertissement avant blocage', 'Malgré un précédent message, votre compte Standix est toujours utilisé par plusieurs personnes en même temps.\n\nSans changement dans les prochains jours, l’accès à ce compte sera bloqué.\n\nPour donner accès à d’autres personnes, ajoutez-les à votre équipe avec le code d’invitation, depuis l’espace gestion. Pour toute question : contact@standix.app'],
+  },
+  general: {
+    info: ['Information importante', 'Bonjour,\n\n\n\nL’équipe Standix'],
+    avertissement: ['Avertissement concernant votre compte', 'Une utilisation non conforme de Standix a été constatée sur votre compte.\n\nSans changement, l’accès pourra être bloqué.\n\nPour toute question : contact@standix.app'],
+    dernier: ['Dernier avertissement avant blocage', 'Malgré un précédent message, l’utilisation non conforme de Standix continue sur votre compte.\n\nSans changement dans les prochains jours, l’accès sera bloqué.\n\nPour toute question : contact@standix.app'],
+  },
+}
+function composerAvertissement(cible) {
+  const deja = AV.filter((a) => (cible.entreprise_id && a.entreprise_id === cible.entreprise_id) || (cible.entreprise && a.entreprise === cible.entreprise))
+  let niveau = deja.some((a) => a.niveau !== 'info') ? 'dernier' : 'avertissement'
+  const modele = MODELES_AV[cible.contexte] || MODELES_AV.general
+  let modifie = false
+  const p = ouvrirFeuille(`<div class="feuille-corps">
+    <div class="feuille-titre">Envoyer un avertissement</div>
+    <p class="note" style="margin:-6px 0 14px">À : <b>${echap(cible.entreprise || 'l’entreprise')}</b> · les responsables${cible.qui ? ' et le compte « ' + echap(cible.qui) + ' »' : ''}. Ils le verront à leur prochaine ouverture de l’app.${deja.length ? '<br>Déjà ' + deja.length + ' message' + (deja.length > 1 ? 's' : '') + ' envoyé' + (deja.length > 1 ? 's' : '') + ' à cette entreprise.' : ''}</p>
+    <div class="champ-feuille"><label>Niveau</label><div class="segments">${Object.entries(NIVEAUX_AV).map(([v, t]) => `<button type="button" data-niv="${v}" aria-pressed="${v === niveau}">${t.replace('Dernier avertissement', 'Dernier')}</button>`).join('')}</div></div>
+    <div class="champ-feuille"><label for="av-titre">Titre</label><input id="av-titre" maxlength="120"></div>
+    <div class="champ-feuille"><label for="av-msg">Message</label><textarea id="av-msg" rows="9" maxlength="2000"></textarea></div>
+    <button class="gros-btn plein" id="av-envoyer">Envoyer</button>
+  </div>`)
+  const remplir = () => { $('#av-titre', p).value = modele[niveau][0]; $('#av-msg', p).value = modele[niveau][1] }
+  remplir()
+  $$('#av-titre, #av-msg', p).forEach((x) => x.addEventListener('input', () => modifie = true))
+  $$('[data-niv]', p).forEach((b) => b.onclick = () => {
+    niveau = b.dataset.niv
+    $$('[data-niv]', p).forEach((x) => x.setAttribute('aria-pressed', x === b))
+    if (!modifie || confirm('Remplacer le texte par le modèle « ' + NIVEAUX_AV[niveau] + ' » ?')) { remplir(); modifie = false }
+  })
+  $('#av-envoyer', p).onclick = async (ev) => {
+    const titre = $('#av-titre', p).value.trim(), message = $('#av-msg', p).value.trim()
+    if (!titre || !message) return toast('Le titre et le message sont obligatoires')
+    ev.currentTarget.disabled = true
+    const { error } = await sb.rpc('admin_envoyer_avertissement', { p: { entreprise_id: cible.entreprise_id || '', compte_vise: cible.compte_vise || '', niveau, titre, message } })
+    if (error) { ev.currentTarget.disabled = false; return toast('Échec : ' + error.message) }
+    fermerPanneau(); toast('Envoyé : il s’affichera à la prochaine ouverture de l’app')
+    const { data } = await sb.rpc('admin_avertissements'); if (Array.isArray(data)) AV = data
+    const y = scrollY; afficher(); scrollTo(0, y)
+  }
+}
+function listeAvertissements(l, sansEntreprise = false) {
+  if (!l.length) return '<div class="vide">Aucun avertissement envoyé</div>'
+  return `<div class="liste">${l.map((a) => {
+    const lu = (a.lectures || []).length
+    return `<div class="ligne" style="align-items:flex-start">
+      <span class="ico-suspect ${a.niveau === 'dernier' ? 'grave' : a.niveau === 'info' ? 'calme' : 'surveiller'}">${ico('avertir')}</span>
+      <div class="t"><b style="white-space:normal">${echap(a.titre)}</b>
+        <span style="white-space:normal">${sansEntreprise ? '' : echap(a.entreprise || '—') + ' · '}${NIVEAUX_AV[a.niveau]} · envoyé ${ilya(a.cree_le)}</span>
+        <span style="white-space:normal;margin-top:3px">${lu ? '<span class="niveau" style="color:var(--ok)">✓ Lu</span> par ' + a.lectures.map((x) => echap(x.nom || '—') + ' ' + ilya(x.lu_le)).join(', ') : '<span class="niveau surveiller">Pas encore lu</span>'}</span>
+      </div>
+      <button class="btn btn-petit" data-retirer-av="${a.id}" title="Retirer : il ne s’affichera plus">Retirer</button>
+    </div>`
+  }).join('')}</div>`
+}
+async function retirerAvertissement(id) {
+  if (!confirm('Retirer ce message ? Il ne s’affichera plus dans l’app.')) return
+  const { error } = await sb.rpc('admin_supprimer_avertissement', { p_id: id })
+  if (error) return toast('Échec : ' + error.message)
+  AV = AV.filter((a) => a.id !== id); toast('Message retiré')
+  if ($('.panneau.ouvert') && $('#fiche-entreprise')) ouvrirEntreprise($('#fiche-entreprise').dataset.id)
+  else { const y = scrollY; afficher(); scrollTo(0, y) }
+}
+document.addEventListener('click', (ev) => {
+  const b = ev.target.closest('#principal [data-retirer-av]'); if (b) retirerAvertissement(b.dataset.retirerAv)
+})
+
+/* ─── Fiche entreprise (depuis Clients) ─── */
+async function ouvrirEntreprise(id) {
+  const e = S.entreprises.find((x) => x.id === id); if (!e) return
+  const pan = $('#panneau')
+  pan.innerHTML = `<div class="poignee" aria-hidden="true"></div><div class="panneau-haut" id="fiche-entreprise" data-id="${id}"><button class="icone-btn x" data-action="fermer" aria-label="Fermer">${ico('x')}</button>
+    <div style="display:flex;align-items:center;gap:10px;padding-right:40px"><span style="font-weight:700;font-size:19px">${echap(e.nom)}</span>${badgeStatut(e)}</div>
+    <div style="color:var(--texte-3);font-size:13px">Inscrite le ${dateC(e.cree_le)} · active ${ilya(e.derniere_activite)}</div>
+    <div class="mini-stats">
+      <div><b>${e.membres}${e.membres_max ? '<small style="font-size:12px;color:var(--texte-3)">/' + e.membres_max + '</small>' : ''}</b><span>membres</span></div>
+      <div><b>${n(e.procedures)}</b><span>procédures</span></div>
+      <div><b>${n(e.validations)}</b><span>lectures</span></div>
+      <div><b>${n(e.analyses_mois)}</b><span>IA ce mois</span></div>
+    </div></div>
+    <div class="panneau-corps"><div class="chargement" style="min-height:120px"><div class="roue"></div></div></div>
+    <div class="panneau-pied"><button class="btn btn-plein" data-avertir-entreprise="${id}">${ico('avertir')}Envoyer un avertissement</button></div>`
+  pan.classList.add('ouvert'); pan.setAttribute('aria-hidden', 'false'); $('#voile').classList.add('ouvert')
+  const { data: gerants } = await sb.rpc('admin_entreprise_gerants', { p_ent: id })
+  const corps = $('.panneau-corps', pan); if (!corps) return
+  const avs = AV.filter((a) => a.entreprise_id === id)
+  corps.innerHTML = `
+    <h3 class="titre-bloc">Responsables</h3>
+    ${(gerants || []).length ? `<div class="groupe">${gerants.map((g) => `<div class="occ-ligne"><b>${echap(g.nom || '—')}${g.fondateur ? ' · fondateur' : ''}</b><span>${echap(g.email || '')} · ${g.derniere_connexion ? 'connecté ' + ilya(g.derniere_connexion) : 'jamais connecté'}</span></div>`).join('')}</div>` : '<div class="vide">Aucun responsable</div>'}
+    <h3 class="titre-bloc">Avertissements envoyés</h3>
+    <div class="groupe" style="padding:0 14px">${listeAvertissements(avs, true)}</div>
+    ${e.erreurs_7j ? `<div class="encart" style="margin-top:6px">${e.erreurs_7j} erreur${e.erreurs_7j > 1 ? 's' : ''} rencontrée${e.erreurs_7j > 1 ? 's' : ''} cette semaine</div>` : ''}`
+}
+
+/* ─── Comptes partagés ─── */
+function carteComptesPartages() {
+  const l = SU.partages || []
+  if (!l.length) return '<div class="carte"><div class="vide">Aucun compte utilisé sur plusieurs appareils pour l\u2019instant.</div></div>'
+  return `<div class="carte"><div class="liste">${l.map((p) => `
+    <button class="ligne ligne-bouton" data-partage="${p.user_id}">
+      <span class="ico-suspect ${p.niveau || 'calme'}">${ico('clients')}</span>
+      <div class="t"><b>${echap(p.membre || p.email || 'Compte')}</b><span>${echap(p.entreprise || 'sans entreprise')} · ${echap(p.email || '')}</span>
+        <span class="puces">
+          <span class="puce">${p.appareils} appareil${p.appareils > 1 ? 's' : ''}</span>
+          <span class="puce">${p.reseaux} réseau${p.reseaux > 1 ? 'x' : ''}</span>
+          ${p.episodes ? `<span class="puce forte">${p.episodes} fois en même temps</span>` : ''}
+          <span class="puce">${p.connexions} connexion${p.connexions > 1 ? 's' : ''}</span>
+        </span>
+      </div>
+      ${p.niveau ? `<span class="badge ${p.niveau === 'grave' ? 'grave' : 'alerte'}">${p.niveau === 'grave' ? 'Probable' : 'Possible'}</span>` : '<span class="badge">Normal</span>'}
+    </button>`).join('')}</div>
+    <p class="note">« Probable » : au moins 3 appareils utilisés au même moment, ou souvent depuis des réseaux différents en même temps. Une même personne avec un téléphone et un ordinateur reste « Normal ».</p></div>`
+}
+async function ouvrirPartage(uid) {
+  const p = (SU.partages || []).find((x) => x.user_id === uid); if (!p) return
+  const pan = $('#panneau')
+  pan.innerHTML = `<div class="poignee" aria-hidden="true"></div><div class="panneau-haut"><button class="icone-btn x" data-action="fermer" aria-label="Fermer">${ico('x')}</button>
+    <div style="font-weight:700;font-size:18px;padding-right:40px">${echap(p.membre || p.email || 'Compte')}</div>
+    <div style="color:var(--texte-3);font-size:13px">${echap(p.entreprise || 'sans entreprise')} · ${echap(p.email || '')}</div>
+    <div class="mini-stats">
+      <div><b>${p.appareils}</b><span>appareils</span></div>
+      <div><b>${p.reseaux}</b><span>réseaux</span></div>
+      <div><b>${p.simultane_max}</b><span>en même temps</span></div>
+      <div><b>${p.connexions}</b><span>connexions</span></div>
+    </div></div>
+    <div class="panneau-corps"><div class="chargement" style="min-height:120px"><div class="roue"></div></div></div>`
+  pan.classList.add('ouvert'); pan.setAttribute('aria-hidden', 'false'); $('#voile').classList.add('ouvert')
+  const { data, error } = await sb.rpc('admin_partage_detail', { p_user: uid })
+  const corps = $('.panneau-corps', pan); if (!corps) return
+  if (error) { corps.innerHTML = `<div class="encart">${echap(error.message)}</div>`; return }
+  const res = (r) => r ? String(r).replace(/\.0$/, '.x').replace(/::$/, '::…') : '—'
+  const d = data || {}
+  corps.innerHTML = `
+    <h3 class="titre-bloc">Utilisé en même temps</h3>
+    ${(d.en_meme_temps || []).length ? `<div class="groupe">${d.en_meme_temps.map((m) => `<div class="occ-ligne"><b>${dateL(m.tranche)}</b><span>${m.appareils.map((a) => echap(a.replace(/\(([^)]*)\)/, (_, r) => '(' + res(r) + ')'))).join('<br>')}</span></div>`).join('')}</div>`
+      : '<div class="encart info">Jamais vu sur 2 appareils au même moment depuis des réseaux différents.</div>'}
+    <h3 class="titre-bloc">Appareils utilisés</h3>
+    ${(d.appareils || []).length ? `<div class="groupe">${d.appareils.map((a) => `<div class="occ-ligne"><b>${echap(a.nom)}</b><span>${(a.reseaux || []).map(res).join(', ') || 'réseau inconnu'} · ${a.connexions} connexion${a.connexions > 1 ? 's' : ''} · dernière activité ${ilya(a.derniere)}</span></div>`).join('')}</div>` : '<div class="vide">Pas d\u2019activité enregistrée sur 14 jours</div>'}
+    ${(d.presences || []).length ? `<h3 class="titre-bloc">Appareils vus par l\u2019app</h3><div class="groupe">${d.presences.map((a) => `<div class="occ-ligne"><b>${echap(a.nom || 'Appareil')}${a.revoquee ? ' · révoqué' : ''}</b><span>${echap(a.reseau || '—')} · vu de ${dateC(a.premiere_fois)} à ${ilya(a.derniere_fois)}</span></div>`).join('')}</div>` : ''}
+    <p class="note">Les réseaux sont tronqués (85.2.14.x) : l\u2019adresse complète n\u2019est jamais enregistrée.</p>`
+  if (!$('.panneau-pied', pan)) pan.insertAdjacentHTML('beforeend', `<div class="panneau-pied"><button class="btn btn-plein" data-avertir-compte="${uid}">${ico('avertir')}Envoyer un avertissement</button></div>`)
+}
+
 function pageSecurite() {
   const s = S.securite
   const ligne = (ok, titre, detail) => `<div class="sante"><span class="badge ${ok === true ? 'ok' : ok === false ? 'grave' : 'alerte'}">${ok === true ? 'OK' : ok === false ? 'Risque' : 'À voir'}</span><div class="t"><b>${titre}</b><span>${detail}</span></div></div>`
@@ -1576,6 +1890,11 @@ function pageSecurite() {
       </div>`).join('')}</div>` : `<div class="vide">${filtreSuspects === 'nouvelles' ? 'Rien de suspect à vérifier.' : 'Rien ici.'}</div>`}</div>
   </div>
 
+  <div class="section">
+    <h2>Comptes partagés <small>un même compte utilisé par plusieurs personnes · 14 jours</small></h2>
+    ${carteComptesPartages()}
+  </div>
+
   <div class="section grille g4">
     ${tuile('Comptes', n(s.comptes), n(s.comptes_30j) + ' créés en 30 jours')}
     ${tuile('Connexions 24 h', n(s.connexions_24h), n(s.connexions_7j) + ' sur 7 jours')}
@@ -1593,6 +1912,9 @@ function pageSecurite() {
     <div class="carte"><h3>Derniers comptes créés</h3>
       <div class="liste">${s.derniers_comptes.map((c) => `<div class="ligne"><div class="t"><b>Créé ${ilya(c.created_at)}</b><span>${c.last_sign_in_at ? 'Dernière connexion ' + ilya(c.last_sign_in_at) : 'Jamais connecté'}</span></div>${c.confirme ? '<span class="badge ok">Confirmé</span>' : '<span class="badge alerte">Non confirmé</span>'}</div>`).join('')}</div>
     </div>
+  </div>
+  <div class="section carte"><h3>Avertissements envoyés <small>${AV.length}</small></h3>
+    ${listeAvertissements(AV)}
   </div>
   <div class="section carte"><h3>Connexions au Dashboard <small>15 dernières</small></h3>
     ${(SU.acces || []).length ? `<div class="liste">${SU.acces.map((c) => `<div class="ligne"><div class="t"><b>${echap(c.email || '—')}</b><span>${echap([c.appareil, c.systeme, c.navigateur].filter(Boolean).join(' · '))} · ${ilya(c.cree_le)}</span></div>${c.nouvel_appareil ? '<span class="badge alerte">Nouvel appareil</span>' : ''}</div>`).join('')}</div>` : '<div class="vide">Aucune connexion notée pour l\u2019instant</div>'}
@@ -1613,7 +1935,16 @@ function brancherPage() {
   $$('[data-filtre]', P).forEach((b) => b.onclick = () => { filtreErreurs = b.dataset.filtre; afficher() })
   $$('[data-source]', P).forEach((b) => b.onclick = () => { filtreSource = b.dataset.source; afficher() })
   if (page === 'sante') testerSites()
+  const lpVoir = $('#lp-voir', P)
+  if (lpVoir) lpVoir.onclick = () => {
+    const ouvert = $('#lp-bien').classList.toggle('replie')
+    lpVoir.textContent = ouvert ? lpVoir.dataset.t : 'Masquer les points OK'
+  }
+  if (lpVoir) lpVoir.dataset.t = lpVoir.textContent
   if (page === 'clients') {
+    $('#table-clients').addEventListener('click', (ev) => {
+      const el = ev.target.closest('[data-entreprise]'); if (el && !ev.target.closest('th')) ouvrirEntreprise(el.dataset.entreprise)
+    })
     const r = $('#recherche')
     r.oninput = () => { rechercheClients = r.value; $('#table-clients').innerHTML = tableClients(); brancherTri() }
     $$('[data-fc]').forEach((b) => b.onclick = () => {
@@ -1625,6 +1956,7 @@ function brancherPage() {
   }
   if (page === 'argent') brancherCouts()
   if (page === 'securite') {
+    $$('[data-partage]', P).forEach((b) => b.onclick = () => ouvrirPartage(b.dataset.partage))
     $$('[data-fs]', P).forEach((b) => b.onclick = () => { filtreSuspects = b.dataset.fs; afficher() })
     $$('[data-vu]', P).forEach((b) => b.onclick = async () => {
       const cle = b.dataset.vu, vue = b.dataset.etat === '1'
@@ -1673,6 +2005,9 @@ function brancherTri() {
 $('#panneau').addEventListener('click', (ev) => {
   const b = ev.target.closest('button'); if (!b) return
   if (b.dataset.action === 'fermer') fermerPanneau()
+  if (b.dataset.avertirCompte) { const p = (SU.partages || []).find((x) => x.user_id === b.dataset.avertirCompte); composerAvertissement({ compte_vise: b.dataset.avertirCompte, entreprise: p?.entreprise, contexte: 'partage', qui: p?.membre || p?.email }) }
+  if (b.dataset.avertirEntreprise) { const e = S.entreprises.find((x) => x.id === b.dataset.avertirEntreprise); composerAvertissement({ entreprise_id: e?.id, entreprise: e?.nom, contexte: 'general' }) }
+  if (b.dataset.retirerAv) retirerAvertissement(b.dataset.retirerAv)
   if (b.dataset.action === 'sortir') sortir()
   if (b.dataset.pageFeuille) { fermerPanneau(); aller(b.dataset.pageFeuille) }
   if (b.dataset.action === 'copier') copierPourClaude()

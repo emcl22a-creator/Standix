@@ -66,6 +66,17 @@
     vertical-align:top;line-height:1.5}
   td:first-child{color:#fff;font-weight:700;white-space:nowrap}
   tr:last-child td{border-bottom:none}
+  /* Les tableaux à plusieurs colonnes (sous-traitants, données) : le texte de la
+     première colonne passe à la ligne, et sur téléphone chaque ligne devient une
+     petite fiche, chaque valeur précédée du nom de sa colonne. */
+  table.liste td:first-child{white-space:normal}
+  @media (max-width:640px){
+    table.liste, table.liste tbody, table.liste tr, table.liste td{display:block;width:100%}
+    table.liste tr:first-child{display:none}
+    table.liste tr{padding:10px 0;border-bottom:0.5px solid rgba(28,28,38,.12)}
+    table.liste td{border-bottom:none;padding:3px 12px;background:none}
+    table.liste td[data-l]::before{content:attr(data-l) " : ";font-weight:700;color:var(--l3)}
+  }
 
   .pied{margin-top:64px;padding-top:28px;border-top:0.5px solid var(--bord);
     font-size:12.5px;color:var(--l3);line-height:1.8}
@@ -281,13 +292,16 @@
     <li><a href="#a10">Disponibilité et responsabilité</a></li>
     <li><a href="#a11">Modification et fin</a></li>
     <li><a href="#a12">Droit applicable</a></li>
+    <li><a href="#annexe-a">Annexe A — Contrat de sous-traitance (RGPD)</a></li>
+    <li><a href="#annexe-b">Annexe B — Politique de confidentialité</a></li>
   </ol>
 </div>
 
 <article id="a1"><div class="num"><i>ARTICLE 01</i><em></em></div>
 <h2>Qui édite Standix</h2>
 <p>Standix est édité par <b>Adrien Moine</b>, entrepreneur individuel immatriculé sous le
-SIRET <b>100 403 401 00019</b>. Contact : <a href="mailto:contact@standix.app">contact@standix.app</a> ·
+SIRET <b>100 403 401 00019</b>, domicilié <b>60, rue François 1er – 75008 Paris</b>.
+Contact : <a href="mailto:contact@standix.app">contact@standix.app</a> ·
 téléphone <a href="tel:+33674579523">+33&nbsp;6&nbsp;74&nbsp;57&nbsp;95&nbsp;23</a>.</p>
 <p>Directeur de la publication : <b>Adrien Moine</b>.</p>
 <p>Standix est une application web permettant à une entreprise de créer, conserver et
@@ -305,6 +319,10 @@ diffuser ses procédures internes, avec l'aide de services d'analyse automatique
 
 <article id="a2"><div class="num"><i>ARTICLE 02</i><em></em></div>
 <h2>Le compte et l'entreprise</h2>
+<p><b>Standix est réservé aux professionnels.</b> Le service s'adresse aux entreprises,
+associations et administrations, pour l'organisation de leur travail. En créant un compte
+ou en souscrivant un abonnement, vous déclarez agir pour les besoins de votre activité
+professionnelle, ou pour le compte de l'organisation qui vous emploie.</p>
 <p>L'utilisation suppose un compte personnel. <b>Chaque personne doit avoir le sien</b> :
 un compte partagé rend impossible le suivi nominatif des lectures, qui est l'une des
 raisons d'être du service.</p>
@@ -340,8 +358,9 @@ TVA, aucune TVA n'est facturée à ce jour.</p>
       bancaire via Stripe. Aucun escompte n'est accordé pour paiement anticipé.</li>
   <li><b>Retard de paiement :</b> toute somme non payée à son échéance porte de plein droit
       des pénalités de retard égales à <b>trois fois le taux d'intérêt légal</b>, sans qu'un
-      rappel soit nécessaire. Si le paiement n'aboutit pas, l'accès aux procédures peut
-      être suspendu jusqu'à régularisation — rien n'est supprimé.</li>
+      rappel soit nécessaire. Si un prélèvement échoue, l'accès reste ouvert pendant
+      <b>trois jours</b> ; sans régularisation, il est ensuite suspendu jusqu'au paiement
+      — rien n'est supprimé.</li>
   <li><b>Frais de recouvrement :</b> tout professionnel en retard de paiement doit en outre
       une <b>indemnité forfaitaire de 40&nbsp;€</b> pour frais de recouvrement (articles L441-10
       et D441-5 du Code de commerce). Une indemnité complémentaire peut être demandée sur
@@ -379,10 +398,10 @@ contenu visible et en rédiger des étapes.</p>
   <div class="t">À lire avant toute utilisation</div>
   <p><b>Ces services peuvent se tromper.</b> Ils peuvent mal entendre un mot, omettre une
   précaution, ou formuler une étape de manière ambiguë.</p>
-  <p><b>Une procédure produite par l'analyse automatique devient visible par vos équipes
-  dès que l'analyse s'achève</b>, sans relecture préalable. Il vous revient d'ouvrir
-  chaque procédure générée, de la vérifier et de la corriger — ou de la retirer si elle
-  ne convient pas.</p>
+  <p><b>Une procédure produite par l'analyse automatique reste en brouillon</b>, visible
+  seulement par la gestion, tant que vous ne l'avez pas publiée. Il vous revient de
+  l'ouvrir, de la vérifier et de la corriger avant de la publier. <b>En la publiant, vous
+  confirmez l'avoir relue</b> et en assumez le contenu.</p>
   <p>Une procédure diffusée engage votre entreprise, jamais Standix, <b>en particulier
   lorsqu'elle concerne la sécurité des personnes</b>. Vous restez seul responsable de son
   exactitude et de sa conformité aux règles qui vous sont applicables.</p>
@@ -396,20 +415,27 @@ inventée</b>, et l'absence de mise en garde ne signifie pas l'absence de danger
 <article id="a7"><div class="num"><i>ARTICLE 07</i><em></em></div>
 <h2>Nos sous-traitants</h2>
 <p>Pour rendre le service, vos contenus transitent par les prestataires suivants :</p>
-<table>
-  <tr><th>Prestataire</th><th>Rôle</th><th>Ce qui transite</th></tr>
-  <tr><td>Supabase</td><td>Hébergement des données et des fichiers</td>
-      <td>Comptes, procédures, vidéos, photos</td></tr>
-  <tr><td>Microsoft Azure</td><td>Transcription et analyse d'image</td>
-      <td>La bande son et les images de vos vidéos</td></tr>
-  <tr><td>Anthropic</td><td>Rédaction des étapes</td>
-      <td>La transcription et les éléments reconnus</td></tr>
-  <tr><td>Stripe</td><td>Paiement</td><td>Vos informations de facturation</td></tr>
-  <tr><td>GitHub Pages</td><td>Diffusion de l'application</td><td>Aucune donnée métier</td></tr>
+<table class="liste">
+  <tr><th>Prestataire</th><th>Rôle</th><th>Ce qui transite</th><th>Lieu</th></tr>
+  <tr><td>Supabase</td><td data-l="Rôle">Hébergement des données et des fichiers</td>
+      <td data-l="Ce qui transite">Comptes, procédures, vidéos, photos</td><td data-l="Lieu">Francfort (Allemagne)</td></tr>
+  <tr><td>Microsoft Azure</td><td data-l="Rôle">Transcription et analyse d'image</td>
+      <td data-l="Ce qui transite">La bande son et les images de vos vidéos</td><td data-l="Lieu">Union européenne ou États-Unis</td></tr>
+  <tr><td>Anthropic</td><td data-l="Rôle">Rédaction et traduction des étapes</td>
+      <td data-l="Ce qui transite">La transcription, les images et le texte des procédures</td><td data-l="Lieu">États-Unis</td></tr>
+  <tr><td>Stripe</td><td data-l="Rôle">Paiement</td><td data-l="Ce qui transite">Vos informations de facturation</td><td data-l="Lieu">Union européenne et États-Unis</td></tr>
+  <tr><td>GitHub Pages</td><td data-l="Rôle">Diffusion de l'application</td><td data-l="Ce qui transite">Aucune donnée métier (adresse réseau des visiteurs)</td><td data-l="Lieu">États-Unis</td></tr>
 </table>
 <p>Ces prestataires agissent sur nos instructions et sont soumis à leurs propres
-engagements de confidentialité. Les traitements ont lieu au sein de l'Union européenne
-lorsque le prestataire le permet.</p>
+engagements de confidentialité.</p>
+<p><b>Transferts hors de l'Union européenne.</b> Certains de ces prestataires traitent des
+données aux États-Unis — en particulier <b>Anthropic, qui rédige et traduit les étapes</b>.
+Ces transferts sont encadrés par les <b>clauses contractuelles types</b> adoptées par la
+Commission européenne et, lorsque le prestataire y adhère, par le cadre de protection des
+données UE–États-Unis (<i>Data Privacy Framework</i>). Les mêmes garanties valent pour les
+clients établis en Suisse, au sens de la loi fédérale sur la protection des données
+(nLPD). Les données stockées — comptes, procédures, vidéos — restent hébergées à
+Francfort.</p>
 </article>
 
 <article id="a8"><div class="num"><i>ARTICLE 08</i><em></em></div>
@@ -476,13 +502,128 @@ après vous en avoir informé.</p>
 <p>Ces conditions sont soumises au <b>droit français</b>. En cas de différend, nous
 chercherons d'abord une solution amiable. À défaut, et pour un professionnel, les
 tribunaux compétents seront ceux du ressort du siège de l'éditeur.</p>
-<p>Le médiateur de la consommation peut être saisi pour les litiges avec un consommateur,
-dans les conditions prévues par le code de la consommation.</p>
+<p>Standix étant réservé aux professionnels, les règles du code de la consommation
+(droit de rétractation, médiation de la consommation) ne s'appliquent pas. Les présentes
+conditions sont rédigées en français ; en cas de traduction, la version française fait
+foi.</p>
+</article>
+
+<article id="annexe-a"><div class="num"><i>ANNEXE A</i><em></em></div>
+<h2>Contrat de sous-traitance (article 28 du RGPD)</h2>
+<p>Cette annexe fait partie des conditions. Elle s'applique dès que votre entreprise
+utilise Standix et règle le traitement des données personnelles que vous nous confiez.</p>
+
+<h3>1. Les rôles</h3>
+<p>Votre entreprise (le « client ») est <b>responsable du traitement</b> : elle décide de
+filmer, de rédiger et de diffuser ses procédures. Standix est <b>sous-traitant</b> : il
+traite ces données pour le compte du client et uniquement sur ses instructions, qui
+consistent à utiliser les fonctions de l'application.</p>
+
+<h3>2. Ce qui est traité</h3>
+<ul>
+  <li><b>Objet et finalité :</b> héberger, analyser, rédiger, traduire et diffuser les
+      procédures internes du client, et suivre leur lecture par ses équipes.</li>
+  <li><b>Durée :</b> le temps de l'abonnement ou de l'essai, puis cent vingt jours
+      (article 8), au terme desquels tout est supprimé.</li>
+  <li><b>Personnes concernées :</b> les membres de l'entreprise (gestion et équipe) et
+      les personnes qui apparaissent ou s'expriment dans les vidéos et les photos.</li>
+  <li><b>Données :</b> nom, adresse e-mail et photo de profil des membres ; images et voix
+      dans les vidéos ; photos ; texte des procédures ; lectures et temps de lecture ;
+      appareils utilisés (type d'appareil, début de l'adresse réseau, dates).</li>
+  <li><b>Données sensibles :</b> aucune n'est attendue. Le client s'engage à ne pas en
+      déposer (article 9).</li>
+</ul>
+
+<h3>3. Les engagements de Standix</h3>
+<ul>
+  <li>Ne traiter les données que pour rendre le service, jamais pour un autre usage, ni
+      pour entraîner un modèle d'intelligence artificielle.</li>
+  <li>Garder les données confidentielles ; seul l'éditeur y a accès, et seulement pour
+      assurer le service ou répondre à une demande du client.</li>
+  <li>Assurer leur sécurité : cloisonnement de chaque entreprise dans la base, fichiers
+      privés servis par des liens temporaires, chiffrement en transit et au repos,
+      sauvegardes, tableau de bord d'administration protégé par double authentification.</li>
+  <li>Ne recourir qu'aux sous-traitants listés à l'article 7, liés par des engagements
+      équivalents. Tout nouveau sous-traitant est annoncé au moins trente jours à
+      l'avance ; le client peut s'y opposer en résiliant sans frais.</li>
+  <li>Aider le client à répondre aux demandes des personnes (accès, rectification,
+      effacement…) et, si besoin, à mener une analyse d'impact.</li>
+  <li><b>Prévenir le client sans délai, et au plus tard quarante-huit heures</b> après en
+      avoir pris connaissance, de toute violation de données le concernant, avec les
+      informations utiles pour qu'il puisse, le cas échéant, la notifier à la CNIL dans
+      les soixante-douze heures.</li>
+  <li>À la fin du contrat, laisser le client récupérer ses procédures (export PDF) pendant
+      cent vingt jours, puis tout supprimer, sauvegardes comprises.</li>
+  <li>Fournir, sur demande, les informations nécessaires pour démontrer le respect de ces
+      engagements. Un audit sur place est possible une fois par an, à la charge du client,
+      avec un préavis de trente jours.</li>
+</ul>
+
+<h3>4. Les engagements du client</h3>
+<ul>
+  <li>Disposer d'une base légale pour filmer et photographier ses équipes, et les en
+      informer avant tout enregistrement.</li>
+  <li>Ne déposer que des contenus utiles à ses procédures internes.</li>
+  <li>Répondre en premier lieu aux demandes de ses employés concernant leurs données.</li>
+</ul>
+
+<h3>5. Transferts</h3>
+<p>Les transferts hors de l'Union européenne sont décrits à l'article 7 et encadrés par
+les clauses contractuelles types de la Commission européenne.</p>
+</article>
+
+<article id="annexe-b"><div class="num"><i>ANNEXE B</i><em></em></div>
+<h2>Politique de confidentialité</h2>
+<p>Cette annexe concerne les données que Standix traite <b>pour son propre compte</b> —
+pour gérer votre compte, votre abonnement et la sécurité du service. Le responsable de ce
+traitement est l'éditeur : Adrien Moine, entrepreneur individuel (article 1).</p>
+
+<h3>Les données, et pourquoi</h3>
+<table class="liste">
+  <tr><th>Données</th><th>Pourquoi</th><th>Base légale</th><th>Durée</th></tr>
+  <tr><td>Nom, e-mail, mot de passe (stocké chiffré, jamais lisible)</td>
+      <td data-l="Pourquoi">Créer et sécuriser votre compte</td><td data-l="Base légale">Contrat</td>
+      <td data-l="Durée">Tant que le compte existe ; supprimé avec l'entreprise (article 8) ou sur demande</td></tr>
+  <tr><td>Nom de l'entreprise, offre, état de l'abonnement</td>
+      <td data-l="Pourquoi">Fournir le service souscrit</td><td data-l="Base légale">Contrat</td>
+      <td data-l="Durée">Tant que l'entreprise existe, puis cent vingt jours</td></tr>
+  <tr><td>Factures et paiements (traités par Stripe)</td>
+      <td data-l="Pourquoi">Facturer, tenir la comptabilité</td><td data-l="Base légale">Obligation légale</td><td data-l="Durée">Dix ans</td></tr>
+  <tr><td>Appareils utilisés (type d'appareil, début de l'adresse réseau, dates)</td>
+      <td data-l="Pourquoi">Limiter un compte à trois appareils, repérer un compte partagé</td>
+      <td data-l="Base légale">Intérêt légitime (sécurité)</td><td data-l="Durée">Tant que le compte existe ; effacés quand l'appareil est retiré</td></tr>
+  <tr><td>Historique des changements dans l'équipe</td>
+      <td data-l="Pourquoi">Permettre au gérant de suivre qui a rejoint ou quitté l'équipe</td>
+      <td data-l="Base légale">Contrat</td><td data-l="Durée">Trente jours</td></tr>
+  <tr><td>Scans des QR codes</td>
+      <td data-l="Pourquoi">Compter l'usage des procédures affichées</td><td data-l="Base légale">Contrat</td><td data-l="Durée">Quatre cents jours</td></tr>
+  <tr><td>Échanges avec nous (e-mail, téléphone)</td>
+      <td data-l="Pourquoi">Vous répondre</td><td data-l="Base légale">Intérêt légitime</td><td data-l="Durée">Trois ans après le dernier échange</td></tr>
+</table>
+
+<h3>Ce qui est gardé sur votre appareil</h3>
+<p>L'application garde sur votre téléphone ou votre ordinateur votre session de connexion,
+votre langue et quelques préférences d'affichage. C'est indispensable à son
+fonctionnement : aucun consentement n'est donc demandé. <b>Standix n'utilise aucun cookie
+publicitaire et aucun outil de mesure d'audience.</b></p>
+
+<h3>Qui reçoit vos données</h3>
+<p>Uniquement les prestataires de l'article 7, pour ce qui les concerne. Vos données ne
+sont jamais vendues ni louées.</p>
+
+<h3>Vos droits</h3>
+<p>Vous pouvez demander l'accès à vos données, leur rectification, leur effacement, leur
+limitation ou leur portabilité, et vous opposer à un traitement fondé sur l'intérêt
+légitime. Écrivez à <a href="mailto:contact@standix.app">contact@standix.app</a> ; nous
+répondons sous un mois. Vous pouvez aussi adresser une réclamation à la CNIL
+(<a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>) ou, en Suisse,
+au Préposé fédéral à la protection des données (PFPDT).</p>
 </article>
 
 <div class="pied">
   Version en vigueur le <b>25 octobre 2026</b>.<br><br>
   <b>Standix</b> — Adrien Moine, entrepreneur individuel<br>
+  60, rue François 1er – 75008 Paris<br>
   SIRET 100 403 401 00019 · <a href="mailto:contact@standix.app">contact@standix.app</a> · +33&nbsp;6&nbsp;74&nbsp;57&nbsp;95&nbsp;23<br>
   Hébergement : GitHub, Inc. (San Francisco) et Supabase Pte. Ltd. (Singapour), détails à l'article 1.
 </div>

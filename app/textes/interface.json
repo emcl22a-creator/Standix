@@ -2035,6 +2035,10 @@
   "en": "Up to <b>{max} members</b>",
   "de": "Bis zu <b>{max} Mitglieder</b>"
  },
+ "J’accepte": {
+  "en": "I accept",
+  "de": "Ich akzeptiere"
+ },
  "J’accepte et je continue": {
   "en": "I accept and continue",
   "de": "Akzeptieren und weiter"
@@ -2343,6 +2347,10 @@
   "en": "The last payment could not be made. Update your payment method to restore access for your whole team.",
   "de": "Die letzte Zahlung konnte nicht durchgeführt werden. Aktualisieren Sie Ihre Zahlungsmethode, um den Zugang für Ihr ganzes Team wiederherzustellen."
  },
+ "Le dernier paiement n’a pas pu être effectué. Mettez à jour votre moyen de paiement d’ici le {date} inclus pour que votre équipe garde l’accès à Standix.": {
+  "en": "The last payment could not be made. Update your payment method by {date} at the latest so your team keeps access to Standix.",
+  "de": "Die letzte Zahlung konnte nicht durchgeführt werden. Aktualisieren Sie Ihre Zahlungsmethode bis spätestens {date}, damit Ihr Team den Zugang zu Standix behält."
+ },
  "Le démarrage a échoué": {
   "en": "Starting failed",
   "de": "Der Start ist fehlgeschlagen"
@@ -2478,6 +2486,10 @@
  "Les catégories se créent toutes seules à mesure que vous ajoutez des procédures — Cuisine, Salle, Bar…": {
   "en": "Folders appear on their own as you add procedures — Kitchen, Dining room, Bar…",
   "de": "Ordner entstehen von selbst, wenn Sie Anleitungen hinzufügen — Küche, Gastraum, Bar…"
+ },
+ "Les conditions d’utilisation de Standix ont été mises à jour. Merci de les lire et de les accepter pour continuer à utiliser l’app.": {
+  "en": "The Standix terms of use have been updated. Please read and accept them to keep using the app.",
+  "de": "Die Nutzungsbedingungen von Standix wurden aktualisiert. Bitte lesen und akzeptieren Sie sie, um die App weiter zu nutzen."
  },
  "Les fichiers .doc (ancien format Word) ne peuvent pas être lus. Enregistrez-le en .docx, ou copiez son texte ci-dessus.": {
   "en": ".doc files (old Word format) cannot be read. Save it as .docx, or copy its text above.",
@@ -2802,6 +2814,10 @@
  "Non défini": {
   "en": "Not set",
   "de": "Nicht festgelegt"
+ },
+ "Nos conditions évoluent": {
+  "en": "Our terms have changed",
+  "de": "Unsere Bedingungen haben sich geändert"
  },
  "Nous contacter": {
   "en": "Contact us",

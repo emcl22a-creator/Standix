@@ -5767,6 +5767,7 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
         nom: `${prenom} ${nom}`,
         entreprise_a_creer: selectedSpace === 'gestion' ? entrepriseNom : null,
         code_attente: selectedSpace === 'gestion' ? null : codeAcces,
+        origine: selectedSpace === 'gestion' ? lireOrigine() : null,
       } } })
 
   if (error) {
@@ -5850,6 +5851,7 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
     }
 
     membre = fiche
+    noterSourceInscription(fiche.entreprise_id, lireOrigine())
   } else {
     /* ═══ REJOINDRE UNE ENTREPRISE PASSE PAR LA BASE ═══
 
@@ -5915,7 +5917,7 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
   }
 
   // Le travail est fait : la connexion suivante n'a plus rien à reprendre.
-  supabase.auth.updateUser({ data: { entreprise_a_creer: null, code_attente: null } }).catch(() => {})
+  supabase.auth.updateUser({ data: { entreprise_a_creer: null, code_attente: null, origine: null } }).catch(() => {})
   setButtonLoading(signupBtn, false)
   enterApp(membre)
 })
@@ -5934,14 +5936,14 @@ async function reprendreInscription(user) {
       const { data, error } = await supabase.rpc('creer_entreprise_et_fondateur', {
         p_nom_entreprise: md.entreprise_a_creer, p_nom_membre: md.nom || '',
       })
-      if (!error && data?.id) fiche = data
+      if (!error && data?.id) { fiche = data; noterSourceInscription(data.entreprise_id, md.origine || {}) }
       else if (reseau(error)) coupure = true
     } else if (md.code_attente) {
       fiche = await rejoindreParCode(md.code_attente).catch((e) => { if (reseau(e)) coupure = true; return null })
     }
     // Réussi ou refusé, on ne retente pas indéfiniment : la fenêtre « Aucune
     // entreprise » prend le relais.
-    if (!coupure) supabase.auth.updateUser({ data: { entreprise_a_creer: null, code_attente: null } }).catch(() => {})
+    if (!coupure) supabase.auth.updateUser({ data: { entreprise_a_creer: null, code_attente: null, origine: null } }).catch(() => {})
     return fiche
   } catch (e) {
     console.warn('[inscription] reprise impossible :', e?.message || e)
@@ -23630,6 +23632,28 @@ async function avertirPaiementEnRetard(membre) {
     })
     if (ok) await ouvrirPortailStripe()
   } catch (e) { /* on préviendra à la prochaine ouverture */ }
+}
+
+/* ═══ D'OÙ VIENT LE CLIENT (demande d'Em, 26 octobre 2026) ═══
+
+   /suivi.js garde, DANS L'ONGLET seulement, le site ou la campagne qui a
+   amené le visiteur (`stx_origine`, effacé à la fermeture de l'onglet). Elle
+   part avec le compte à l'inscription (la confirmation de l'e-mail ouvre
+   souvent un autre onglet), puis le fondateur l'envoie au serveur à la
+   création de l'entreprise — une fois. Le Dashboard en tire « d'où viennent
+   les clients payants ». Sans origine connue : « accès direct ». */
+function lireOrigine() {
+  try {
+    const o = JSON.parse(sessionStorage.getItem('stx_origine') || 'null')
+    return o && typeof o === 'object' && !Array.isArray(o) ? o : null
+  } catch (e) { return null }
+}
+async function noterSourceInscription(entrepriseId, origine) {
+  if (!entrepriseId) return
+  try {
+    const { error } = await supabase.rpc('noter_source_inscription', { p_entreprise: entrepriseId, p: origine || lireOrigine() || {} })
+    if (!error) { try { sessionStorage.removeItem('stx_origine') } catch (e) {} }
+  } catch (e) { /* la source manquera, rien de plus */ }
 }
 
 async function lireEtatAbonnementReseau() {

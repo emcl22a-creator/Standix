@@ -127,7 +127,7 @@
       try {
         message = String(message || '').trim()
         if (!message || BRUIT.test(message)) return
-        if (/signaler_erreur|noter_visite|noter_activite/.test(message)) return
+        if (/signaler_erreur|noter_visite|noter_activite|noter_perf/.test(message)) return
         var cle = genre + '|' + message.slice(0, 120)
         var maintenant = Date.now()
         if (vues[cle] && maintenant - vues[cle] < 10000) return
@@ -218,7 +218,7 @@
     window.fetch = function (entree, options) {
       var u = ''
       try { u = typeof entree === 'string' ? entree : (entree && entree.url) || String(entree) } catch (e) {}
-      var surveille = /supabase\.co|\/functions\/v1\//.test(u) && !/rpc\/(signaler_erreur|noter_visite|noter_activite|mes_avertissements|lire_avertissement)/.test(u)
+      var surveille = /supabase\.co|\/functions\/v1\//.test(u) && !/rpc\/(signaler_erreur|noter_visite|noter_activite|noter_perf|mes_avertissements|lire_avertissement)/.test(u)
       var p = fetchOrigine(entree, options)
       if (!surveille) return p
       return p.then(function (rep) {
@@ -265,13 +265,73 @@
           if (document.visibilityState !== 'visible' || !jeton()) return
           if (Date.now() - derniereActivite < 4 * 60 * 1000) return
           derniereActivite = Date.now()
-          envoyer('noter_activite', {})
+          envoyer('noter_activite', { version: version() })
         } catch (e) {}
       }
       setTimeout(activite, 4000)
       setInterval(activite, 5 * 60 * 1000)
       document.addEventListener('visibilitychange', activite)
+
+      /* La vitesse réelle : réponse du serveur, page lue, et app vraiment
+         affichée (jalon « APP AFFICHÉE » de boot.js). Une fois par chargement. */
+      var debutMesure = Date.now()
+      var mesurer = function () {
+        try {
+          var chrono = window.__chrono || []
+          var pret = null
+          for (var i = 0; i < chrono.length; i++) if (/APP AFFICH/.test(chrono[i][0])) { pret = chrono[i][1]; break }
+          if (pret === null && Date.now() - debutMesure < 25000) { setTimeout(mesurer, 1000); return }
+          var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0]
+          envoyer('noter_perf', {
+            appareil: APPAREIL, systeme: SYSTEME, navigateur: NAVIGATEUR, version: version(),
+            reseau: (navigator.connection && navigator.connection.effectiveType) || null,
+            serveur_ms: nav ? String(Math.round(nav.responseStart)) : null,
+            page_ms: nav ? String(Math.round(nav.domContentLoadedEventEnd)) : null,
+            pret_ms: pret !== null ? String(Math.round(pret)) : null,
+          })
+        } catch (e) {}
+      }
+      if (document.readyState === 'complete') setTimeout(mesurer, 1500)
+      else window.addEventListener('load', function () { setTimeout(mesurer, 1500) })
     }
+
+    /* ═══ ANTI-PIRATAGE (app et site) ══════════════════════════════════
+       Toute page de Standix ne charge du code que depuis une courte liste de
+       domaines connus. Un script ou un cadre venu d'ailleurs (code injecté
+       par un pirate) est signalé au Dashboard, une fois par domaine. */
+    var DOMAINES_CONNUS = ['standix.app', 'www.standix.app', 'emcl22a-creator.github.io', 'fonts.googleapis.com', 'fonts.gstatic.com',
+      'cdn.jsdelivr.net', 'tlrtsoahwqhtvtkhssbm.supabase.co', 'js.stripe.com', 'checkout.stripe.com', 'hooks.stripe.com', 'm.stripe.network']
+    var dejaSignales = {}
+    var verifierSource = function (url, genre) {
+      try {
+        if (!url || !/^https?:/i.test(url)) return
+        var h = new URL(url, location.href).hostname
+        if (h === location.hostname || DOMAINES_CONNUS.indexOf(h) >= 0 || dejaSignales[h]) return
+        dejaSignales[h] = true
+        signaler('intrusion', genre + ' inconnu chargé depuis ' + h, { code: 'INTRUSION', url: String(url).split('?')[0] })
+      } catch (e) {}
+    }
+    var inspecter = function () {
+      try {
+        var el = document.querySelectorAll('script[src], iframe[src]')
+        for (var i = 0; i < el.length; i++) verifierSource(el[i].src, el[i].tagName === 'IFRAME' ? 'Cadre' : 'Script')
+        var res = (performance.getEntriesByType && performance.getEntriesByType('resource')) || []
+        for (var j = 0; j < res.length; j++) if (res[j].initiatorType === 'script') verifierSource(res[j].name, 'Script')
+      } catch (e) {}
+    }
+    if (document.readyState === 'complete') setTimeout(inspecter, 3000)
+    else window.addEventListener('load', function () { setTimeout(inspecter, 3000) })
+    try {
+      new MutationObserver(function (liste) {
+        for (var i = 0; i < liste.length; i++) {
+          var ajouts = liste[i].addedNodes
+          for (var j = 0; j < ajouts.length; j++) {
+            var n = ajouts[j]
+            if (n.tagName === 'SCRIPT' || n.tagName === 'IFRAME') verifierSource(n.src, n.tagName === 'IFRAME' ? 'Cadre' : 'Script')
+          }
+        }
+      }).observe(document.documentElement, { childList: true, subtree: true })
+    } catch (e) {}
 
     /* ═══ ③ LES MESSAGES DE STANDIX AUX RESPONSABLES (app seulement) ════
        Envoyés depuis le Dashboard privé (« Envoyer un avertissement »).

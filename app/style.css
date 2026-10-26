@@ -26682,3 +26682,13 @@ html::-webkit-scrollbar-thumb:hover{
   font-size:calc(25.5px * var(--ech, 1));
   letter-spacing:-0.02em;
 }
+
+/* ─── LA PHRASE D'ACCUEIL UN CRAN PLUS GRANDE SUR ORDINATEUR ET TABLETTE
+   (à la demande, 26 oct. 2026 : « légèrement », ≈ +6 %) ───
+   « Votre savoir-faire transmis simplement », sous le mot « Standix ».
+   Même formule qu'avant (27 px × le coefficient d'écran `--ech`), multipliée
+   par 1,06 : 28,4 → 30 px sur ordinateur, 30,2 → 32 px sur un grand iPad.
+   ⚠ `min-height:600px` : le téléphone, debout ou couché, ne change pas. */
+@media (min-width:700px) and (min-height:600px){
+  #login-screen .bv-slogan{ font-size:calc(27px * 1.06 * var(--ech, 1)); }
+}

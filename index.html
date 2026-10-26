@@ -162,8 +162,6 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/site-favicon-32.png">
 <link rel="icon" type="image/png" sizes="96x96" href="/site-favicon-96.png">
 <link rel="apple-touch-icon" href="/site-apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- ⚠ INTER EST DEMANDÉ EN FONTE VARIABLE (`wght@400..700`), PLUS EN QUATRE
      GRAISSES FIXES. Avec des graisses fixes, une valeur intermédiaire comme
      560 n'existe pas : le navigateur remonte à la plus proche au-dessus, donc
@@ -172,7 +170,10 @@
      ⚠ LA PLAGE DESCEND À 300, PAS 400 : la ligne sous le titre du premier
      écran est en 380. Sans cette plage, elle serait ramenée à 400 et
      l'allègement disparaîtrait sans erreur ni avertissement. -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+<!-- Polices servies par Standix depuis le 26 octobre 2026 (voir /polices.css) :
+     plus aucune requête vers Google Fonts. Inter y est en fonte variable 100–900. -->
+<link rel="preload" href="/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/polices.css">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    LES JETONS

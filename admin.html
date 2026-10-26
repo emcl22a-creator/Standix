@@ -339,6 +339,19 @@ button { cursor: pointer; }
 .bq-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
 .bq-btns .btn-plein { background: var(--degrade); color: #fff; border: 0; }
 .urgence .guide-ligne .num { background: var(--grave); }
+.urgence .guide-role b { color: var(--texte); }
+.guide-ligne span b { display: inline; font-size: inherit; margin: 0; color: var(--texte); }
+.liens-ext { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+.lien-ext { display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 99px; background: var(--grave-doux); color: var(--grave); font-size: 13px; font-weight: 600; text-decoration: none; }
+.lien-ext svg { width: 13px; height: 13px; stroke-width: 2.4; }
+.u-confirme { padding: 0 14px 14px 48px; }
+.u-confirme .champ-feuille { margin-bottom: 10px; }
+.u-fichiers { display: grid; gap: 6px; margin-top: 9px; }
+.u-fichiers a { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 12px; border-radius: 10px; background: var(--carte-2); color: var(--texte); text-decoration: none; font-size: 13px; }
+.u-fichiers a svg { width: 16px; height: 16px; color: var(--texte-3); flex: none; }
+.u-autre { margin: 10px 0 4px; } .u-autre summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--grave); padding: 6px 4px; list-style: none; }
+.u-autre summary::-webkit-details-marker { display: none; } .u-autre summary::after { content: ' ›'; } .u-autre[open] summary::after { content: ' ⌄'; }
+.u-autre .groupe { margin-top: 6px; }
 .gl-t { display: flex; flex-direction: column; min-width: 0; padding: 8px 0; }
 .gl-t b { font-weight: 600; font-size: 16px; }
 .gl-t small { font-size: 12.5px; color: var(--texte-3); font-weight: 400; line-height: 1.35; margin-top: 1px; }
@@ -614,6 +627,8 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
 @keyframes tourne { to { transform: rotate(360deg); } }
 .encart { padding: 12px 14px; border-radius: 12px; background: var(--alerte-doux); color: var(--texte); font-size: 13px; margin-bottom: 14px; }
 .encart.info { background: var(--carte-2); color: var(--texte-2); }
+.fin-session { font-size: 12px; color: var(--texte-3); }
+.fin-session-l { color: var(--texte-2); font-size: 14px; gap: 8px; } .fin-session-l svg { width: 16px; height: 16px; color: var(--texte-3); flex: none; }
 .encart.grave { background: var(--grave-doux); }
 .note.etat-boite { display: flex; align-items: center; gap: 6px; } .note.etat-boite svg { width: 14px; height: 14px; color: var(--ok); flex: none; }
 
@@ -805,6 +820,7 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
     <div class="cote-bas">
       <span class="direct"><span class="point" id="point"></span><span id="etat-direct">Connexion…</span></span>
       <span id="maj">—</span>
+      <span id="fin-session" class="fin-session"></span>
       <button class="lien-discret" id="sortir">Se déconnecter</button>
     </div>
   </aside>
@@ -901,6 +917,9 @@ const I = {
   cloche: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>',
   bouclier: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
   eclair: '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',
+  externe: '<path d="M7 17 17 7"/><path d="M8 7h9v9"/>',
+  telecharger: '<path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/>',
+  cle: '<circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.7-8.7"/><path d="m16 7 3 3"/><path d="m14 9 2 2"/>',
   repondre: '<path d="M9 17 4 12l5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>',
   archive: '<rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/>',
   plus3: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
@@ -971,6 +990,9 @@ async function entrer() {
      écran ne donne accès à rien. */
   const { data: niveau } = await sb.auth.mfa.getAuthenticatorAssuranceLevel()
   if (niveau?.currentLevel !== 'aal2') return demanderCode(niveau?.nextLevel === 'aal2')
+  /* ③ Une connexion au Dashboard ne dure que 7 jours (le serveur le vérifie
+     aussi : passé ce délai, il refuse tout, même avec une session volée). */
+  if (await sessionExpiree()) return
   noterAcces()
   $('#porte').classList.add('cache')
   $('#coque').classList.remove('cache')
@@ -979,8 +1001,39 @@ async function entrer() {
   lireEtatPush().then(() => { if (['vue', 'securite'].includes(page)) afficher() })
   brancherDirect()
   clearInterval(minuteur)
-  minuteur = setInterval(() => { if (document.visibilityState === 'visible') charger() }, 60000)
+  minuteur = setInterval(() => {
+    if (finSession && Date.now() >= finSession.getTime()) return expirer()
+    if (document.visibilityState === 'visible') charger()
+  }, 60000)
 }
+
+/* ─── Connexion limitée à 7 jours ─── */
+const DUREE_SESSION_J = 7
+let finSession = null
+async function sessionExpiree() {
+  const { data, error } = await sb.rpc('admin_session_fin')
+  if (error) return false                         // fichier SQL pas encore lancé : rien à vérifier
+  finSession = data ? new Date(data) : new Date(0) // session inconnue du serveur = expirée
+  if (finSession.getTime() <= Date.now()) { await expirer(); return true }
+  clearTimeout(sessionExpiree.t)
+  sessionExpiree.t = setTimeout(expirer, Math.min(finSession.getTime() - Date.now() + 1000, 2 ** 31 - 1))
+  majFinSession()
+  return false
+}
+async function expirer() {
+  clearInterval(minuteur); clearTimeout(sessionExpiree.t)
+  try { if (canal) sb.removeChannel(canal) } catch (e) {}
+  try { await sb.auth.signOut({ scope: 'local' }) } catch (e) {}
+  fermerPanneau?.()
+  montrerPorte('Par sécurité, une connexion au Dashboard dure ' + DUREE_SESSION_J + ' jours. Reconnecte-toi avec ton mot de passe et ton code.')
+}
+function texteFinSession() {
+  if (!finSession || finSession.getTime() <= 0) return ''
+  const ms = finSession.getTime() - Date.now()
+  const j = Math.floor(ms / 86400e3), h = Math.max(1, Math.round((ms % 86400e3) / 3600e3))
+  return 'Reconnexion obligatoire ' + (j >= 1 ? 'dans ' + j + ' j' : 'dans ' + h + ' h')
+}
+function majFinSession() { const el = $('#fin-session'); if (el) el.textContent = texteFinSession() }
 
 /* Chaque ouverture du Dashboard est notée (page Sécurité) ; un appareil
    jamais vu déclenche une alerte. Une fois par onglet. */
@@ -1135,6 +1188,7 @@ async function charger(premier = false) {
 function majHorloge() {
   const t = S?.genere_le ? new Date(S.genere_le).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—'
   $('#maj').textContent = 'Mis à jour à ' + t
+  majFinSession()
   $('#maj-m').textContent = t
 }
 
@@ -1205,6 +1259,7 @@ function ouvrirPlus() {
     ${['Pilotage', 'Produit', 'Technique'].map((g) => `<div class="titre-bloc">${g}</div><div class="groupe">${DANS_PLUS.map(pageDe).filter((p) => p.groupe === g).map((p) => `<button class="groupe-ligne" data-page-feuille="${p.id}">${pastilleIcone(p, 'gi')}<span class="gl-t"><b>${p.nom}</b><small>${p.desc}</small></span><span class="pastille cache" data-pastille="${p.id}" style="margin-right:6px"></span>${ico('fleche')}</button>`).join('')}</div>`).join('')}
     <div class="groupe">
       <div class="groupe-ligne statique sans-icone"><span class="point${enDirect ? ' vivant' : ''}"></span>${enDirect ? 'En direct' : 'Hors direct'} · mis à jour à ${t}</div>
+      ${texteFinSession() ? `<div class="groupe-ligne statique sans-icone fin-session-l">${ico('cle')}${texteFinSession()} · par sécurité, tous les ${DUREE_SESSION_J} jours</div>` : ''}
       <button class="groupe-ligne rouge sans-icone" data-action="sortir">Se déconnecter</button>
     </div>
   </div>`)
@@ -1713,6 +1768,7 @@ function blocsSante() {
       ${(sv.derniere_reponse?.echecs || []).length ? ligneEtat(false, 'Échecs au dernier passage', sv.derniere_reponse.echecs.length + ' vidéo(s)') : ''}
     </div>
   </div>
+  ${blocHorsSite()}
   <div class="section grille g3 larges">
     <div class="carte"><h3>Vitesse chez les clients <small>7 jours</small></h3>
       ${pf.n ? `<div class="gros-chiffre">${nf1.format((pf.pret_median || 0) / 1000)} s<small> pour ouvrir l’app</small></div>
@@ -1733,6 +1789,24 @@ function blocsSante() {
       : '<div class="vide">Les versions apparaîtront avec les prochaines utilisations.</div>'}
     </div>
   </div>`
+}
+
+/* ─── Copie de secours hors site (Infomaniak, Suisse) ─── */
+const octetsLisibles = (o) => o >= 1e9 ? nf1.format(o / 1e9) + ' Go' : o >= 1e6 ? n(Math.round(o / 1e6)) + ' Mo' : n(Math.round((o || 0) / 1e3)) + ' ko'
+function blocHorsSite() {
+  const hs = SA?.hors_site
+  if (!hs) return ''
+  const e = hs.etat || {}
+  if (!e.branche) return `<div class="section"><div class="carte"><h3>Copie de secours hors site <small>Infomaniak · Suisse</small></h3>
+    ${ligneEtat(null, 'Pas encore branchée', 'Aujourd’hui, toutes les copies sont chez Supabase. Ajoute les 3 clés Infomaniak dans Supabase : voir « Comment lire cette page ».')}</div></div>`
+  const total = (hs.fichiers || 0) + (hs.restants || 0)
+  return `<div class="section"><div class="carte"><h3>Copie de secours hors site <small>Infomaniak · Suisse</small></h3>
+    ${e.erreur ? `<div class="encart grave" style="margin:4px 0 8px"><b>Dernière tentative échouée</b> · ${echap(e.erreur)}</div>` : ''}
+    ${ligneEtat(!e.erreur && !!e.derniere_reussite, 'Dernière copie réussie', e.derniere_reussite ? ilya(e.derniere_reussite) + ' · vérifiée toutes les 15 minutes' : 'pas encore')}
+    ${ligneEtat(!!e.base, 'Base de données', e.base ? 'copie du ' + dateL(e.base.quand).split(',')[0] + ' · ' + octetsLisibles(e.base.octets) + ' · gardée 30 jours' : 'première copie au prochain passage')}
+    ${ligneEtat(!!e.code, 'Code du site et de l’app', e.code ? 'copie du ' + dateL(e.code.quand).split(',')[0] + ' · ' + octetsLisibles(e.code.octets) : 'première copie au prochain passage')}
+    ${ligneEtat(hs.restants ? (e.erreur ? false : null) : true, 'Vidéos et logos', hs.restants ? n(hs.fichiers || 0) + ' sur ' + n(total) + ' copiés · la suite dans les prochains passages' : n(hs.fichiers || 0) + ' copiés · ' + octetsLisibles(hs.octets || 0) + ' · jamais effacés', hs.restants ? Math.round(100 * (hs.fichiers || 0) / Math.max(1, total)) + ' %' : '')}
+  </div></div>`
 }
 
 /* ─── Anti-piratage ─── */
@@ -1761,7 +1835,7 @@ function blocBouclier() {
 }
 function blocMisesEnLigne() {
   if (!BO) return ''
-  const ml = BO.mises_en_ligne || [], j = BO.journal || []
+  const ml = (BO.mises_en_ligne || []).slice(0, 12), j = BO.journal || []
   const NOMS = { suppression_massive: 'Suppression massive', admin_ajoute: 'Admin ajouté', admin_retire: 'Admin retiré', compte_admin_modifie: 'Compte admin modifié', mode_urgence: 'Mode urgence activé', compte_deconnecte: 'Compte déconnecté partout', integrite_validee: 'Mise en ligne validée', entreprise_supprimee: 'Entreprise supprimée' }
   return `<div class="section grille g2">
     <div class="carte"><h3>Dernières mises en ligne <small>dépôt GitHub</small></h3>
@@ -1770,21 +1844,89 @@ function blocMisesEnLigne() {
       ${j.length ? `<div class="liste">${j.map((x) => `<div class="ligne"><div class="t"><b>${NOMS[x.type] || echap(x.type)}</b><span>${echap(x.detail?.email || x.detail?.nom || (x.detail?.table ? x.detail.n + ' ' + x.detail.table : '') || (x.detail?.sessions != null ? x.detail.sessions + ' session(s) fermée(s)' : ''))} · ${ilya(x.cree_le)}</span></div></div>`).join('')}</div>` : '<div class="vide">Rien à signaler</div>'}</div>
   </div>`
 }
+/* ─── Mode urgence : couper, réparer, verrouiller, prévenir ───
+   Tout est fait pour marcher même paniqué, depuis un téléphone : des liens
+   qui ouvrent directement la bonne page, dans l'ordre. */
+const DEPOT_GH = 'emcl22a-creator/Standix'
+const GH = 'https://github.com/' + DEPOT_GH
+const SB_PROJET = 'https://supabase.com/dashboard/project/tlrtsoahwqhtvtkhssbm'
+const FICHIERS_DEPOT = { '/': 'index.html', '/app/': 'app/index.html', '/app/app.js': 'app/app.js', '/app/style.css': 'app/style.css', '/app/boot.js': 'app/boot.js', '/app/supabase.js': 'app/supabase.js', '/suivi.js': 'suivi.js', '/admin.html': 'admin.html' }
+let urgenceSha = null
+/* La dernière version saine : la plus récente mise en ligne faite par ton
+   compte AVANT le premier signe anormal (mise en ligne inconnue ou fichier
+   modifié sans mise en ligne). Si le pirate a utilisé ton propre compte
+   GitHub, tu choisis toi-même dans la liste. */
+function versionSaine() {
+  const ml = (BO?.mises_en_ligne || []).slice().sort((a, b) => new Date(b.quand) - new Date(a.quand))
+  const modifies = (BO?.fichiers || []).filter((x) => x.empreinte_validee && x.empreinte_actuelle !== x.empreinte_validee)
+  const inconnus = ml.filter((m) => !m.connu)
+  const debuts = [...inconnus.map((m) => +new Date(m.quand)), ...modifies.map((f) => +new Date(f.change_le || Date.now()))]
+  const t0 = debuts.length ? Math.min(...debuts) : Infinity
+  const auto = ml.find((m) => m.connu && +new Date(m.quand) < t0) || null
+  const choisie = ml.find((m) => m.sha === urgenceSha) || auto
+  const apres = choisie ? ml.filter((m) => +new Date(m.quand) > +new Date(choisie.quand)) : []
+  const aRemettre = [...new Set([...modifies.map((f) => FICHIERS_DEPOT[f.chemin]).filter(Boolean), ...apres.flatMap((m) => m.fichiers || [])])]
+  return { ml, auto, choisie, apres, aRemettre, inconnus, modifies, horsDepot: modifies.length > 0 && !inconnus.length }
+}
+const lienExt = (url, texte) => `<a class="lien-ext" href="${url}" target="_blank" rel="noopener">${texte}${ico('externe')}</a>`
+const etapeU = (n, titre, texte, liens = '') => `<div class="guide-ligne"><span class="num">${n}</span><div><b>${titre}</b><span>${texte}</span>${liens ? `<div class="liens-ext">${liens}</div>` : ''}</div></div>`
 function ouvrirUrgence() {
-  ouvrirFeuille(`<div class="feuille-corps urgence">
+  const v = versionSaine(), c = v.choisie
+  const dossiers = [...new Set(v.aRemettre.map((f) => f.includes('/') ? f.slice(0, f.lastIndexOf('/')) : ''))]
+  const panneau = ouvrirFeuille(`<div class="feuille-corps urgence">
     <div class="guide-haut"><span class="pi grand" style="--c:#E5484D">${ico('eclair')}</span><div><div class="ent-groupe" style="color:var(--grave)">En cas de piratage</div><div class="feuille-titre" style="margin:2px 0 0">Mode urgence</div></div></div>
-    <p class="guide-role">Déconnecte immédiatement <b>tous les comptes</b> de l’app (sauf les 3 comptes du Dashboard). Chacun devra se reconnecter avec son mot de passe.</p>
-    <div class="titre-bloc">Ensuite, dans cet ordre</div>
-    <div class="groupe">${[
-      ['Change ton mot de passe', 'Sur le compte du Dashboard, et celui de GitHub.'],
-      ['Change les clés Supabase', 'Supabase → Project Settings → API → « Roll » la clé secrète (service role).'],
-      ['Change la clé Stripe', 'Stripe → Développeurs → Clés API → renouveler la clé secrète, puis la remettre dans Supabase (secret STRIPE_SECRET_KEY).'],
-      ['Vérifie GitHub', 'Dépôt Standix → Commits : supprime toute modification qui ne vient pas de toi.'],
-      ['Préviens tes clients si des données ont fuité', 'C’est obligatoire sous 72 h (RGPD). Écris à contact@standix.app avant d’agir si tu as un doute.'],
-    ].map(([t, d], i) => `<div class="guide-ligne"><span class="num" style="--c:var(--grave)">${i + 1}</span><div><b>${t}</b><span>${d}</span></div></div>`).join('')}</div>
-    <div class="champ-feuille"><label for="urgence-mot">Pour confirmer, écris URGENCE</label><input id="urgence-mot" autocomplete="off" autocapitalize="characters"></div>
-    <button class="gros-btn rouge-plein" data-action="urgence-ok">Déconnecter tout le monde</button>
+    <p class="guide-role">Quatre temps, dans l’ordre : <b>couper</b>, <b>réparer</b>, <b>verrouiller</b>, <b>prévenir</b>. Chaque lien ouvre directement la bonne page.</p>
+
+    <div class="titre-bloc">1 · Couper</div>
+    <div class="groupe">
+      ${etapeU(1, 'Déconnecter tout le monde', 'Tous les comptes de l’app sont déconnectés, sauf les 3 comptes du Dashboard. Chacun devra se reconnecter avec son mot de passe.')}
+      <div class="u-confirme">
+        <div class="champ-feuille"><label for="urgence-mot">Pour confirmer, écris URGENCE</label><input id="urgence-mot" autocomplete="off" autocapitalize="characters"></div>
+        <button class="gros-btn rouge-plein" data-action="urgence-ok">Déconnecter tout le monde</button>
+      </div>
+      ${etapeU(2, 'Mettre le site et l’app hors ligne', 'Les visiteurs ne reçoivent plus le code piraté. Sur la page qui s’ouvre : <b>⋯</b> à côté de « Your site is live » → <b>Unpublish site</b>. 10 secondes. <b>Le Dashboard s’arrête aussi</b> : fais l’étape 1 avant.', lienExt(GH + '/settings/pages', 'Réglages GitHub Pages'))}
+    </div>
+
+    <div class="titre-bloc">2 · Réparer</div>
+    ${v.horsDepot ? `<div class="encart grave" style="margin:0 0 10px"><b>Le dépôt GitHub n’a pas changé</b>, mais le site servi est différent. Soit c’est toi qui viens de mettre en ligne (touche « C’est moi qui ai mis en ligne » sur la page Sécurité), soit <b>l’adresse standix.app a été détournée</b> : vérifie le compte de ton fournisseur de nom de domaine et le « Custom domain » de GitHub Pages.</div>` : ''}
+    <div class="groupe">
+      <div class="guide-ligne"><span class="num">3</span><div><b>Revenir à la dernière version saine</b>
+        ${c ? `<span>Version du <b>${dateL(c.quand)}</b> · « ${echap((c.message || '').split('\n')[0].slice(0, 70))} » · <span class="code">${echap(c.sha.slice(0, 7))}</span>${v.auto && c.sha === v.auto.sha ? ' · choisie automatiquement' : ''}</span>
+          <div class="liens-ext">${lienExt(GH + '/archive/' + c.sha + '.zip', 'Télécharger cette version (ZIP)')}${lienExt(GH + '/tree/' + c.sha, 'La voir sur GitHub')}</div>`
+        : '<span>Aucune mise en ligne connue pour l’instant : le veilleur les note toutes les 15 minutes.</span>'}
+      </div></div>
+      ${v.aRemettre.length ? `<div class="guide-ligne"><span class="num">4</span><div><b>Remettre ${v.aRemettre.length > 1 ? 'ces ' + v.aRemettre.length + ' fichiers' : 'ce fichier'}</b>
+        <span>Ouvre chaque fichier, touche <b>Download raw file</b>, puis envoie-le au bon endroit avec « Upload files » (le dossier est indiqué).</span>
+        <div class="u-fichiers">${v.aRemettre.slice(0, 20).map((f) => `<a href="${GH}/blob/${c ? c.sha : 'main'}/${f}" target="_blank" rel="noopener"><span class="code">${echap(f)}</span>${ico('telecharger')}</a>`).join('')}</div>
+        <div class="liens-ext">${dossiers.map((d) => lienExt(GH + '/upload/main' + (d ? '/' + d : ''), 'Upload files · ' + (d ? 'dossier ' + d : 'racine'))).join('')}</div>
+      </div></div>` : etapeU(4, 'Remettre les fichiers', 'Aucun fichier anormal détecté. Si tu as un doute, télécharge la version saine (ZIP) et renvoie les fichiers modifiés.')}
+      ${etapeU(5, 'Remettre le site en ligne', 'Réglages GitHub Pages → Source : « Deploy from a branch » → branche <b>main</b>, dossier <b>/ (root)</b> → Save. Le site revient en 1 à 2 minutes.', lienExt(GH + '/settings/pages', 'Réglages GitHub Pages'))}
+    </div>
+    ${v.ml.length > 1 ? `<details class="u-autre"><summary>Choisir une autre version</summary>
+      <div class="groupe">${v.ml.slice(0, 20).map((m) => `<button class="groupe-ligne sans-icone" data-version-saine="${m.sha}"><span class="gl-t"><b>${echap((m.message || '—').split('\n')[0].slice(0, 60))}</b><small>${dateL(m.quand)} · ${echap(m.auteur || '?')}${m.connu ? '' : ' · <span style="color:var(--grave)">inconnu</span>'}</small></span>${c && m.sha === c.sha ? ico('ok') : ''}</button>`).join('')}</div></details>` : ''}
+
+    <div class="titre-bloc">3 · Verrouiller</div>
+    <div class="groupe">
+      ${etapeU(6, 'GitHub : mot de passe, appareils, clés', 'Change le mot de passe, déconnecte les appareils inconnus, supprime les jetons et clés que tu ne reconnais pas, active la double authentification.', lienExt('https://github.com/settings/security', 'Mot de passe et 2FA') + lienExt('https://github.com/settings/sessions', 'Appareils connectés') + lienExt('https://github.com/settings/tokens', 'Jetons') + lienExt(GH + '/settings/keys', 'Clés du dépôt'))}
+      ${etapeU(7, 'Supabase : mot de passe et clés', 'Change ton mot de passe Supabase, puis crée une nouvelle clé secrète et supprime l’ancienne. Remplace-la aussi dans Integrations → Vault (secret « standix_cle_service ») : sinon le veilleur et les sauvegardes s’arrêtent.', lienExt('https://supabase.com/dashboard/account/security', 'Compte') + lienExt(SB_PROJET + '/settings/api-keys', 'Clés du projet'))}
+      ${etapeU(8, 'Stripe : clé secrète', 'Renouvelle la clé secrète, puis remplace le secret STRIPE_SECRET_KEY dans Supabase.', lienExt('https://dashboard.stripe.com/apikeys', 'Clés Stripe') + lienExt(SB_PROJET + '/functions/secrets', 'Secrets Supabase'))}
+      ${etapeU(9, 'Boîte e-mail et Dashboard', 'Change le mot de passe de ta boîte e-mail (c’est elle qui permet de tout réinitialiser) et celui du Dashboard.')}
+    </div>
+
+    <div class="titre-bloc">4 · Prévenir et restaurer</div>
+    <div class="groupe">
+      ${etapeU(10, 'Si des données ont pu fuiter : prévenir tes clients', 'Sans tarder : tu traites leurs données pour eux. Ce sont eux qui ont ensuite 72 h pour le signaler à l’autorité (CNIL en France, PFPDT en Suisse). Dis ce qui s’est passé, quelles données, ce que tu as fait.')}
+      ${etapeU(11, 'Si des données ont été effacées : restaurer', 'Base : sauvegarde quotidienne Supabase (7 jours). Vidéos : copie de secours horaire. Si tout le compte Supabase est perdu : la copie hors site chez Infomaniak (base, vidéos, code), chaque nuit.', lienExt(SB_PROJET + '/database/backups/scheduled', 'Sauvegardes Supabase') + lienExt('https://manager.infomaniak.com', 'Infomaniak'))}
+    </div>
+    <p class="note" style="margin:14px 4px 0">Ce plan existe aussi en version papier : garde-la hors de l’ordinateur, elle sert si le Dashboard est lui-même inaccessible.</p>
   </div>`)
+  panneau.querySelectorAll('[data-version-saine]').forEach((b) => b.onclick = () => {
+    urgenceSha = b.dataset.versionSaine
+    const y = panneau.querySelector('.feuille-corps')?.scrollTop || 0
+    ouvrirUrgence()
+    const c = $('#panneau .feuille-corps'); if (c) c.scrollTop = y
+    toast('Version choisie')
+  })
 }
 async function lancerUrgence() {
   if (($('#urgence-mot')?.value || '').trim().toUpperCase() !== 'URGENCE') return toast('Écris URGENCE pour confirmer')
@@ -1857,6 +1999,7 @@ const LEGENDES = {
   'Coûts réels de l’IA': 'Les vraies factures de Claude et d’Azure, lues directement chez eux. Tant qu’ils ne sont pas connectés, les coûts restent estimés.',
   'Disponibilité 24h/24': 'Le veilleur visite le site et l’app toutes les 5 minutes, même quand le Dashboard est fermé. Chaque case est une heure : verte en ligne, rouge en panne.',
   'Sauvegardes des vidéos': 'Chaque heure, les nouvelles vidéos sont copiées en lieu sûr. « En attente » doit revenir à 0.',
+  'Copie de secours hors site': 'Une copie complète de Standix (base, vidéos, code) chez un autre hébergeur, en Suisse. Elle sert si le compte Supabase est perdu ou piraté.',
   'Vitesse chez les clients': 'Le temps réel, sur leurs téléphones, entre l’ouverture de l’app et son affichage complet. Sous 3 s, c’est très bien.',
   'Création par l’IA': 'Combien de temps l’IA met à transformer une vidéo en procédure, mesuré chez les clients.',
   'Versions de l’app': 'Après une mise à jour, la nouvelle version doit remplacer l’ancienne chez tout le monde. Si une ancienne reste longtemps, les clients gardent l’app en cache.',
@@ -1880,7 +2023,7 @@ const GUIDES = {
     role: 'Lire, sans quitter le Dashboard, les e-mails envoyés à contact@standix.app.',
     parties: [['La boîte de réception', 'Les messages les plus récents en haut. Un point bleu = pas encore lu.'], ['Le message', 'Touche-le pour le lire en entier. « Répondre » ouvre ton application Mail avec la réponse déjà préparée.'], ['Archivés', 'Les messages rangés, pour garder la boîte propre.']],
     si: [['Un nouveau message arrive', 'Tu reçois une notification sur ton téléphone (si activée) et une pastille bleue apparaît. Il reste « non lu » dans ta messagerie habituelle : le Dashboard ne fait que lire.'],
-      ['Brancher la boîte (une seule fois)', 'Supabase → Edge Functions → Secrets → ajoute IMAP_HOTE (le serveur de ta messagerie, ex. imap.gmail.com, mail.infomaniak.com, ssl0.ovh.net, imap.mail.me.com), IMAP_UTILISATEUR (contact@standix.app) et IMAP_MOT_DE_PASSE (de préférence un « mot de passe d’application » créé chez ton hébergeur). Les messages arrivent dans les 5 minutes.'],
+      ['Brancher la boîte (une seule fois)', '① Sur le compte Gmail qui reçoit les messages de contact@ : myaccount.google.com/apppasswords → nom « Standix Dashboard » → Créer → copie le code de 16 lettres. ② Supabase → Edge Functions → Secrets : IMAP_HOTE = imap.gmail.com, IMAP_UTILISATEUR = cette adresse Gmail, IMAP_MOT_DE_PASSE = le code. Seuls les messages adressés à contact@standix.app entrent dans le Dashboard.'],
       ['« La boîte ne peut pas être relevée »', 'Le mot de passe a changé ou n’est pas accepté : recrée un mot de passe d’application et remplace IMAP_MOT_DE_PASSE.']],
   },
   vue: {
@@ -1923,12 +2066,12 @@ const GUIDES = {
   },
   sante: {
     role: 'Vérifier que tout ce qui fait tourner Standix fonctionne.',
-    parties: [['Services', 'Base de données, serveur, paiements, site et app : testés à chaque ouverture de la page, avec leur temps de réponse.'], ['Disponibilité 24h/24', 'Le veilleur vérifie le site et l’app toutes les 5 minutes, jour et nuit, et te prévient sur ton téléphone en cas de panne.'], ['Sauvegardes, vitesse, versions', 'Les vidéos sont-elles copiées ? L’app est-elle rapide chez les clients ? Ont-ils la dernière version ?'], ['Intelligence artificielle', 'La part de procédures réussies par l’IA.'], ['Stockage', 'La place utilisée sur ton abonnement Supabase.']],
-    si: [['Un service « En panne »', 'Recharge la page. Si ça persiste, regarde status.supabase.com ou status.stripe.com.'], ['Stockage au-dessus de 80 %', 'Prévoir un plan Supabase plus grand ou supprimer d’anciennes vidéos.']],
+    parties: [['Services', 'Base de données, serveur, paiements, site et app : testés à chaque ouverture de la page, avec leur temps de réponse.'], ['Disponibilité 24h/24', 'Le veilleur vérifie le site et l’app toutes les 5 minutes, jour et nuit, et te prévient sur ton téléphone en cas de panne.'], ['Sauvegardes, vitesse, versions', 'Les vidéos sont-elles copiées ? L’app est-elle rapide chez les clients ? Ont-ils la dernière version ?'], ['Copie de secours hors site', 'Chaque nuit la base et le code, toutes les 15 minutes les nouvelles vidéos, copiés chez Infomaniak (Suisse). Pour la brancher : Infomaniak → Swiss Backup → Ajouter un appareil → type S3 ; puis Supabase → Edge Functions → Secrets : HORS_SITE_ADRESSE (l’adresse « Endpoint »), HORS_SITE_CLE (« Access Key ») et HORS_SITE_SECRET (« Secret Key »).'], ['Intelligence artificielle', 'La part de procédures réussies par l’IA.'], ['Stockage', 'La place utilisée sur ton abonnement Supabase.']],
+    si: [['Copie hors site en échec', 'Le message dit pourquoi. « Accès refusé » : les clés Infomaniak sont fausses ou ont changé, remplace-les dans Supabase.'], ['Un service « En panne »', 'Recharge la page. Si ça persiste, regarde status.supabase.com ou status.stripe.com.'], ['Stockage au-dessus de 80 %', 'Prévoir un plan Supabase plus grand ou supprimer d’anciennes vidéos.']],
   },
   securite: {
     role: 'Protéger Standix et tes clients : connexions, comptes partagés, comportements anormaux.',
-    parties: [['Protection anti-piratage', 'Le veilleur vérifie toutes les 5 minutes que le site et l’app n’ont pas été modifiés par quelqu’un d’autre, qu’aucun code étranger n’y a été glissé, et surveille la base et les comptes admin.'], ['Mode urgence', 'En cas de piratage : déconnecte tout le monde d’un geste, puis te guide étape par étape.'], ['Activités suspectes', 'Tout ce qui sort de l’ordinaire, du plus grave au moins grave.'], ['Comptes partagés', 'Les comptes utilisés par plusieurs personnes. « Probable » en rouge : à traiter.'], ['Points de contrôle', 'Les réglages de sécurité essentiels.'], ['Avertissements envoyés', 'Les messages envoyés aux gérants, et s’ils les ont lus.'], ['Connexions au Dashboard', 'Qui a ouvert ce Dashboard, et sur quel appareil.']],
+    parties: [['Connexion limitée à 7 jours', 'Par sécurité, le Dashboard te déconnecte 7 jours après ta connexion : mot de passe et code à 6 chiffres à retaper. Le serveur le vérifie aussi, donc une session volée devient inutile au bout de 7 jours.'], ['Protection anti-piratage', 'Le veilleur vérifie toutes les 5 minutes que le site et l’app n’ont pas été modifiés par quelqu’un d’autre, qu’aucun code étranger n’y a été glissé, et surveille la base et les comptes admin.'], ['Mode urgence', 'En cas de piratage : déconnecte tout le monde d’un geste, puis te guide étape par étape.'], ['Activités suspectes', 'Tout ce qui sort de l’ordinaire, du plus grave au moins grave.'], ['Comptes partagés', 'Les comptes utilisés par plusieurs personnes. « Probable » en rouge : à traiter.'], ['Points de contrôle', 'Les réglages de sécurité essentiels.'], ['Avertissements envoyés', 'Les messages envoyés aux gérants, et s’ils les ont lus.'], ['Connexions au Dashboard', 'Qui a ouvert ce Dashboard, et sur quel appareil.']],
     si: [['« Fichier modifié » alors que tu viens de mettre en ligne', 'Touche « C’est moi qui ai mis en ligne » : cette version devient la référence.'], ['« Fichier modifié » sans que tu aies rien fait', 'Probable piratage : touche « Mode urgence » et suis les étapes.'], ['Un compte partagé « Probable »', 'Ouvre-le → « Envoyer un avertissement ». Si ça continue, envoie un « Dernier avertissement ».'], ['Une alerte vérifiée', 'Touche « Vu » pour la ranger.'], ['Un nouvel appareil inconnu sur le Dashboard', 'Change ton mot de passe et vérifie ton code à 6 chiffres.']],
   },
 }
@@ -2093,6 +2236,11 @@ function analyse() {
     if ((sv.derniere_reponse?.echecs || []).length) ajoute(false, 'Sauvegarde : ' + sv.derniere_reponse.echecs.length + ' vidéo(s) non copiée(s)', 'sante', 2)
     else if (sv.derniere_verif && Date.now() - new Date(sv.derniere_verif) > 3 * 3600e3) ajoute(false, 'Sauvegarde : pas de vérification depuis ' + ilya(sv.derniere_verif).replace('il y a ', ''), 'sante', 2)
     else if (sv.derniere_verif) ajoute(true, 'Toutes les vidéos sont sauvegardées', 'sante')
+    const hs = SA.hors_site?.etat
+    if (SA.hors_site && !hs?.branche) ajoute(false, 'Aucune copie de secours hors de Supabase', 'sante', 1)
+    else if (hs?.erreur) ajoute(false, 'Copie hors site en échec', 'sante', 2)
+    else if (hs?.derniere_reussite && Date.now() - new Date(hs.derniere_reussite) > 26 * 3600e3) ajoute(false, 'Copie hors site : rien depuis ' + ilya(hs.derniere_reussite).replace('il y a ', ''), 'sante', 2)
+    else if (hs?.derniere_reussite) ajoute(true, 'Copie de secours hors site à jour', 'sante')
     if (SA.perf?.pret_median > 4000) ajoute(false, 'L’app met ' + nf1.format(SA.perf.pret_median / 1000) + ' s à s’ouvrir chez les clients', 'sante', 2)
     else if (SA.perf?.pret_median) ajoute(true, 'L’app s’ouvre en ' + nf1.format(SA.perf.pret_median / 1000) + ' s chez les clients', 'sante')
   }

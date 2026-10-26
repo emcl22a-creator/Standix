@@ -47,9 +47,22 @@ try {
 // on en a vraiment besoin, pas au démarrage — ça accélère nettement l'ouverture de l'app.
 let QRCode = null
 let jsQRLib = null
+/* ═══ LES BIBLIOTHÈQUES SONT SERVIES PAR STANDIX (26 octobre 2026) ═══
+   QR code, lecture de QR, PDF, lecture des PDF et des .docx : les fichiers
+   sont dans le dossier de l'app (`qrcode.js`, `jsqr.js`, `jspdf.js`,
+   `pdf.min.js`, `pdf.worker.min.js`, `mammoth.js`). Plus aucun serveur tiers
+   n'est contacté en temps normal. jsDelivr ne sert plus que de SECOURS, si un
+   fichier manquait dans le dépôt — mieux vaut un détour qu'une fonction morte. */
+async function importerLocal(local, secours) {
+  try { return await import(local) } catch (e) {
+    console.warn('[biblio] ' + local + ' indisponible, secours :', e?.message || e)
+    return await import(secours)
+  }
+}
+
 async function ensureQRCode() {
   if (!QRCode) {
-    const mod = await import('https://cdn.jsdelivr.net/npm/qrcode@1.5.3/+esm')
+    const mod = await importerLocal('./qrcode.js', 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/+esm')
     QRCode = mod.default
   }
   return QRCode
@@ -61,13 +74,16 @@ async function ensureQRCode() {
 
 async function ensureJsQR() {
   if (!jsQRLib) {
-    await new Promise((resolve, reject) => {
+    /* Le fichier de l'app d'abord, jsDelivr en secours. */
+    const charger = (src) => new Promise((resolve, reject) => {
       const s = document.createElement('script')
-      s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'
+      s.src = src
       s.onload = resolve
       s.onerror = reject
       document.head.appendChild(s)
     })
+    try { await charger('jsqr.js') }
+    catch (e) { await charger('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js') }
     jsQRLib = window.jsQR
   }
   return jsQRLib
@@ -5648,7 +5664,7 @@ document.addEventListener('click', (e) => {
 /* La version des conditions d'utilisation en vigueur (voir
    `verifierAcceptationCgu`, plus bas) : à changer à chaque modification
    importante de `cgu.html`. */
-const CGU_VERSION = '2026-10-25'
+const CGU_VERSION = '2026-10-26'
 
 document.getElementById('signup-btn')?.addEventListener('click', async () => {
   /* Même garde que la connexion : un double appui créait deux fois la suite. */
@@ -24654,7 +24670,7 @@ let mammothLib = null, pdfjsLib = null
 
 async function ensureMammoth() {
   if (mammothLib) return mammothLib
-  const m = await import('https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm')
+  const m = await importerLocal('./mammoth.js', 'https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm')
   mammothLib = m.default || m
   return mammothLib
 }
@@ -24664,8 +24680,15 @@ async function ensurePdfjs() {
   /* ⚠ LA VERSION « legacy » (audit du 24 octobre 2026). L'autre exige
      `Promise.withResolvers`, absent avant iOS 17.4 : sur un iPhone plus
      ancien, importer un PDF échouait toujours. Celle-ci apporte ce qui manque. */
-  const m = await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/legacy/build/pdf.min.mjs')
-  m.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/legacy/build/pdf.worker.min.mjs'
+  const CDN = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/legacy/build/'
+  let m, local = true
+  try { m = await import('./pdf.min.js') }
+  catch (e) { local = false; m = await import(CDN + 'pdf.min.mjs') }
+  /* Le moteur de lecture vient du même endroit que la bibliothèque : les deux
+     doivent être exactement de la même version. */
+  m.GlobalWorkerOptions.workerSrc = local
+    ? new URL('./pdf.worker.min.js', import.meta.url).href
+    : CDN + 'pdf.worker.min.mjs'
   pdfjsLib = m
   return pdfjsLib
 }
@@ -33818,7 +33841,7 @@ function logoPourPdf() {
 
 async function chargerJsPDF() {
   if (jsPDFModule) return jsPDFModule
-  const m = await import('https://cdn.jsdelivr.net/npm/jspdf@2.5.2/+esm')
+  const m = await importerLocal('./jspdf.js', 'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/+esm')
   jsPDFModule = m.jsPDF || m.default?.jsPDF || m.default
   return jsPDFModule
 }

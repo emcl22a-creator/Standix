@@ -5154,6 +5154,93 @@ body.pret .barre-hote{animation-play-state:running}
   from{opacity:0}
   to  {opacity:1}
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LE SITE PLUS VIVANT, SUR ORDINATEUR SEULEMENT (à la demande, 26 oct. 2026)
+   Choix « D » : le mouvement au défilement ET la réaction au survol, comme
+   les pages produit d'Apple.
+   · Les grands titres passent du flou au net en montant.
+   · Les écrans de l'app (« Découvrez l'application ») glissent un peu
+     moins vite que la page : un léger relief.
+   · Au survol, les tuiles de l'app et de la sécurité s'inclinent vers la
+     souris (5° au plus) avec un reflet blanc qui suit le curseur ; les photos se
+     rapprochent lentement ; les cartes de prix se soulèvent.
+   ⚠ ORDINATEUR SEULEMENT : souris ou pavé tactile, écran de 981 px ou plus.
+     Rien ne change sur tablette ni sur téléphone.
+   ⚠ RIEN POUR QUI A DEMANDÉ MOINS D'ANIMATIONS dans les réglages du système.
+   ⚠ LES CARTES QUI SE RETOURNENT (« Vos bénéfices ») NE S'INCLINENT PAS :
+     leur 3D est fragile dans Safari (voir « LES CARTES POINTS FORTS »). Seule
+     la photo bouge, à l'intérieur de la face avant.
+   ⚠ L'ENTRÉE DES TITRES n'est plus « sans flou » sur ordinateur (voir
+     « L'ENTRÉE AU DÉFILEMENT ») : c'est le choix du 26 octobre.
+   L'inclinaison, le reflet et le relief sont posés par le script « LE SITE
+   PLUS VIVANT », en bas de la page.
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (min-width:981px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  /* Les titres : du flou au net, en montant. */
+  .car-t[data-monte], .tar-t[data-monte], .fin-t[data-monte]{
+    filter:blur(14px);
+    transition:opacity 1.05s cubic-bezier(.28,.11,.32,1) var(--d, 0ms),
+               translate 1.05s cubic-bezier(.28,.11,.32,1) var(--d, 0ms),
+               filter 1.35s cubic-bezier(.28,.11,.32,1) var(--d, 0ms);
+  }
+  .car-t[data-monte].vu, .tar-t[data-monte].vu, .fin-t[data-monte].vu{filter:none}
+
+  /* Le relief : l'image est un peu plus grande que son cadre et glisse
+     dedans (`--relief`, posé par le script). */
+  .car-s3 .car-vue-ecran img{scale:1.08; translate:0 var(--relief, 0px)}
+  /* Les photos : pas de relief (il rapprochait les visages des titres) ;
+     au survol elles se rapprochent lentement, autour du tiers haut de la
+     carte, là où sont les visages et la plaque QR : ils ne bougent presque
+     pas, le titre reste dégagé. */
+  .car-pf .pf .pf-img{
+    transform-origin:50% 35%;
+    transition:scale 1.4s cubic-bezier(.2,.7,.2,1);
+  }
+  .car-pf .pf-carte:hover .pf .pf-img{scale:1.06}
+
+  /* Les tuiles qui s'inclinent : la carte garde ses coins arrondis pendant
+     le mouvement. */
+  .car-s3 .car-vue, .secu .car-vue{position:relative; isolation:isolate}
+  /* ⚠ DE LA PLACE AU-DESSUS DES TUILES : inclinée, une tuile dépasse de
+     quelques pixels, et la piste rogne tout ce qui dépasse. Même procédé que
+     la section « Vos bénéfices » : une réserve, annulée par une marge
+     négative — la mise en page ne bouge pas. */
+  .car-s3 .car-piste, .secu .car-piste{padding-top:24px; margin-top:-24px}
+
+  /* Le reflet : une lumière douce sous le curseur. */
+  .vif-reflet{
+    position:absolute; inset:0; z-index:1; border-radius:inherit; pointer-events:none;
+    opacity:0; transition:opacity .6s ease;
+    background:radial-gradient(520px circle at var(--mx, 50%) var(--my, 30%),
+      rgba(255,255,255,.13), rgba(255,255,255,.04) 35%, rgba(255,255,255,0) 65%);
+  }
+  .vif-actif .vif-reflet{opacity:1}
+  /* Sécurité : la même lumière blanche que les autres cartes (à la demande,
+     26 oct. 2026 — elle prenait la couleur de l'icône), posée sous le texte. */
+  .secu .vif-reflet{z-index:0}
+  .secu .secu-in{position:relative; z-index:1}
+  /* Les photos : sous le texte, au-dessus du voile. */
+  .car-pf .pf .vif-reflet{z-index:1}
+  .car-pf .pf-clair .vif-reflet{
+    background:radial-gradient(520px circle at var(--mx, 50%) var(--my, 30%),
+      rgba(255,255,255,.22), rgba(255,255,255,0) 60%);
+  }
+}
+/* Les cartes de prix se soulèvent. Au-delà de 1 100 px seulement : en
+   dessous, elles sont dans une ligne qui défile et qui rognerait le haut. */
+@media (min-width:1101px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  .tar .abo-carte{
+    transition:opacity 1.05s cubic-bezier(.28,.11,.32,1) var(--d, 0ms),
+               translate 1.05s cubic-bezier(.28,.11,.32,1) var(--d, 0ms),
+               transform .55s cubic-bezier(.2,.7,.2,1),
+               box-shadow .55s cubic-bezier(.2,.7,.2,1);
+  }
+  .tar .abo-carte:hover{
+    transform:translateY(-6px);
+    box-shadow:0 2px 6px rgba(0,0,0,.04), 0 36px 64px -34px rgba(0,0,0,.30);
+  }
+}
 </style>
 </head>
 <body>
@@ -7112,6 +7199,99 @@ body.pret .barre-hote{animation-play-state:running}
   /* Dernière mesure juste avant que le contenu n'apparaisse (script du chargement). */
   addEventListener('standix:mesure', mesure);
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(mesure);
+})();
+</script>
+<script>
+/* ═══ LE SITE PLUS VIVANT, SUR ORDINATEUR (voir la feuille de style, même
+   titre) : l'inclinaison et le reflet au survol, le relief au défilement.
+   Tout passe par `requestAnimationFrame`, et chaque mouvement RATTRAPE sa
+   cible d'une part de l'écart à chaque image : c'est ce lissage qui le rend
+   soyeux, à la souris comme à la molette. ═══ */
+(function(){
+  var pc = matchMedia('(min-width:981px) and (hover:hover) and (pointer:fine)');
+  var calme = matchMedia('(prefers-reduced-motion: reduce)');
+  if(!pc.matches || calme.matches) return;
+  var actif = function(){ return pc.matches && !calme.matches; };
+
+  function reflet(hote){
+    var s = document.createElement('span');
+    s.className = 'vif-reflet'; s.setAttribute('aria-hidden', 'true');
+    hote.appendChild(s);
+    return s;
+  }
+
+  /* ─── L'inclinaison : 5° au plus, vers la souris ─── */
+  function inclinable(el, max){
+    var cx = 0, cy = 0, tx = 0, ty = 0, boucle = 0;
+    reflet(el);
+    function peindre(){
+      cx += (tx - cx) * .12; cy += (ty - cy) * .12;
+      if(Math.abs(tx - cx) < .01 && Math.abs(ty - cy) < .01){ cx = tx; cy = ty; }
+      el.style.transform = (cx || cy)
+        ? 'perspective(1000px) rotateX(' + cy.toFixed(3) + 'deg) rotateY(' + cx.toFixed(3) + 'deg)'
+        : '';
+      boucle = (cx === tx && cy === ty) ? 0 : requestAnimationFrame(peindre);
+    }
+    function relancer(){ if(!boucle) boucle = requestAnimationFrame(peindre); }
+    el.addEventListener('pointermove', function(e){
+      if(!actif() || e.pointerType !== 'mouse') return;
+      var r = el.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+      tx = (px - .5) * 2 * max; ty = -(py - .5) * 2 * max;
+      el.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+      el.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+      el.classList.add('vif-actif');
+      relancer();
+    });
+    el.addEventListener('pointerleave', function(){
+      tx = 0; ty = 0; el.classList.remove('vif-actif'); relancer();
+    });
+  }
+  document.querySelectorAll('.car-s3 .car-vue').forEach(function(el){ inclinable(el, 5); });
+  document.querySelectorAll('.secu .car-vue').forEach(function(el){ inclinable(el, 4); });
+
+  /* ─── Les photos de « Vos bénéfices » : le reflet seul, sur la face avant ─── */
+  document.querySelectorAll('.car-pf .pf-carte').forEach(function(carte){
+    var face = carte.querySelector('.pf-tourne > .pf');
+    if(!face) return;
+    reflet(face);
+    carte.addEventListener('pointermove', function(e){
+      if(!actif() || e.pointerType !== 'mouse') return;
+      var r = face.getBoundingClientRect();
+      face.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+      face.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+      face.classList.add('vif-actif');
+    });
+    carte.addEventListener('pointerleave', function(){ face.classList.remove('vif-actif'); });
+  });
+
+  /* ─── Le relief : l'écran de l'app glisse un peu moins vite que la page ───
+     0 quand le centre de la tuile est au centre de l'écran ; ±12 px quand
+     elle entre ou sort. */
+  var reliefs = [].slice.call(document.querySelectorAll('.car-s3 .car-vue-ecran img')).map(function(i){ return {el:i, amp:12, v:0, c:0}; });
+  var boucleR = 0;
+  function cibler(){
+    var h = innerHeight;
+    reliefs.forEach(function(o){
+      var r = o.el.parentNode.getBoundingClientRect();
+      if(r.bottom < -200 || r.top > h + 200) return;
+      var d = (r.top + r.height / 2 - h / 2) / (h / 2 + r.height / 2);
+      o.c = Math.max(-1, Math.min(1, d)) * o.amp;
+    });
+  }
+  function peindreR(){
+    var encore = false;
+    reliefs.forEach(function(o){
+      o.v += (o.c - o.v) * .14;
+      if(Math.abs(o.c - o.v) < .02) o.v = o.c; else encore = true;
+      o.el.style.setProperty('--relief', o.v.toFixed(2) + 'px');
+    });
+    boucleR = encore ? requestAnimationFrame(peindreR) : 0;
+  }
+  function relancerR(){ if(!actif()) return; cibler(); if(!boucleR) boucleR = requestAnimationFrame(peindreR); }
+  addEventListener('scroll', relancerR, {passive:true});
+  addEventListener('resize', relancerR);
+  cibler(); reliefs.forEach(function(o){ o.v = o.c; o.el.style.setProperty('--relief', o.v.toFixed(2) + 'px'); });
 })();
 </script>
 </body>

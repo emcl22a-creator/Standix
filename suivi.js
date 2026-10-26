@@ -19,6 +19,11 @@
      boutons, durée de la visite. Sans cookie, sans adresse IP : un
      identifiant au hasard, oublié à la fermeture de l'onglet.
 
+   ⑤ L'ORIGINE (site + app, 26 octobre 2026) — le site ou la campagne qui a
+     amené le visiteur, gardé dans l'onglet (`stx_origine`, oublié à sa
+     fermeture). L'app l'envoie à la création d'une entreprise : le Dashboard
+     sait alors d'où viennent les clients payants.
+
    ⚠ CE FICHIER NE DOIT JAMAIS CASSER LA PAGE. Tout est dans des try/catch,
      rien n'est attendu, et si le serveur ne répond pas, tant pis : on perd
      un signalement, jamais l'app.
@@ -410,6 +415,75 @@
       setInterval(verifierMessages, 10 * 60 * 1000)
       document.addEventListener('visibilitychange', function () { setTimeout(verifierMessages, 800) })
     }
+
+    /* ═══ ⑤ L'ORIGINE DU VISITEUR (site + app) ═══════════════════════════════
+
+       Ce qui l'a amené : le site d'où il vient (nom de domaine seulement),
+       les paramètres de campagne (utm_…), la page d'arrivée, l'heure. Dans
+       l'onglet seulement, comme l'identifiant de visite.
+
+       ⚠ LA PREMIÈRE ORIGINE COMPTE, sauf une nouvelle campagne : quelqu'un
+         qui lit trois pages ne « vient » pas de la page d'avant. Mais un lien
+         de campagne (utm) dit d'où il arrive vraiment.
+       ⚠ DANS L'APP, ON N'ÉCRIT QUE CE QUI VIENT DE L'EXTÉRIEUR : un gérant qui
+         rouvre l'app n'est pas une « visite directe ».
+       ⚠ LES BOUTONS « ESSAYER » OUVRENT UN NOUVEL ONGLET, qui part sans rien
+         de l'onglet du site. L'origine passe donc dans l'adresse du lien vers
+         /app/ (paramètres o_…, ajoutés au moment du clic), et l'app la retire
+         de son adresse dès qu'elle l'a lue. */
+    try {
+      var p5 = {}
+      try { new URLSearchParams(location.search).forEach(function (v, k) { p5[k] = v }) } catch (e) {}
+      var court = function (v, n) { return v ? String(v).slice(0, n) : null }
+      var O5 = ['o_ref', 'o_src', 'o_med', 'o_camp', 'o_page', 'o_t']
+      if (SOURCE === 'app' && (p5.o_ref || p5.o_src || p5.o_page)) {
+        var quand5 = p5.o_t && !isNaN(Date.parse(p5.o_t)) ? new Date(p5.o_t).toISOString() : new Date().toISOString()
+        sessionStorage.setItem('stx_origine', JSON.stringify({
+          referent: court(p5.o_ref, 200), utm_source: court(p5.o_src, 100), utm_medium: court(p5.o_med, 100),
+          utm_campagne: court(p5.o_camp, 150), page: court(p5.o_page, 200), quand: quand5,
+        }))
+        try {
+          var u5 = new URL(location.href)
+          O5.forEach(function (k) { u5.searchParams.delete(k) })
+          history.replaceState(history.state, '', u5.pathname + (u5.searchParams.toString() ? '?' + u5.searchParams.toString() : '') + u5.hash)
+        } catch (e) {}
+        p5 = {}
+      }
+      if (SOURCE === 'site') {
+        var versApp = function (ev) {
+          try {
+            var a = ev.target && ev.target.closest && ev.target.closest('a[href]')
+            if (!a) return
+            var u = new URL(a.getAttribute('href'), location.href)
+            if (u.origin !== location.origin || !/^\/app(\/|$)/.test(u.pathname)) return
+            var o = JSON.parse(sessionStorage.getItem('stx_origine') || 'null')
+            if (!o) return
+            var champs = { o_ref: o.referent, o_src: o.utm_source, o_med: o.utm_medium, o_camp: o.utm_campagne, o_page: o.page, o_t: o.quand }
+            for (var k in champs) if (champs[k]) u.searchParams.set(k, champs[k]); else u.searchParams.delete(k)
+            a.setAttribute('href', u.pathname + '?' + u.searchParams.toString() + u.hash)
+          } catch (e) {}
+        }
+        document.addEventListener('click', versApp, true)
+        document.addEventListener('auxclick', versApp, true)
+      }
+      var ref5 = null
+      try {
+        if (document.referrer) {
+          var h5 = new URL(document.referrer).hostname.replace(/^www\./, '')
+          if (h5 !== location.hostname.replace(/^www\./, '')) ref5 = h5
+        }
+      } catch (e) {}
+      var campagne5 = p5.utm_source || p5.ref || null
+      var deja5 = null
+      try { deja5 = sessionStorage.getItem('stx_origine') } catch (e) {}
+      if ((!deja5 && (SOURCE === 'site' || ref5 || campagne5)) || campagne5) {
+        sessionStorage.setItem('stx_origine', JSON.stringify({
+          referent: court(ref5, 200), utm_source: court(campagne5, 100),
+          utm_medium: court(p5.utm_medium, 100), utm_campagne: court(p5.utm_campaign, 150),
+          page: court(location.pathname, 200), quand: new Date().toISOString(),
+        }))
+      }
+    } catch (e) {}
 
     /* ═══ ④ LES VISITES (site seulement) ══════════════════════════════════ */
 

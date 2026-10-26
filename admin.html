@@ -1791,17 +1791,24 @@ function blocsSante() {
   </div>`
 }
 
-/* ─── Copie de secours hors site (Infomaniak, Suisse) ─── */
+/* ─── Copie de secours hors site : par e-mail dans Gmail (ou, si branché, un stockage S3) ─── */
 const octetsLisibles = (o) => o >= 1e9 ? nf1.format(o / 1e9) + ' Go' : o >= 1e6 ? n(Math.round(o / 1e6)) + ' Mo' : n(Math.round((o || 0) / 1e3)) + ' ko'
 function blocHorsSite() {
   const hs = SA?.hors_site
   if (!hs) return ''
   const e = hs.etat || {}
-  if (!e.branche) return `<div class="section"><div class="carte"><h3>Copie de secours hors site <small>Infomaniak · Suisse</small></h3>
-    ${ligneEtat(null, 'Pas encore branchée', 'Aujourd’hui, toutes les copies sont chez Supabase. Ajoute les 3 clés Infomaniak dans Supabase : voir « Comment lire cette page ».')}</div></div>`
+  const tete = (sous) => `<div class="section"><div class="carte"><h3>Copie de secours hors site <small>${sous}</small></h3>`
+  const echec = e.erreur ? `<div class="encart grave" style="margin:4px 0 8px"><b>Dernière tentative échouée</b> · ${echap(e.erreur)}${e.mode === 'courriel' ? '<br>Nouvel essai toutes les heures. Si Gmail refuse le code, la correction est la même que pour la boîte contact (voir « Comment lire cette page »).' : ''}</div>` : ''
+  if (!e.branche) return tete('par e-mail') + ligneEtat(null, 'Pas encore branchée', 'Aujourd’hui, toutes les copies sont chez Supabase. La base partira chaque nuit dans ta boîte Gmail dès que le code Gmail de 16 lettres sera posé dans Supabase : voir « Comment lire cette page ».') + '</div></div>'
+  if (e.mode === 'courriel') return tete('par e-mail · Gmail') + echec
+    + ligneEtat(!e.erreur && !!e.derniere_reussite, 'Dernière copie envoyée', e.derniere_reussite ? ilya(e.derniere_reussite) + (e.adresse ? ' · dans la boîte ' + echap(e.adresse) : '') : 'pas encore')
+    + ligneEtat(!!e.base, 'Base de données', e.base ? 'copie du ' + dateL(e.base.quand).split(',')[0] + ' · ' + octetsLisibles(e.base.octets) + ' · une par nuit, en pièce jointe' : 'première copie dès que Gmail accepte le code')
+    + ligneEtat(true, 'Code du site et de l’app', 'sur GitHub · les fonctions serveur sont dans le ZIP de secours')
+    + ligneEtat(null, 'Vidéos et logos', 'chez Supabase seulement, en deux exemplaires · trop lourds pour un e-mail')
+    + '</div></div>'
   const total = (hs.fichiers || 0) + (hs.restants || 0)
-  return `<div class="section"><div class="carte"><h3>Copie de secours hors site <small>Infomaniak · Suisse</small></h3>
-    ${e.erreur ? `<div class="encart grave" style="margin:4px 0 8px"><b>Dernière tentative échouée</b> · ${echap(e.erreur)}</div>` : ''}
+  return `${tete(echap(e.hote || 'S3'))}
+    ${echec}
     ${ligneEtat(!e.erreur && !!e.derniere_reussite, 'Dernière copie réussie', e.derniere_reussite ? ilya(e.derniere_reussite) + ' · vérifiée toutes les 15 minutes' : 'pas encore')}
     ${ligneEtat(!!e.base, 'Base de données', e.base ? 'copie du ' + dateL(e.base.quand).split(',')[0] + ' · ' + octetsLisibles(e.base.octets) + ' · gardée 30 jours' : 'première copie au prochain passage')}
     ${ligneEtat(!!e.code, 'Code du site et de l’app', e.code ? 'copie du ' + dateL(e.code.quand).split(',')[0] + ' · ' + octetsLisibles(e.code.octets) : 'première copie au prochain passage')}
@@ -1916,7 +1923,7 @@ function ouvrirUrgence() {
     <div class="titre-bloc">4 · Prévenir et restaurer</div>
     <div class="groupe">
       ${etapeU(10, 'Si des données ont pu fuiter : prévenir tes clients', 'Sans tarder : tu traites leurs données pour eux. Ce sont eux qui ont ensuite 72 h pour le signaler à l’autorité (CNIL en France, PFPDT en Suisse). Dis ce qui s’est passé, quelles données, ce que tu as fait.')}
-      ${etapeU(11, 'Si des données ont été effacées : restaurer', 'Base : sauvegarde quotidienne Supabase (7 jours). Vidéos : copie de secours horaire. Si tout le compte Supabase est perdu : la copie hors site chez Infomaniak (base, vidéos, code), chaque nuit.', lienExt(SB_PROJET + '/database/backups/scheduled', 'Sauvegardes Supabase') + lienExt('https://manager.infomaniak.com', 'Infomaniak'))}
+      ${etapeU(11, 'Si des données ont été effacées : restaurer', 'Base : sauvegarde quotidienne Supabase (7 jours). Vidéos : copie de secours horaire. Si tout le compte Supabase est perdu : la copie de la base reçue chaque nuit dans ta boîte Gmail (« Standix · copie de secours »), le code sur GitHub et les fonctions serveur dans le ZIP de secours.', lienExt(SB_PROJET + '/database/backups/scheduled', 'Sauvegardes Supabase') + lienExt('https://mail.google.com/mail/?authuser=' + encodeURIComponent(SA?.hors_site?.etat?.adresse || 'standix.app@gmail.com') + '#search/%22Standix+%C2%B7+copie+de+secours%22', 'Copies dans Gmail'))}
     </div>
     <p class="note" style="margin:14px 4px 0">Ce plan existe aussi en version papier : garde-la hors de l’ordinateur, elle sert si le Dashboard est lui-même inaccessible.</p>
   </div>`)
@@ -1999,7 +2006,7 @@ const LEGENDES = {
   'Coûts réels de l’IA': 'Les vraies factures de Claude et d’Azure, lues directement chez eux. Tant qu’ils ne sont pas connectés, les coûts restent estimés.',
   'Disponibilité 24h/24': 'Le veilleur visite le site et l’app toutes les 5 minutes, même quand le Dashboard est fermé. Chaque case est une heure : verte en ligne, rouge en panne.',
   'Sauvegardes des vidéos': 'Chaque heure, les nouvelles vidéos sont copiées en lieu sûr. « En attente » doit revenir à 0.',
-  'Copie de secours hors site': 'Une copie complète de Standix (base, vidéos, code) chez un autre hébergeur, en Suisse. Elle sert si le compte Supabase est perdu ou piraté.',
+  'Copie de secours hors site': 'Une copie de la base de données hors de Supabase : chaque nuit, en pièce jointe dans ta boîte Gmail. Elle sert si le compte Supabase est perdu ou piraté. Le code est sur GitHub ; les vidéos restent chez Supabase.',
   'Vitesse chez les clients': 'Le temps réel, sur leurs téléphones, entre l’ouverture de l’app et son affichage complet. Sous 3 s, c’est très bien.',
   'Création par l’IA': 'Combien de temps l’IA met à transformer une vidéo en procédure, mesuré chez les clients.',
   'Versions de l’app': 'Après une mise à jour, la nouvelle version doit remplacer l’ancienne chez tout le monde. Si une ancienne reste longtemps, les clients gardent l’app en cache.',
@@ -2024,7 +2031,8 @@ const GUIDES = {
     parties: [['La boîte de réception', 'Les messages les plus récents en haut. Un point bleu = pas encore lu.'], ['Le message', 'Touche-le pour le lire en entier. « Répondre » ouvre ton application Mail avec la réponse déjà préparée.'], ['Archivés', 'Les messages rangés, pour garder la boîte propre.']],
     si: [['Un nouveau message arrive', 'Tu reçois une notification sur ton téléphone (si activée) et une pastille bleue apparaît. Il reste « non lu » dans ta messagerie habituelle : le Dashboard ne fait que lire.'],
       ['Brancher la boîte (une seule fois)', '① Sur le compte Gmail qui reçoit les messages de contact@ : myaccount.google.com/apppasswords → nom « Standix Dashboard » → Créer → copie le code de 16 lettres. ② Supabase → Edge Functions → Secrets : IMAP_HOTE = imap.gmail.com, IMAP_UTILISATEUR = cette adresse Gmail, IMAP_MOT_DE_PASSE = le code. Seuls les messages adressés à contact@standix.app entrent dans le Dashboard.'],
-      ['« La boîte ne peut pas être relevée »', 'Le mot de passe a changé ou n’est pas accepté : recrée un mot de passe d’application et remplace IMAP_MOT_DE_PASSE.']],
+      ['« La boîte ne peut pas être relevée »', 'Le mot de passe a changé ou n’est pas accepté : recrée un mot de passe d’application et remplace IMAP_MOT_DE_PASSE.'],
+      ['« Invalid credentials »', 'Gmail refuse le code. Souvent : il a été créé sur un autre compte Gmail que celui de IMAP_UTILISATEUR, ou c’est le mot de passe habituel qui a été collé. Recrée le code en étant connecté au bon compte, puis remplace IMAP_MOT_DE_PASSE. Le même code sert à la copie de secours.']],
   },
   vue: {
     role: 'C’est l’accueil : il résume tout Standix et te dit par où commencer.',
@@ -2066,8 +2074,8 @@ const GUIDES = {
   },
   sante: {
     role: 'Vérifier que tout ce qui fait tourner Standix fonctionne.',
-    parties: [['Services', 'Base de données, serveur, paiements, site et app : testés à chaque ouverture de la page, avec leur temps de réponse.'], ['Disponibilité 24h/24', 'Le veilleur vérifie le site et l’app toutes les 5 minutes, jour et nuit, et te prévient sur ton téléphone en cas de panne.'], ['Sauvegardes, vitesse, versions', 'Les vidéos sont-elles copiées ? L’app est-elle rapide chez les clients ? Ont-ils la dernière version ?'], ['Copie de secours hors site', 'Chaque nuit la base et le code, toutes les 15 minutes les nouvelles vidéos, copiés chez Infomaniak (Suisse). Pour la brancher : Infomaniak → Swiss Backup → Ajouter un appareil → type S3 ; puis Supabase → Edge Functions → Secrets : HORS_SITE_ADRESSE (l’adresse « Endpoint »), HORS_SITE_CLE (« Access Key ») et HORS_SITE_SECRET (« Secret Key »).'], ['Intelligence artificielle', 'La part de procédures réussies par l’IA.'], ['Stockage', 'La place utilisée sur ton abonnement Supabase.']],
-    si: [['Copie hors site en échec', 'Le message dit pourquoi. « Accès refusé » : les clés Infomaniak sont fausses ou ont changé, remplace-les dans Supabase.'], ['Un service « En panne »', 'Recharge la page. Si ça persiste, regarde status.supabase.com ou status.stripe.com.'], ['Stockage au-dessus de 80 %', 'Prévoir un plan Supabase plus grand ou supprimer d’anciennes vidéos.']],
+    parties: [['Services', 'Base de données, serveur, paiements, site et app : testés à chaque ouverture de la page, avec leur temps de réponse.'], ['Disponibilité 24h/24', 'Le veilleur vérifie le site et l’app toutes les 5 minutes, jour et nuit, et te prévient sur ton téléphone en cas de panne.'], ['Sauvegardes, vitesse, versions', 'Les vidéos sont-elles copiées ? L’app est-elle rapide chez les clients ? Ont-ils la dernière version ?'], ['Copie de secours hors site', 'Chaque nuit, la base de données part en pièce jointe dans ta boîte Gmail (e-mail « Standix · copie de secours »). Rien d’autre à brancher : elle utilise le même code Gmail de 16 lettres que la boîte contact (page Messages). Les mots de passe des utilisateurs n’y sont pas ; les vidéos restent chez Supabase.'], ['Intelligence artificielle', 'La part de procédures réussies par l’IA.'], ['Stockage', 'La place utilisée sur ton abonnement Supabase.']],
+    si: [['Copie hors site en échec', 'Le message dit pourquoi. « Connexion (adresse ou mot de passe) refusé » : Gmail n’accepte pas le code de 16 lettres, même correction que pour la boîte contact (page Messages). Un nouvel essai a lieu toutes les heures.'], ['Un service « En panne »', 'Recharge la page. Si ça persiste, regarde status.supabase.com ou status.stripe.com.'], ['Stockage au-dessus de 80 %', 'Prévoir un plan Supabase plus grand ou supprimer d’anciennes vidéos.']],
   },
   securite: {
     role: 'Protéger Standix et tes clients : connexions, comptes partagés, comportements anormaux.',

@@ -157,8 +157,9 @@ button { cursor: pointer; }
   font-weight: 500; text-align: left; position: relative; white-space: nowrap;
 }
 .nav button svg { width: 18px; height: 18px; flex: none; }
+.nav button { padding-left: 8px; }
 .nav button:hover { background: var(--carte-2); color: var(--texte); }
-.nav button[aria-current="page"] { background: var(--accent-doux); color: var(--accent); }
+.nav button[aria-current="page"] { background: color-mix(in srgb, var(--c, var(--accent)) 13%, transparent); color: var(--texte); font-weight: 600; }
 .pastille {
   margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px;
   background: #3A78EE; color: #fff; font-size: 11.5px; font-weight: 600;
@@ -190,6 +191,69 @@ button { cursor: pointer; }
 /* Barre du haut + onglets (téléphone) */
 .haut-mobile, .tabbar, .tirer, .poignee, .cartes-clients, .couts-m { display: none; }
 .replie { display: none !important; }
+/* Icône de page (style Réglages iPhone) */
+.pi { --c: var(--accent); width: 26px; height: 26px; border-radius: 7px; flex: none; display: inline-grid; place-items: center; color: #fff;
+  background: var(--c); background: linear-gradient(180deg, color-mix(in srgb, var(--c) 78%, #fff) 0%, var(--c) 100%); box-shadow: inset 0 0 0 .5px rgba(0,0,0,.08); }
+.pi svg { width: 16px !important; height: 16px !important; stroke-width: 2; }
+.pi.grand { width: 48px; height: 48px; border-radius: 13px; box-shadow: 0 4px 14px color-mix(in srgb, var(--c) 30%, transparent); }
+.pi.grand svg { width: 26px !important; height: 26px !important; }
+.pi.mini { width: 20px; height: 20px; border-radius: 6px; margin-right: 7px; vertical-align: -4px; }
+.pi.mini svg { width: 12px !important; height: 12px !important; }
+.pi.gi { width: 32px; height: 32px; border-radius: 8px; }
+.pi.gi svg { width: 18px !important; height: 18px !important; }
+.nav-groupe { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--texte-3); padding: 14px 10px 6px; }
+.nav-groupe:first-child { padding-top: 2px; }
+.ent-gauche { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.ent-groupe { font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--c); margin-bottom: 1px; }
+/* État de la page */
+.etat-page { display: flex; gap: 12px; align-items: flex-start; padding: 13px 16px; border-radius: 14px; margin: -6px 0 16px; border: 1px solid var(--bord); background: var(--carte); }
+.etat-page .signe { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; flex: none; margin-top: 1px; }
+.etat-page .signe svg { width: 14px; height: 14px; stroke-width: 3; }
+.etat-page .signe i { width: 11px; height: 2.5px; border-radius: 2px; background: currentColor; }
+.etat-page b { display: block; font-size: 14.5px; font-weight: 600; }
+.etat-page span:not(.signe) { display: block; font-size: 13px; color: var(--texte-2); margin-top: 3px; line-height: 1.45; }
+.etat-page .ok-aussi { color: var(--texte-3) !important; }
+.etat-page.ok .signe { background: var(--ok-doux); color: var(--ok); }
+.etat-page.mal { border-color: color-mix(in srgb, var(--alerte) 30%, transparent); background: var(--alerte-doux); }
+.etat-page.mal .signe { background: var(--alerte); color: #fff; }
+.etat-page.grave { border-color: color-mix(in srgb, var(--grave) 30%, transparent); background: var(--grave-doux); }
+.etat-page.grave .signe { background: var(--grave); color: #fff; }
+/* Sur cette page */
+.sommaire { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin: 0 0 6px; }
+.sommaire .som-lib { font-size: 12px; font-weight: 600; color: var(--texte-3); margin-right: 4px; white-space: nowrap; flex: none; }
+.sommaire button { flex: none; }
+.sommaire button { height: 30px; padding: 0 12px; border-radius: 15px; border: 1px solid var(--bord-fort); background: var(--carte); font-size: 13px; font-weight: 500; color: var(--texte-2); white-space: nowrap; }
+.sommaire button:hover { color: var(--texte); border-color: var(--texte-3); }
+@keyframes repere { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); } 100% { box-shadow: 0 0 0 10px transparent; } }
+.repere { animation: repere 1s ease-out; }
+/* ⓘ */
+.aide { width: 17px; height: 17px; border-radius: 50%; border: 1.3px solid var(--texte-3); background: none; color: var(--texte-3); font: 700 10.5px/1 Georgia, serif; font-style: italic; display: inline-grid; place-items: center; padding: 0; margin-left: 2px; flex: none; position: relative; }
+.aide::after { content: ""; position: absolute; inset: -12px; }
+.aide:hover { color: var(--accent); border-color: var(--accent); }
+.pop-aide { position: fixed; z-index: 70; background: var(--texte); color: var(--fond); border-radius: 14px; padding: 12px 14px; font-size: 13.5px; line-height: 1.45; box-shadow: 0 10px 34px rgba(0,0,0,.22); opacity: 0; transform: translateY(4px) scale(.98); transition: opacity .15s, transform .15s; pointer-events: none; }
+.pop-aide.vu { opacity: 1; transform: none; pointer-events: auto; }
+.pop-aide b { display: block; font-size: 14px; margin-bottom: 3px; }
+/* Changement de page */
+@keyframes entree { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.principal.entree > * { animation: entree .32s cubic-bezier(.2,.8,.2,1) both; }
+.principal.entree > *:nth-child(2) { animation-delay: .03s; } .principal.entree > *:nth-child(3) { animation-delay: .06s; } .principal.entree > *:nth-child(n+4) { animation-delay: .09s; }
+@media (prefers-reduced-motion: reduce) { .principal.entree > * { animation: none; } }
+/* Feuille Plus : nom + phrase */
+.explic { margin: -8px 0 14px; font-size: 13px; line-height: 1.45; color: var(--texte-3); max-width: 70ch; }
+.section > h2 + .explic { margin: -6px 0 12px; }
+.guide-haut { display: flex; align-items: center; gap: 14px; margin: 4px 0 12px; }
+.guide-role { font-size: 16px; line-height: 1.5; margin: 0 0 18px; color: var(--texte); }
+.guide-ligne { display: flex; gap: 12px; padding: 13px 14px; border-top: 1px solid var(--bord); }
+.guide-ligne:first-child { border-top: 0; }
+.guide-ligne b { display: block; font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.guide-ligne span:not(.num) { font-size: 13.5px; line-height: 1.5; color: var(--texte-2); }
+.guide-ligne .num { width: 22px; height: 22px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff; background: var(--c); margin-top: 1px; }
+.guide-ligne .num.fl { background: color-mix(in srgb, var(--c) 14%, transparent); color: var(--c); }
+.guide-ligne .num svg { width: 13px; height: 13px; stroke-width: 2.6; }
+.guide .titre-bloc { margin-top: 4px; }
+.gl-t { display: flex; flex-direction: column; min-width: 0; padding: 8px 0; }
+.gl-t b { font-weight: 600; font-size: 16px; }
+.gl-t small { font-size: 12.5px; color: var(--texte-3); font-weight: 400; line-height: 1.35; margin-top: 1px; }
 .pastille.rouge { background: var(--grave); }
 .ligne-cliquable { cursor: pointer; }
 .ligne-cliquable:hover td { background: var(--carte-2); }
@@ -486,7 +550,7 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
   .haut-mobile.compact { border-bottom-color: var(--bord); }
   .haut-mobile .barre { position: relative; height: 46px; padding: 0 16px; }
   .mini-logo { width: 26px; height: 26px; border-radius: 7px; }
-  .titre-compact { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -30%); font-size: 16px; font-weight: 600; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; white-space: nowrap; }
+  .titre-compact { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -30%); font-size: 16px; font-weight: 600; display: flex; align-items: center; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; white-space: nowrap; }
   .haut-mobile.compact .titre-compact { opacity: 1; transform: translate(-50%, -50%); }
 
   /* ② Barre d'onglets flottante en verre, au pouce */
@@ -503,7 +567,8 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
     transition: color .15s, background .15s; -webkit-tap-highlight-color: transparent;
   }
   .tabbar button svg { width: 23px; height: 23px; }
-  .tabbar button[aria-current="page"] { color: var(--accent); background: var(--accent-doux); }
+  .tabbar button[aria-current="page"] { color: var(--c, var(--accent)); background: color-mix(in srgb, var(--c, var(--accent)) 13%, transparent); }
+  .tabbar .tb-ico { display: grid; place-items: center; }
   .tabbar button:active { transform: scale(.94); }
   .tabbar .pastille { position: absolute; top: 4px; left: calc(50% + 5px); margin: 0; height: 17px; min-width: 17px; padding: 0 5px; font-size: 10.5px; border: 2px solid var(--carte); box-sizing: content-box; }
 
@@ -516,11 +581,18 @@ pre.pile { white-space: pre-wrap; word-break: break-all; font: 11.5px/1.5 ui-mon
 
   .principal { padding: 4px 16px calc(100px + env(safe-area-inset-bottom)); }
   .entete { flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 18px; }
-  .entete h1 { font-size: 34px; letter-spacing: -.025em; line-height: 1.1; }
+  .entete h1 { font-size: 30px; letter-spacing: -.025em; line-height: 1.1; }
+  .pi.grand { width: 44px; height: 44px; border-radius: 12px; }
+  .etat-page { margin-top: -4px; }
+  .sommaire { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px 4px; padding: 2px 16px 6px; scrollbar-width: none; }
+  .sommaire::-webkit-scrollbar { display: none; }
+  .haut-mobile .barre { cursor: pointer; }
   .entete p { font-size: 15px; }
   .section > h2 { flex-wrap: wrap; row-gap: 2px; }
   .section > h2 small { flex-basis: 100%; }
   .entete [data-action="actualiser"] { display: none; }
+  .btn-guide { height: 32px; border-radius: 16px; font-size: 13px; background: color-mix(in srgb, var(--c) 10%, var(--carte)); border-color: transparent; color: var(--c); font-weight: 600; }
+  .explic { font-size: 12.5px; }
   .entete .actions:empty { display: none; }
 
   /* ④ Les deux chiffres clés en grand, pleine largeur */
@@ -724,20 +796,27 @@ const I = {
   horloge: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
   etincelle: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
   avertir: '<path d="M3 11l18-8-8 18-2-8-8-2z"/>',
+  question: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',
   plus3: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
 }
 const ico = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`
 
+/* Chaque page a sa couleur et son icône (comme les Réglages de l'iPhone),
+   un thème (le « groupe ») et une phrase qui dit à quoi elle sert. L'ordre
+   est celui du menu ; les touches 1 à 8 y mènent sur ordinateur. */
 const PAGES = [
-  { id: 'vue', nom: 'Vue d’ensemble', court: 'Accueil', icone: 'vue' },
-  { id: 'argent', nom: 'Argent', icone: 'argent' },
-  { id: 'erreurs', nom: 'Erreurs', icone: 'erreurs' },
-  { id: 'sante', nom: 'Santé technique', court: 'Santé', icone: 'sante' },
-  { id: 'clients', nom: 'Clients', icone: 'clients' },
-  { id: 'usage', nom: 'Usage de l’app', court: 'Usage', icone: 'usage' },
-  { id: 'site', nom: 'Site internet', court: 'Site', icone: 'site' },
-  { id: 'securite', nom: 'Sécurité', icone: 'securite' },
+  { id: 'vue', nom: 'Vue d’ensemble', court: 'Accueil', icone: 'vue', couleur: '#3A78EE', groupe: 'Pilotage', desc: 'L’essentiel de Standix en un coup d’œil' },
+  { id: 'argent', nom: 'Argent', icone: 'argent', couleur: '#30A46C', groupe: 'Business', desc: 'Ce que tu gagnes, ce que tu payes, et ce qu’il reste' },
+  { id: 'clients', nom: 'Clients', icone: 'clients', couleur: '#6E56CF', groupe: 'Business', desc: 'Toutes les entreprises inscrites : essais, abonnés, à relancer' },
+  { id: 'usage', nom: 'Usage de l’app', court: 'Usage', icone: 'usage', couleur: '#F76B15', groupe: 'Produit', desc: 'Comment les entreprises utilisent l’app au quotidien' },
+  { id: 'site', nom: 'Site internet', court: 'Site', icone: 'site', couleur: '#0894B3', groupe: 'Produit', desc: 'Qui visite standix.app, d’où, et ce qu’ils cliquent · sans cookie' },
+  { id: 'erreurs', nom: 'Erreurs', icone: 'erreurs', couleur: '#E5484D', groupe: 'Technique', desc: 'Chaque problème rencontré par un client, regroupé, à corriger' },
+  { id: 'sante', nom: 'Santé technique', court: 'Santé', icone: 'sante', couleur: '#12A594', groupe: 'Technique', desc: 'Serveur, IA, paiements, stockage : tout ce qui fait tourner Standix' },
+  { id: 'securite', nom: 'Sécurité', icone: 'securite', couleur: '#687076', groupe: 'Technique', desc: 'Connexions, comptes partagés, activités suspectes et avertissements' },
 ]
+const pageDe = (id) => PAGES.find((x) => x.id === id)
+/* L'icône carrée colorée d'une page */
+const pastilleIcone = (p, classe = '') => `<span class="pi ${classe}" style="--c:${p.couleur}">${ico(p.icone)}</span>`
 
 /* ═══════════════════════════════════════════════════════════════════════
    2. ÉTAT
@@ -961,17 +1040,24 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
    5. NAVIGATION
    ═══════════════════════════════════════════════════════════════════════ */
 function construireNav() {
-  $('#nav').innerHTML = PAGES.map((p) => `<button data-page="${p.id}">${ico(p.icone)}<span>${p.nom}</span><span class="pastille cache" data-pastille="${p.id}"></span></button>`).join('')
+  let groupe = ''
+  $('#nav').innerHTML = PAGES.map((p, i) => {
+    const titre = p.groupe !== groupe ? `<div class="nav-groupe">${p.groupe}</div>` : ''
+    groupe = p.groupe
+    return titre + `<button data-page="${p.id}" style="--c:${p.couleur}" title="${p.nom} · touche ${i + 1}">${pastilleIcone(p)}<span>${p.nom}</span><span class="pastille cache" data-pastille="${p.id}"></span></button>`
+  }).join('')
   $('#tabbar').innerHTML = ONGLETS.map((id) => {
-    if (id === 'plus') return `<button data-plus>${ico('plus3')}<span>Plus</span><span class="pastille cache" data-pastille="plus"></span></button>`
+    if (id === 'plus') return `<button data-plus><span class="tb-ico">${ico('plus3')}</span><span class="tb-nom">Plus</span><span class="pastille cache" data-pastille="plus"></span></button>`
     const p = PAGES.find((x) => x.id === id)
-    return `<button data-page="${id}">${ico(p.icone)}<span>${p.court || p.nom}</span><span class="pastille cache" data-pastille="${id}"></span></button>`
+    return `<button data-page="${id}" style="--c:${p.couleur}">${ico(p.icone)}<span>${p.court || p.nom}</span><span class="pastille cache" data-pastille="${id}"></span></button>`
   }).join('')
   $$('[data-page]').forEach((b) => b.addEventListener('click', () => aller(b.dataset.page)))
   $('[data-plus]').addEventListener('click', ouvrirPlus)
 }
 function aller(p) {
+  const change = p !== page
   page = p
+  if (change) { const m = $('#principal'); m.classList.remove('entree'); void m.offsetWidth; m.classList.add('entree') }
   history.replaceState(null, '', '#' + p)
   afficher()
   window.scrollTo({ top: 0 })
@@ -991,7 +1077,7 @@ function ouvrirPlus() {
   const t = S?.genere_le ? new Date(S.genere_le).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—'
   ouvrirFeuille(`<div class="feuille-corps">
     <div class="feuille-titre">Plus</div>
-    <div class="groupe">${DANS_PLUS.map((id) => { const p = PAGES.find((x) => x.id === id); return `<button class="groupe-ligne" data-page-feuille="${id}"><span class="gi">${ico(p.icone)}</span><span>${p.nom}</span><span class="pastille cache" data-pastille="${id}" style="margin-right:6px"></span>${ico('fleche')}</button>` }).join('')}</div>
+    ${['Produit', 'Technique'].map((g) => `<div class="titre-bloc">${g}</div><div class="groupe">${DANS_PLUS.map(pageDe).filter((p) => p.groupe === g).map((p) => `<button class="groupe-ligne" data-page-feuille="${p.id}">${pastilleIcone(p, 'gi')}<span class="gl-t"><b>${p.nom}</b><small>${p.desc}</small></span><span class="pastille cache" data-pastille="${p.id}" style="margin-right:6px"></span>${ico('fleche')}</button>`).join('')}</div>`).join('')}
     <div class="groupe">
       <div class="groupe-ligne statique sans-icone"><span class="point${enDirect ? ' vivant' : ''}"></span>${enDirect ? 'En direct' : 'Hors direct'} · mis à jour à ${t}</div>
       <button class="groupe-ligne rouge sans-icone" data-action="sortir">Se déconnecter</button>
@@ -1006,7 +1092,8 @@ function surveillerTitre() {
   observateurTitre?.disconnect()
   const h1 = $('#principal .entete h1'), haut = $('#haut-mobile')
   if (!h1 || !haut) return
-  $('#titre-compact').textContent = h1.textContent
+  const pg = pageDe(page)
+  $('#titre-compact').innerHTML = (pg ? pastilleIcone(pg, 'mini') : '') + echap(h1.textContent)
   observateurTitre = new IntersectionObserver(([e]) => haut.classList.toggle('compact', !e.isIntersecting), { rootMargin: '-50px 0px 0px 0px' })
   observateurTitre.observe(h1)
 }
@@ -1108,20 +1195,66 @@ function majPastilles() {
 function afficher() {
   if (!S) return
   $$('[data-page]').forEach((b) => { if (b.dataset.page === page) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current') })
-  $('[data-plus]')?.toggleAttribute('aria-current', DANS_PLUS.includes(page))
-  if (DANS_PLUS.includes(page)) $('[data-plus]')?.setAttribute('aria-current', 'page')
+  const plus = $('[data-plus]')
+  if (plus) {
+    const sous = DANS_PLUS.includes(page) ? pageDe(page) : null
+    plus.toggleAttribute('aria-current', !!sous)
+    if (sous) plus.setAttribute('aria-current', 'page')
+    plus.style.setProperty('--c', sous ? sous.couleur : '')
+    $('.tb-ico', plus).innerHTML = sous ? ico(sous.icone) : ico('plus3')
+    $('.tb-nom', plus).textContent = sous ? (sous.court || sous.nom) : 'Plus'
+  }
   const fn = { vue: pageVue, argent: pageArgent, erreurs: pageErreurs, sante: pageSante, clients: pageClients, usage: pageUsage, site: pageSite, securite: pageSecurite }[page]
   $('#principal').innerHTML = fn()
   document.title = 'Standix · ' + PAGES.find((p) => p.id === page).nom
+  ajouterLegendes()
   dessinerGraphiques()
   brancherPage()
+  construireSommaire()
   surveillerTitre()
   majPastilles()
 }
 
 function entete(titre, sous, actions = '') {
-  return `<div class="entete"><div><h1>${titre}</h1>${sous ? `<p>${sous}</p>` : ''}</div>
-    <div class="actions">${actions}<button class="btn" data-action="actualiser">${ico('maj')}Actualiser</button></div></div>`
+  const p = pageDe(page) || {}
+  return `<div class="entete" style="--c:${p.couleur || 'var(--accent)'}">
+      <div class="ent-gauche">${p.icone ? pastilleIcone(p, 'grand') : ''}
+        <div><div class="ent-groupe">${p.groupe || ''}</div><h1>${titre}</h1><p>${p.desc || sous || ''}</p></div>
+      </div>
+      <div class="actions">${actions}<button class="btn btn-guide" data-action="guide">${ico('question')}Comment lire cette page</button><button class="btn" data-action="actualiser">${ico('maj')}Actualiser</button></div>
+    </div>
+    ${page === 'vue' ? '' : etatPage()}
+    <nav class="sommaire" id="sommaire" aria-label="Sur cette page"></nav>`
+}
+/* L'état de la page, en une phrase : ce qui ne va pas ICI (–), sinon ✓. */
+function etatPage() {
+  const { mal, bien } = analyse()
+  const m = mal.filter((x) => x.va === page), b = bien.filter((x) => x.va === page)
+  const grave = m.some((x) => x.poids >= 3)
+  if (!m.length) return `<div class="etat-page ok"><span class="signe">${ico('ok')}</span><div><b>Rien à signaler ici</b>${b.length ? `<span>${b.map((x) => echap(x.texte)).join(' · ')}</span>` : ''}</div></div>`
+  return `<div class="etat-page ${grave ? 'grave' : 'mal'}"><span class="signe"><i></i></span><div>
+      <b>${m.length === 1 ? '1 point à surveiller ici' : m.length + ' points à surveiller ici'}</b>
+      ${m.map((x) => `<span>– ${echap(x.texte)}</span>`).join('')}
+      ${b.length ? `<span class="ok-aussi">✓ ${b.map((x) => echap(x.texte)).join(' · ')}</span>` : ''}
+    </div></div>`
+}
+/* « Sur cette page » : un raccourci vers chaque partie de la page. */
+function construireSommaire() {
+  const nav = $('#sommaire'); if (!nav) return
+  const titres = $$('#principal .section > h2, #principal .section.carte > h3, #principal .section.grille > .carte > h3')
+    .filter((h) => !h.closest('.le-point'))
+  if (titres.length < 3) { nav.remove(); return }
+  nav.innerHTML = '<span class="som-lib">Sur cette page</span>' + titres.map((h, i) => {
+    h.id = 'partie-' + i
+    const t = (h.firstChild?.textContent || h.textContent).trim()
+    return `<button data-partie="${h.id}">${echap(t)}</button>`
+  }).join('')
+  $$('[data-partie]', nav).forEach((b) => b.onclick = () => {
+    const cible = document.getElementById(b.dataset.partie); if (!cible) return
+    const bloc = cible.closest('.carte') || cible
+    window.scrollTo({ top: bloc.getBoundingClientRect().top + scrollY - (mobile() ? 64 : 20), behavior: 'smooth' })
+    bloc.classList.remove('repere'); void bloc.offsetWidth; bloc.classList.add('repere')
+  })
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1161,9 +1294,163 @@ function argent() {
 const serie = (cle, jours = 30) => (S.serie || []).slice(-jours).map((d) => ({ x: d.j, y: d[cle] || 0 }))
 const somme = (l) => l.reduce((s, d) => s + d.y, 0)
 
+const AIDE = {
+  'Revenu mensuel récurrent': 'Ce que rapportent chaque mois tous les abonnements en cours (MRR). Un abonnement annuel compte pour 1/12 par mois.',
+  'Bénéfice ce mois': 'Argent encaissé ce mois (frais Stripe déduits), moins les coûts du mois : coûts fixes + IA estimée.',
+  'Erreurs à corriger': 'Nombre de problèmes différents rencontrés par des clients et pas encore marqués « corrigé ». Une erreur répétée compte une seule fois.',
+  'À corriger': 'Nombre de problèmes différents pas encore marqués « corrigé ». Une erreur répétée compte une seule fois.',
+  'Entreprises actives': 'Entreprises où il s’est passé quelque chose ces 7 derniers jours : procédure créée ou lue, QR code scanné, ou app ouverte.',
+  'Inscriptions': 'Nouvelles entreprises créées sur les 30 derniers jours.',
+  'Procédures créées': 'Procédures créées sur 30 jours, toutes entreprises confondues. Le pourcentage compare les analyses IA de ce mois au mois dernier.',
+  'Procédures lues': 'Nombre de fois où un employé a lu une procédure jusqu’au bout, sur 30 jours.',
+  'Visiteurs du site': 'Personnes différentes venues sur standix.app sur 30 jours (sans cookie).',
+  'Encaissé ce mois': 'Argent réellement reçu par Stripe ce mois, frais Stripe déduits.',
+  'Coûts ce mois': 'Coûts fixes actifs (Supabase, assurance…) + coût estimé de l’IA selon le nombre d’analyses et de traductions.',
+  'Revenu moyen par client': 'Revenu mensuel récurrent divisé par le nombre de clients payants.',
+  'Coût par entreprise': 'Coûts du mois divisés par toutes les entreprises inscrites, essais compris.',
+  'Coût IA ce mois': 'Estimation : nombre d’analyses × coût unitaire (réglable dans « Coûts variables », plus bas).',
+  'Solde Stripe': 'Argent disponible chez Stripe, pas encore versé sur ton compte bancaire.',
+  'Dernières 24 h': 'Nombre total de signalements d’erreurs reçus ces dernières 24 heures.',
+  'Entreprises touchées': 'Le plus grand nombre d’entreprises touchées par une même erreur à corriger.',
+  'Échecs IA': 'Procédures que l’IA n’a pas réussi à générer.',
+  'Entreprises': 'Toutes les entreprises inscrites, quel que soit leur statut.',
+  'Clients payants': 'Entreprises avec un abonnement actif. Conversion = clients payants ÷ entreprises inscrites.',
+  'Essais en cours': 'Entreprises dans leurs 14 jours d’essai gratuit.',
+  'Impayés · résiliés': 'Impayé : le dernier paiement a échoué. Résilié : l’abonnement est terminé.',
+  'Procédures': 'Toutes les procédures créées. Brouillon : pas encore publiée.',
+  'Analyses IA': 'Nombre de fois où l’IA a transformé une vidéo ou un document en procédure.',
+  'Lectures (30 j)': 'Procédures lues jusqu’au bout par les employés sur 30 jours, et le temps moyen passé à lire.',
+  'Scans QR (30 j)': 'QR codes de procédures scannés sur 30 jours.',
+  'En ligne maintenant': 'Visiteurs présents sur le site dans les 5 dernières minutes.',
+  'Visiteurs 30 j': 'Personnes différentes venues sur le site sur 30 jours.',
+  'Clics « Essayer »': 'Clics sur les boutons « Essayer 14 jours » du site. Le pourcentage = clics ÷ visiteurs.',
+  'Inscriptions 30 j': 'Entreprises créées sur 30 jours, et temps moyen passé sur le site par visite.',
+  'Pages vues 30 j': 'Nombre total de pages affichées sur le site sur 30 jours.',
+  'Clics « Se connecter »': 'Clics sur « Se connecter » depuis le site.',
+  'Clics « Contact »': 'Clics sur l’adresse e-mail de contact du site.',
+  'Comptes': 'Tous les comptes créés, responsables et employés.',
+  'Connexions 24 h': 'Comptes qui se sont connectés ces dernières 24 heures.',
+  'Sessions ouvertes': 'Connexions encore ouvertes sur des appareils. Une déconnexion ferme la session.',
+  'Appareils vus': 'Appareils différents vus par l’app. Révoqué : appareil retiré par un responsable.',
+}
+/* ═══ EXPLICATIONS ═══
+   Une phrase sous chaque bloc (graphique, liste) : ce qu'il montre et à
+   quoi il sert. Repérée par le titre du bloc. */
+const LEGENDES = {
+  '30 derniers jours': 'L’activité du mois écoulé. Chaque petite barre est un jour : plus elle est haute, plus il y a eu d’activité ce jour-là.',
+  'Dernières erreurs': 'Les derniers problèmes rencontrés par des clients. Touche une ligne pour voir le détail.',
+  'Dernières inscriptions': 'Les entreprises qui viennent de créer un compte, et où elles en sont (essai, abonnée…).',
+  'Encaissé et dépensé, 12 derniers mois': 'Mois par mois : en bleu l’argent reçu, en gris ce que Standix a coûté. Si le bleu dépasse le gris, le mois est rentable.',
+  'Abonnements Stripe': 'Chaque client qui paie, son offre et la date du prochain prélèvement. « Impayé » : sa carte a été refusée.',
+  'Revenu par offre': 'Quelle offre rapporte le plus chaque mois.',
+  'Coûts fixes': 'Ce que tu payes chaque mois quoi qu’il arrive. Active un coût dès que tu commences à le payer : il est alors compté dans le bénéfice.',
+  'Coûts variables': 'Ce que coûte l’IA à chaque utilisation. Ajuste ces prix quand tu reçois une vraie facture.',
+  'Signalements par jour': 'Combien de fois des erreurs ont été rencontrées chaque jour. Un pic = un problème à regarder ce jour-là.',
+  'Générations IA en échec': 'Procédures que l’IA n’a pas réussi à créer, avec la raison. Le client a dû recommencer.',
+  'Services': 'Chaque brique technique de Standix, testée à l’ouverture de la page. Tout doit être « OK ».',
+  'Intelligence artificielle': 'La fiabilité de l’IA qui crée les procédures, et combien elle a travaillé.',
+  'Stockage': 'La place utilisée sur Supabase par la base de données et les fichiers (vidéos, logos). Au-delà de 80 %, il faudra un plan plus grand.',
+  'Par dossier': 'Ce qui prend le plus de place dans les fichiers.',
+  'Lignes par table': 'Le nombre d’éléments enregistrés dans chaque partie de la base. Utile pour voir ce qui grossit.',
+  'Essais en cours': 'Les entreprises qui testent Standix gratuitement, de la plus proche de la fin à la plus lointaine. Le bon moment pour les contacter.',
+  'Essais terminés ce mois': 'Essais finis sans abonnement : des clients potentiels à relancer.',
+  'Inscriptions par jour': 'Le nombre de nouvelles entreprises chaque jour sur 3 mois.',
+  'Toutes les entreprises': 'Chaque entreprise inscrite. Touche une entreprise pour ouvrir sa fiche et lui envoyer un message.',
+  'Procédures créées par jour': 'Combien de procédures ont été créées chaque jour : le signe que les clients produisent du contenu.',
+  'Lectures par jour': 'Combien de procédures les employés ont lues chaque jour : le signe que Standix est vraiment utilisé sur le terrain.',
+  'Type de procédure': 'Le genre de procédures que les clients créent le plus.',
+  'Créée à partir de': 'Si les procédures viennent plutôt d’une vidéo ou d’un document.',
+  'Langue des membres': 'La langue choisie par les utilisateurs dans l’app.',
+  'Procédures les plus utilisées': 'Les procédures les plus lues et scannées, toutes entreprises confondues.',
+  'Visiteurs par jour': 'Le nombre de personnes différentes venues sur le site chaque jour.',
+  'D’où ils viennent': 'Le site qui a amené chaque visiteur (Google, LinkedIn…). « Accès direct » : adresse tapée ou lien enregistré.',
+  'Appareils': 'Sur quel type d’appareil les visiteurs regardent le site.',
+  'Systèmes': 'Le système de leur appareil (iPhone, Android, Windows…).',
+  'Région': 'D’où viennent les visiteurs, d’après le fuseau horaire de leur appareil.',
+  'Pages vues': 'Les pages du site les plus regardées.',
+  'Boutons cliqués': 'Les boutons et liens sur lesquels les visiteurs cliquent le plus.',
+  'Activités suspectes': 'Ce qui sort de l’ordinaire : mots de passe forcés, comptes partagés, faux comptes, IA utilisée en masse… Touche « Vu » une fois vérifié.',
+  'Comptes partagés': 'Un même compte utilisé par plusieurs personnes. Touche un compte pour voir ses appareils et lui envoyer un avertissement.',
+  'Points de contrôle': 'Les réglages de sécurité importants, vérifiés automatiquement.',
+  'Derniers comptes créés': 'Les nouveaux comptes, et s’ils ont confirmé leur adresse e-mail.',
+  'Avertissements envoyés': 'Les messages envoyés aux responsables, et s’ils les ont lus dans l’app.',
+  'Connexions au Dashboard': 'Chaque ouverture de ce Dashboard. Un « nouvel appareil » que tu ne reconnais pas doit t’alerter.',
+  'Changements de rôle récents': 'Arrivées, départs et promotions dans les équipes de tes clients.',
+}
+function ajouterLegendes() {
+  $$('#principal .section > h2, #principal .carte > h3').forEach((h) => {
+    if (h.nextElementSibling?.classList.contains('explic')) return
+    const t = (h.firstChild?.textContent || '').trim()
+    if (LEGENDES[t]) h.insertAdjacentHTML('afterend', `<p class="explic">${echap(LEGENDES[t])}</p>`)
+  })
+}
+
+/* « Comment lire cette page » : à quoi sert la page, chaque partie
+   expliquée, et quoi faire quand quelque chose ne va pas. */
+const GUIDES = {
+  vue: {
+    role: 'C’est l’accueil : il résume tout Standix et te dit par où commencer.',
+    parties: [['Le point sur Standix', 'Une analyse automatique de tous les chiffres. « – » : ce qui ne va pas, du plus grave au moins grave. « ✓ » : ce qui va bien. Touche une ligne pour aller à la bonne page.'],
+      ['Les 4 grands chiffres', 'Ce que Standix rapporte chaque mois, le bénéfice du mois, les erreurs à corriger et les entreprises qui utilisent vraiment l’app.'],
+      ['30 derniers jours', 'L’activité du mois : inscriptions, procédures créées et lues, visiteurs du site.'],
+      ['Dernières erreurs et inscriptions', 'Ce qui vient de se passer.']],
+    si: [['Une ligne rouge dans « Le point »', 'Commence par elle : touche-la pour aller à la page concernée.'], ['Une pastille sur un onglet', 'Il y a du nouveau sur cette page. Bleue : à voir. Rouge : important.']],
+  },
+  argent: {
+    role: 'Savoir si Standix gagne de l’argent : ce qui rentre, ce qui sort, et ce qui reste.',
+    parties: [['Revenu mensuel récurrent', 'Ce que rapportent tous les abonnements chaque mois. C’est le chiffre clé d’un SaaS.'],
+      ['Encaissé, coûts, bénéfice', 'L’argent vraiment reçu ce mois, ce que Standix a coûté, et la différence.'],
+      ['Le graphique sur 12 mois', 'Pour voir si l’activité progresse.'],
+      ['Coûts fixes et variables', 'Tu peux les modifier directement : tout est enregistré et recalculé.']],
+    si: [['Bénéfice en rouge', 'Les coûts dépassent les revenus ce mois. Vérifie les coûts fixes, ou relance les essais terminés (page Clients).'], ['Un client « Impayé »', 'Sa carte a été refusée : Stripe réessaie automatiquement, mais un petit message au client aide.'], ['« Stripe ne répond pas »', 'Les revenus affichés sont estimés. Réessaie plus tard.']],
+  },
+  clients: {
+    role: 'Suivre chaque entreprise inscrite, du premier jour d’essai jusqu’à l’abonnement.',
+    parties: [['Les 4 chiffres', 'Entreprises inscrites, clients qui paient, essais en cours, impayés.'], ['Essais en cours / terminés', 'Les entreprises à contacter maintenant pour les convertir.'], ['Toutes les entreprises', 'La liste complète. Filtre-la (Essai, Abonnés, À relancer) ou cherche un nom. Touche une entreprise pour ouvrir sa fiche.']],
+    si: [['Un essai se termine bientôt', 'C’est le meilleur moment pour proposer une démo ou de l’aide.'], ['Beaucoup d’essais terminés sans abonnement', 'Contacte-les : c’est souvent un détail qui bloque.'], ['Envoyer un message à un gérant', 'Ouvre la fiche de l’entreprise → « Envoyer un avertissement ».']],
+  },
+  usage: {
+    role: 'Voir si les clients utilisent vraiment Standix, et comment.',
+    parties: [['Procédures et analyses IA', 'Ce que les responsables créent.'], ['Lectures et scans QR', 'Ce que les employés consultent sur le terrain. C’est la preuve que Standix est utile.'], ['Types, sources, langues', 'Pour comprendre les habitudes des clients.']],
+    si: [['Beaucoup de procédures créées mais peu lues', 'Les équipes n’ont peut-être pas l’app : propose au client de partager le code d’invitation ou les QR codes.']],
+  },
+  site: {
+    role: 'Savoir qui visite standix.app et si le site donne envie d’essayer.',
+    parties: [['Visiteurs', 'Les personnes venues sur le site. Aucun cookie, aucune adresse IP enregistrée.'], ['Clics « Essayer »', 'Combien de visiteurs veulent tester Standix. C’est le chiffre qui compte.'], ['D’où ils viennent', 'Google, LinkedIn, accès direct… pour savoir quelle publicité marche.']],
+    si: [['Beaucoup de visiteurs mais peu de clics « Essayer »', 'Le haut de la page d’accueil ne convainc pas assez : le titre et le bouton sont à revoir.']],
+  },
+  erreurs: {
+    role: 'Repérer et corriger chaque problème rencontré par un client, avant qu’il ne s’en plaigne.',
+    parties: [['Les erreurs', 'Une même erreur répétée est regroupée en une seule ligne, avec le nombre de fois et d’entreprises touchées. Elles arrivent en direct.'], ['Le détail', 'Touche une erreur : appareil, page, entreprise, et toutes les informations techniques.'], ['Générations IA en échec', 'Les procédures que l’IA n’a pas réussi à créer.']],
+    si: [['Corriger une erreur', 'Ouvre-la → « Copier pour Claude » → colle le texte dans ta conversation avec Claude.'], ['Une fois corrigée', 'Touche « Corrigée ». Si elle revient, elle repassera automatiquement « À corriger ».'], ['Une erreur sans importance', 'Touche « Ignorer » : elle ne t’alertera plus.']],
+  },
+  sante: {
+    role: 'Vérifier que tout ce qui fait tourner Standix fonctionne.',
+    parties: [['Services', 'Base de données, serveur, paiements, site et app : testés à chaque ouverture de la page, avec leur temps de réponse.'], ['Intelligence artificielle', 'La part de procédures réussies par l’IA.'], ['Stockage', 'La place utilisée sur ton abonnement Supabase.']],
+    si: [['Un service « En panne »', 'Recharge la page. Si ça persiste, regarde status.supabase.com ou status.stripe.com.'], ['Stockage au-dessus de 80 %', 'Prévoir un plan Supabase plus grand ou supprimer d’anciennes vidéos.']],
+  },
+  securite: {
+    role: 'Protéger Standix et tes clients : connexions, comptes partagés, comportements anormaux.',
+    parties: [['Activités suspectes', 'Tout ce qui sort de l’ordinaire, du plus grave au moins grave.'], ['Comptes partagés', 'Les comptes utilisés par plusieurs personnes. « Probable » en rouge : à traiter.'], ['Points de contrôle', 'Les réglages de sécurité essentiels.'], ['Avertissements envoyés', 'Les messages envoyés aux gérants, et s’ils les ont lus.'], ['Connexions au Dashboard', 'Qui a ouvert ce Dashboard, et sur quel appareil.']],
+    si: [['Un compte partagé « Probable »', 'Ouvre-le → « Envoyer un avertissement ». Si ça continue, envoie un « Dernier avertissement ».'], ['Une alerte vérifiée', 'Touche « Vu » pour la ranger.'], ['Un nouvel appareil inconnu sur le Dashboard', 'Change ton mot de passe et vérifie ton code à 6 chiffres.']],
+  },
+}
+function ouvrirGuide() {
+  const g = GUIDES[page], p = pageDe(page); if (!g || !p) return
+  ouvrirFeuille(`<div class="feuille-corps guide" style="--c:${p.couleur}">
+    <div class="guide-haut">${pastilleIcone(p, 'grand')}<div><div class="ent-groupe">Comment lire cette page</div><div class="feuille-titre" style="margin:2px 0 0">${p.nom}</div></div></div>
+    <p class="guide-role">${echap(g.role)}</p>
+    <div class="titre-bloc">Ce que tu vois</div>
+    <div class="groupe">${g.parties.map(([t, d], i) => `<div class="guide-ligne"><span class="num">${i + 1}</span><div><b>${echap(t)}</b><span>${echap(d)}</span></div></div>`).join('')}</div>
+    <div class="titre-bloc">Que faire si…</div>
+    <div class="groupe">${g.si.map(([t, d]) => `<div class="guide-ligne"><span class="num fl">${ico('fleche')}</span><div><b>${echap(t)}</b><span>${echap(d)}</span></div></div>`).join('')}</div>
+    <button class="gros-btn plein" data-action="fermer" style="margin-top:6px">J’ai compris</button>
+  </div>`)
+}
+
 function tuile(lib, val, sous = '', opts = {}) {
   return `<div class="carte tuile${opts.heros ? ' heros' : ''}">
-    <div class="lib">${lib}</div>
+    <div class="lib">${lib}${AIDE[lib] ? `<button class="aide" data-aide="${echap(lib)}" aria-label="Que veut dire « ${echap(lib)} » ?">i</button>` : ''}</div>
     <div class="val ${opts.ton || ''}">${val}</div>
     ${sous ? `<div class="sous">${sous}</div>` : ''}
     ${opts.spark ? `<div class="spark graph" data-graph='${echap(JSON.stringify({ type: 'spark', d: opts.spark, lib }))}'></div>` : ''}
@@ -1185,7 +1472,8 @@ function hbars(items, opts = {}) {
 const objEnListe = (o, noms = {}) => Object.entries(o || {}).map(([k, v]) => ({ k: noms[k] || k, n: v })).sort((a, b) => b.n - a.n)
 
 /* ─── Vue d'ensemble ─── */
-function pageVue() {
+/* Les alertes « à traiter » (reprises dans l'analyse) */
+function calculerAlertes() {
   const k = S.kpi, a = argent()
   const alertes = []
   const nouvelles = (S.erreurs || []).filter((e) => e.statut === 'nouveau')
@@ -1203,9 +1491,16 @@ function pageVue() {
   }
   if (!a.stripeOk) alertes.push({ ton: 'alerte', ico: 'argent', t: `<b>Stripe ne répond pas</b> <span>· revenus estimés</span>`, va: 'argent' })
 
+  return alertes
+}
+
+function pageVue() {
+  const k = S.kpi, a = argent()
+  const alertes = calculerAlertes()
+
   const visites30 = serie('visites'), inscr30 = serie('entreprises'), proc30 = serie('procedures'), valid30 = serie('validations')
 
-  return entete('Vue d’ensemble', 'Standix en un coup d’œil') + lePoint(alertes).replace('<div class="section">', '<div class="section" style="margin-top:0;margin-bottom:26px">') + `
+  return entete('Vue d’ensemble', 'Standix en un coup d’œil') + lePoint().replace('<div class="section">', '<div class="section" style="margin-top:0;margin-bottom:26px">') + `
   <div class="grille g4">
     ${tuile('Revenu mensuel récurrent', eur(a.mrr), a.stripeOk ? 'Stripe · ' + (ST.mode === 'réel' ? 'mode réel' : 'mode test') : 'Estimé (Stripe indisponible)', { heros: 1 })}
     ${tuile('Bénéfice ce mois', eur(a.benefice), `${eur(a.revenuMois)} encaissés − ${eur(a.couts.total)} de coûts`, { heros: 1, ton: a.benefice >= 0 ? 'ok' : 'grave' })}
@@ -1239,7 +1534,8 @@ function pageVue() {
    Une analyse automatique de tous les chiffres, en phrases courtes :
    « – » ce qui ne va pas (du plus grave au moins grave), « ✓ » ce qui va.
    Reprend aussi tout ce que listait « À traiter ». */
-function lePoint(alertesBrutes) {
+function analyse() {
+  const alertesBrutes = calculerAlertes()
   const k = S.kpi, a = argent(), mal = [], bien = []
   const plur = (n, mot, pl = mot + 's') => n + ' ' + (n > 1 ? pl : mot)
   const ajoute = (ok, texte, va, poids = 1) => (ok ? bien : mal).push({ texte, va, poids })
@@ -1286,6 +1582,11 @@ function lePoint(alertesBrutes) {
   if (!(SU.alertes || []).some((x) => !x.vue)) ajoute(true, 'Aucune activité suspecte à vérifier', 'securite')
 
   mal.sort((x, y) => y.poids - x.poids)
+  return { mal, bien }
+}
+function lePoint() {
+  const { mal, bien } = analyse()
+  const plur = (n, mot, pl = mot + 's') => n + ' ' + (n > 1 ? pl : mot)
   const titre = !mal.length ? 'Tout va bien' : mal.length === 1 ? '1 point à surveiller' : mal.length + ' points à surveiller'
   const ligne = (x, ok) => `<button class="point-ligne ${ok ? 'ok' : (x.poids >= 3 ? 'grave' : 'mal')}" ${x.va ? `data-aller="${x.va}"` : ''}>
       <span class="signe">${ok ? ico('ok') : '<i></i>'}</span><span class="txt">${echap(x.texte)}</span>${x.va ? ico('fleche') : ''}</button>`
@@ -1931,6 +2232,7 @@ function brancherPage() {
   const P = $('#principal')
   $$('[data-action="actualiser"]', P).forEach((b) => b.onclick = async () => { b.disabled = true; await charger(); toast('Chiffres à jour') })
   $$('[data-aller]', P).forEach((b) => b.onclick = () => aller(b.dataset.aller))
+  $$('[data-action="guide"]', P).forEach((b) => b.onclick = ouvrirGuide)
   $$('[data-erreur]', P).forEach((b) => b.onclick = () => ouvrirErreur(b.dataset.erreur))
   $$('[data-filtre]', P).forEach((b) => b.onclick = () => { filtreErreurs = b.dataset.filtre; afficher() })
   $$('[data-source]', P).forEach((b) => b.onclick = () => { filtreSource = b.dataset.source; afficher() })
@@ -2207,6 +2509,35 @@ new ResizeObserver(() => {
   largeurPrecedente = innerWidth
   dessinerGraphiques()
 }).observe(document.body)
+
+/* ─── ⓘ : explication d'un chiffre ─── */
+const popAide = document.createElement('div'); popAide.className = 'pop-aide'; document.body.appendChild(popAide)
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-aide]')
+  if (!b) { popAide.classList.remove('vu'); return }
+  e.stopPropagation()
+  if (popAide.classList.contains('vu') && popAide.dataset.lib === b.dataset.aide) { popAide.classList.remove('vu'); return }
+  popAide.dataset.lib = b.dataset.aide
+  popAide.innerHTML = `<b>${echap(b.dataset.aide)}</b>${echap(AIDE[b.dataset.aide] || '')}`
+  popAide.classList.add('vu')
+  const r = b.getBoundingClientRect(), w = Math.min(300, innerWidth - 32)
+  popAide.style.width = w + 'px'
+  popAide.style.left = Math.max(16, Math.min(innerWidth - w - 16, r.left + r.width / 2 - w / 2)) + 'px'
+  const h = popAide.offsetHeight
+  popAide.style.top = (r.bottom + 8 + h > innerHeight - 90 ? r.top - h - 8 : r.bottom + 8) + 'px'
+}, true)
+addEventListener('scroll', () => popAide.classList.remove('vu'), { passive: true })
+
+/* ─── Ordinateur : touches 1 à 8 pour changer de page, R pour actualiser ─── */
+document.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest('input, textarea, select') || !S || $('#coque').classList.contains('cache')) return
+  const n = parseInt(e.key, 10)
+  if (n >= 1 && n <= PAGES.length) { fermerPanneau(); aller(PAGES[n - 1].id) }
+  if (e.key === 'r' || e.key === 'R') charger().then(() => toast('Chiffres à jour'))
+})
+
+/* ─── Téléphone : toucher la barre du haut remonte en haut de page ─── */
+$('#haut-mobile')?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }))
 
 /* Pincement sur iOS (le double appui est réglé en CSS). */
 ;['gesturestart', 'gesturechange', 'gestureend'].forEach((t) => document.addEventListener(t, (e) => e.preventDefault(), { passive: false }))

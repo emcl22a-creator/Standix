@@ -2,7 +2,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#050506">
 <title>Standix — Conditions d'utilisation</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap&family=Poppins:wght@400;500;600">
+<link rel="preload" href="/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/polices.css">
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{--l2:rgba(235,235,245,.64);--l3:rgba(235,235,245,.32);--bord:rgba(255,255,255,.09)}
@@ -341,10 +342,17 @@ souscription — <b>rien n'est supprimé</b>.</p>
 <p>Les abonnements sont mensuels ou annuels. Le paiement est traité par <b>Stripe</b> ;
 nous ne conservons aucune donnée bancaire.</p>
 <ul>
-  <li>L'abonnement <b>mensuel</b> est sans engagement, résiliable à tout moment. La
-      résiliation prend effet à la fin de la période payée.</li>
+  <li>L'abonnement <b>mensuel</b> est sans engagement, résiliable à tout moment. Il se
+      renouvelle automatiquement chaque mois. La résiliation prend effet à la fin de la
+      période payée.</li>
   <li>L'abonnement <b>annuel</b> est réglé en une fois. Il couvre douze mois et n'est pas
-      remboursable au prorata, sauf accord écrit.</li>
+      remboursable au prorata, sauf accord écrit. <b>À son terme, il se renouvelle
+      automatiquement pour douze mois</b>, sauf résiliation avant la date d'échéance,
+      depuis «&nbsp;Gérer mon abonnement&nbsp;».</li>
+  <li><b>Changement de prix :</b> toute hausse est annoncée au moins <b>trente jours à
+      l'avance</b>, par e-mail ou dans l'application. Elle s'applique à l'échéance suivante ;
+      si elle ne vous convient pas, vous pouvez résilier avant. Un abonnement annuel en
+      cours garde son prix jusqu'à son terme.</li>
   <li>Chaque offre inclut un nombre de membres et un quota mensuel d'analyses
       automatiques. Le quota se remet à zéro le premier de chaque mois et ne se reporte
       pas.</li>
@@ -488,6 +496,14 @@ prestataires tiers et d'un réseau que nous ne maîtrisons pas.</p>
 avez effectivement versées au cours des douze derniers mois.</p>
 <p>Nous ne saurions être tenus responsables des conséquences d'une procédure mal rédigée,
 mal comprise ou mal appliquée au sein de votre entreprise.</p>
+<p><b>Dommages indirects.</b> Standix ne répond que des dommages directs. Sont exclus les
+dommages indirects, notamment la perte de chiffre d'affaires, de clientèle ou
+d'exploitation, et l'arrêt d'activité.</p>
+<p><b>Force majeure.</b> Aucune des parties n'est responsable d'un retard ou d'une
+inexécution dus à un événement qui échappe à son contrôle, au sens de l'article 1218 du
+Code civil — par exemple une panne générale d'un hébergeur ou d'un réseau, une
+cyberattaque de grande ampleur, une catastrophe naturelle ou une décision des autorités.
+Si l'empêchement dure plus de trente jours, chacun peut résilier sans indemnité.</p>
 </article>
 
 <article id="a11"><div class="num"><i>ARTICLE 11</i><em></em></div>
@@ -602,13 +618,34 @@ traitement est l'éditeur : Adrien Moine, entrepreneur individuel (article 1).</
       <td data-l="Pourquoi">Compter l'usage des procédures affichées</td><td data-l="Base légale">Contrat</td><td data-l="Durée">Quatre cents jours</td></tr>
   <tr><td>Échanges avec nous (e-mail, téléphone)</td>
       <td data-l="Pourquoi">Vous répondre</td><td data-l="Base légale">Intérêt légitime</td><td data-l="Durée">Trois ans après le dernier échange</td></tr>
+  <tr><td>Erreurs techniques (page, message d'erreur, type d'appareil, de système et de
+      navigateur, compte et entreprise concernés)</td>
+      <td data-l="Pourquoi">Repérer et corriger les bugs</td><td data-l="Base légale">Intérêt légitime</td><td data-l="Durée">Quatre-vingt-dix jours</td></tr>
+  <tr><td>Signal d'activité pendant l'utilisation de l'app (toutes les cinq minutes :
+      heure, navigateur, début de l'adresse réseau)</td>
+      <td data-l="Pourquoi">Repérer un compte utilisé par plusieurs personnes</td><td data-l="Base légale">Intérêt légitime (sécurité)</td><td data-l="Durée">Quatre-vingt-dix jours</td></tr>
+  <tr><td>Temps de chargement de l'app (type d'appareil et de réseau, sans identité)</td>
+      <td data-l="Pourquoi">Améliorer la vitesse</td><td data-l="Base légale">Intérêt légitime</td><td data-l="Durée">Treize mois</td></tr>
+  <tr><td>Visites du site standix.app (page vue, liens cliqués, durée, site d'origine,
+      type d'appareil, langue, fuseau horaire)</td>
+      <td data-l="Pourquoi">Mesurer la fréquentation du site</td><td data-l="Base légale">Intérêt légitime</td><td data-l="Durée">Treize mois</td></tr>
+  <tr><td>Tentatives de connexion et événements de sécurité</td>
+      <td data-l="Pourquoi">Protéger les comptes contre le piratage</td><td data-l="Base légale">Intérêt légitime (sécurité)</td><td data-l="Durée">Six mois (tentatives), un an (événements)</td></tr>
+  <tr><td>Messages de Standix au responsable de l'entreprise, et leur lecture</td>
+      <td data-l="Pourquoi">Prévenir d'un problème sur le compte</td><td data-l="Base légale">Contrat</td><td data-l="Durée">Tant que l'entreprise existe</td></tr>
 </table>
 
 <h3>Ce qui est gardé sur votre appareil</h3>
 <p>L'application garde sur votre téléphone ou votre ordinateur votre session de connexion,
 votre langue et quelques préférences d'affichage. C'est indispensable à son
-fonctionnement : aucun consentement n'est donc demandé. <b>Standix n'utilise aucun cookie
-publicitaire et aucun outil de mesure d'audience.</b></p>
+fonctionnement : aucun consentement n'est donc demandé.</p>
+<p><b>Standix n'utilise aucun cookie et aucun outil publicitaire ou de mesure
+d'audience d'un tiers</b> (ni Google Analytics, ni réseau social). Le site mesure lui-même
+sa fréquentation, pour son seul usage : sans cookie et sans conserver d'adresse réseau,
+avec un identifiant tiré au hasard, gardé dans l'onglet et effacé à sa fermeture. Les
+statistiques ne sont jamais croisées avec d'autres données ni transmises à quiconque.
+Les polices de caractères et les outils de l'application sont servis par Standix
+lui-même : votre navigateur ne contacte aucun serveur tiers pour les afficher.</p>
 
 <h3>Qui reçoit vos données</h3>
 <p>Uniquement les prestataires de l'article 7, pour ce qui les concerne. Vos données ne
@@ -624,7 +661,7 @@ au Préposé fédéral à la protection des données (PFPDT).</p>
 </article>
 
 <div class="pied">
-  Version en vigueur le <b>25 octobre 2026</b>.<br><br>
+  Version en vigueur le <b>26 octobre 2026</b>.<br><br>
   <b>Standix</b> — Adrien Moine, entrepreneur individuel<br>
   60, rue François 1er – 75008 Paris<br>
   SIRET 100 403 401 00019 · <a href="mailto:contact@standix.app">contact@standix.app</a> · +33&nbsp;6&nbsp;74&nbsp;57&nbsp;95&nbsp;23<br>

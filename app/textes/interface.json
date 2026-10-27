@@ -919,6 +919,10 @@
   "en": "This procedure belongs to “{nom}”, where you already have access. Switch to that company to open it?",
   "de": "Diese Anleitung gehört zu „{nom}“, wo Sie schon Zugriff haben. Zu diesem Unternehmen wechseln, um sie zu öffnen?"
  },
+ "Cette procédure appartient à « {nom} ». Entrez le code de cette entreprise pour y accéder.": {
+  "en": "This procedure belongs to “{nom}”. Enter this company's code to access it.",
+  "de": "Diese Anleitung gehört zu „{nom}“. Geben Sie den Code dieses Unternehmens ein, um darauf zuzugreifen."
+ },
  "Cette procédure appartient à « {nom} ». Vous pourrez la consulter, mais pas les autres procédures de l'entreprise : il faut pour cela le code de votre responsable.": {
   "en": "This procedure belongs to “{nom}”. You can open it, but not the company's other procedures: for those you need your manager's code.",
   "de": "Diese Anleitung gehört zu „{nom}“. Sie können sie öffnen, die anderen Anleitungen des Unternehmens aber nicht: Dafür brauchen Sie den Code Ihrer Führungskraft."
@@ -1655,9 +1659,17 @@
   "en": "Enterprise",
   "de": "Enterprise"
  },
+ "Entrer le code": {
+  "en": "Enter the code",
+  "de": "Code eingeben"
+ },
  "Entrez d’abord votre adresse e-mail.": {
   "en": "Enter your email address first.",
   "de": "Geben Sie zuerst Ihre E-Mail-Adresse ein."
+ },
+ "Entrez le code de votre entreprise pour accéder aux procédures.": {
+  "en": "Enter your company code to access the procedures.",
+  "de": "Geben Sie den Code Ihres Unternehmens ein, um auf die Anleitungen zuzugreifen."
  },
  "Entrez le code à 6 caractères que son responsable vous a communiqué. Elle s'ajoutera à celles que vous avez déjà.": {
   "en": "Enter the 6-character code their manager gave you. It will be added to the ones you already have.",
@@ -3066,6 +3078,10 @@
  "Procédure": {
   "en": "Procedure",
   "de": "Anleitung"
+ },
+ "Procédure d'une autre entreprise": {
+  "en": "Procedure from another company",
+  "de": "Anleitung eines anderen Unternehmens"
  },
  "Procédure en cours de modification": {
   "en": "Procedure being edited",

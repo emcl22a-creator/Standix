@@ -543,6 +543,7 @@ const DICO = {
     "Cette procédure": "This procedure",
     "Cette procédure a été supprimée entre-temps.": "This procedure was deleted in the meantime.",
     "Cette procédure appartient à « {nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?": "This procedure belongs to “{nom}”, where you already have access. Switch to that company to open it?",
+    "Cette procédure appartient à « {nom} ». Entrez le code de cette entreprise pour y accéder.": "This procedure belongs to “{nom}”. Enter this company's code to access it.",
     "Cette procédure appartient à « {nom} ». Vous pourrez la consulter, mais pas les autres procédures de l'entreprise : il faut pour cela le code de votre responsable.": "This procedure belongs to “{nom}”. You can open it, but not the company's other procedures: for those you need your manager's code.",
     "Cette procédure est ouverte depuis un moment sans que rien ne bouge. Reprenez où vous en étiez, ou revenez-y plus tard.": "This procedure has been open for a while with nothing happening. Pick up where you left off, or come back to it later.",
     "Cette procédure n'a pas encore d'étapes. Prévenez votre responsable : il doit les ajouter avant que la procédure soit utilisable.": "This procedure has no steps yet. Tell your manager: they need to add them before it can be used.",
@@ -747,7 +748,9 @@ const DICO = {
     "Enregistrer l’écran": "Record screen",
     "Enregistré.": "Saved.",
     "Entreprise": "Enterprise",
+    "Entrer le code": "Enter the code",
     "Entrez d’abord votre adresse e-mail.": "Enter your email address first.",
+    "Entrez le code de votre entreprise pour accéder aux procédures.": "Enter your company code to access the procedures.",
     "Entrez le code à 6 caractères que son responsable vous a communiqué. Elle s'ajoutera à celles que vous avez déjà.": "Enter the 6-character code their manager gave you. It will be added to the ones you already have.",
     "environ {minutes} minute": "about {minutes} minute",
     "environ {minutes} minutes": "about {minutes} minutes",
@@ -1148,6 +1151,7 @@ const DICO = {
     "Presque prêt": "Almost there",
     "Prix hors taxes.": "Prices exclude tax.",
     "Procédure": "Procedure",
+    "Procédure d'une autre entreprise": "Procedure from another company",
     "Procédure en cours de modification": "Procedure being edited",
     "procédure en ligne": "procedure live",
     "Procédure générée": "Procedure ready",
@@ -1917,6 +1921,7 @@ const DICO = {
     "Cette procédure": "Diese Anleitung",
     "Cette procédure a été supprimée entre-temps.": "Dieses Verfahren wurde inzwischen gelöscht.",
     "Cette procédure appartient à « {nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?": "Diese Anleitung gehört zu „{nom}“, wo Sie schon Zugriff haben. Zu diesem Unternehmen wechseln, um sie zu öffnen?",
+    "Cette procédure appartient à « {nom} ». Entrez le code de cette entreprise pour y accéder.": "Diese Anleitung gehört zu „{nom}“. Geben Sie den Code dieses Unternehmens ein, um darauf zuzugreifen.",
     "Cette procédure appartient à « {nom} ». Vous pourrez la consulter, mais pas les autres procédures de l'entreprise : il faut pour cela le code de votre responsable.": "Diese Anleitung gehört zu „{nom}“. Sie können sie öffnen, die anderen Anleitungen des Unternehmens aber nicht: Dafür brauchen Sie den Code Ihrer Führungskraft.",
     "Cette procédure est ouverte depuis un moment sans que rien ne bouge. Reprenez où vous en étiez, ou revenez-y plus tard.": "Diese Anleitung ist schon eine Weile offen, ohne dass sich etwas tut. Machen Sie weiter, wo Sie waren, oder kommen Sie später zurück.",
     "Cette procédure n'a pas encore d'étapes. Prévenez votre responsable : il doit les ajouter avant que la procédure soit utilisable.": "Diese Anleitung hat noch keine Schritte. Sagen Sie Ihrer Führungskraft Bescheid: Die Schritte müssen erst ergänzt werden.",
@@ -2121,7 +2126,9 @@ const DICO = {
     "Enregistrer l’écran": "Bildschirm aufnehmen",
     "Enregistré.": "Gespeichert.",
     "Entreprise": "Enterprise",
+    "Entrer le code": "Code eingeben",
     "Entrez d’abord votre adresse e-mail.": "Geben Sie zuerst Ihre E-Mail-Adresse ein.",
+    "Entrez le code de votre entreprise pour accéder aux procédures.": "Geben Sie den Code Ihres Unternehmens ein, um auf die Anleitungen zuzugreifen.",
     "Entrez le code à 6 caractères que son responsable vous a communiqué. Elle s'ajoutera à celles que vous avez déjà.": "Geben Sie den 6-stelligen Code ein, den Sie von der Führungskraft bekommen haben. Er kommt zu Ihren bisherigen hinzu.",
     "environ {minutes} minute": "etwa {minutes} Minute",
     "environ {minutes} minutes": "etwa {minutes} Minuten",
@@ -2522,6 +2529,7 @@ const DICO = {
     "Presque prêt": "Fast fertig",
     "Prix hors taxes.": "Preise ohne Steuern.",
     "Procédure": "Anleitung",
+    "Procédure d'une autre entreprise": "Anleitung eines anderen Unternehmens",
     "Procédure en cours de modification": "Anleitung wird bearbeitet",
     "procédure en ligne": "Anleitung live",
     "Procédure générée": "Anleitung fertig",
@@ -7104,6 +7112,12 @@ async function ouvrirCibleQR() {
 
   if (currentMembre?.role === 'gestion') { openAnalyse(id); return }
 
+  /* ⚠ LE VISITEUR N'OUVRE RIEN (à la demande, 27 octobre 2026). Sans le code
+     de l'entreprise, aucune procédure ne s'affiche, pas même celle du QR
+     scanné : seul l'encadré du code reste visible. La base refuse aussi de
+     la lui donner (politiques de lecture des procédures, étapes, vidéos). */
+  if (estVisiteur()) { showEquipeScreen('e-list'); renderBlocVisiteur(); return }
+
   /* Arrivée depuis l'appareil photo du téléphone. On passe TOUJOURS par la
      fenêtre, comme pour le scanner de l'app : un code peut être mal visé, et
      atterrir d'un coup dans une procédure sans savoir laquelle est brutal.
@@ -7193,9 +7207,11 @@ async function proposerEntrepriseDuQR(code) {
 
   const nom = ent.nom || tLang('cette entreprise')
   const ok = await confirmDialog({
-    titre: dejaMembre ? tLang('Changer d\'entreprise ?') : tLang('Consulter cette procédure ?'),
-    message: dejaMembre ? tLang('Cette procédure appartient à « {nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?', { nom }) : tLang('Cette procédure appartient à « {nom} ». Vous pourrez la consulter, mais pas les autres procédures de l\'entreprise : il faut pour cela le code de votre responsable.', { nom }),
-    confirmer: dejaMembre ? tLang('Basculer') : tLang('Consulter'),
+    titre: dejaMembre ? tLang('Changer d\'entreprise ?') : tLang('Procédure d\'une autre entreprise'),
+    /* ⚠ SANS LE CODE, RIEN (27 octobre 2026) : on ne promet plus de pouvoir
+       consulter la procédure ; la personne entrera le code de l'entreprise. */
+    message: dejaMembre ? tLang('Cette procédure appartient à « {nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?', { nom }) : tLang('Cette procédure appartient à « {nom} ». Entrez le code de cette entreprise pour y accéder.', { nom }),
+    confirmer: dejaMembre ? tLang('Basculer') : tLang('Entrer le code'),
     annuler: tLang('Annuler'),
     danger: false,
   })
@@ -32267,7 +32283,9 @@ async function renderBlocVisiteur() {
      Elle était masquée — or c'est le seul endroit où sa procédure est listée :
      après « Retour », il ne voyait plus que le cadenas et devait rescanner
      l'affiche. On ne retire que la recherche et le tri, inutiles pour une
-     seule procédure. */
+     seule procédure.
+     ⚠ REMPLACÉ LE 27 OCTOBRE 2026 : le visiteur ne voit plus aucune procédure
+     sans le code (voir plus bas, la grille est masquée). */
   const outils = grille ? [grille.querySelector('.proc-rech-rang'), document.getElementById('e-proc-segm')] : []
   if (!estVisiteur()) {
     bloc.style.display = 'none'
@@ -32276,19 +32294,15 @@ async function renderBlocVisiteur() {
     return
   }
 
+  /* ⚠ TOUT EST BLOQUÉ SANS LE CODE (à la demande, 27 octobre 2026) : la
+     grille disparaît, la procédure du QR comprise ; plus de décompte des
+     « autres procédures ». Seul l'encadré du code reste. */
   bloc.style.display = 'block'
-  if (grille) grille.style.display = ''
+  if (grille) grille.style.display = 'none'
   outils.forEach(el => { if (el) el.style.display = 'none' })
 
-  const { count } = await supabase
-    .from('procedures').select('id', { count: 'exact', head: true })
-    .eq('entreprise_id', currentMembre.entreprise_id)
-
-  const autres = Math.max(0, (count || 0) - 1)
   const titre = document.getElementById('e-visiteur-titre')
-  if (titre) {
-    titre.textContent = autres > 0 ? (autres > 1 ? tLang('{autres} autres procédures dans cette entreprise', { autres }) : tLang('{autres} autre procédure dans cette entreprise', { autres })) : tLang('Les autres procédures ne vous sont pas accessibles')
-  }
+  if (titre) titre.textContent = tLang('Entrez le code de votre entreprise pour accéder aux procédures.')
 }
 
 /* Le code transforme l'adhésion visiteur en adhésion d'équipe : c'est la base
@@ -32398,26 +32412,11 @@ document.addEventListener('click', (e) => {
 
 async function loadEquipeProcedures() {
   majNomsTraduits()
-  /* Un visiteur arrivé par QR n'a accès qu'à la procédure scannée. On ne
-     demande donc que celle-là : les autres ne sont jamais chargées, il n'y a
-     rien à masquer ni à contourner côté navigateur. */
-  const requete = estVisiteur()
-    /* ═══ L'ÉQUIPE NE VOIT QUE CE QUI EST PUBLIÉ ═══
-
-       `.not('publiee_le', 'is', null)` écarte les brouillons. Le gérant les
-       voit dans son espace, l'équipe non.
-
-       ⚠ CE FILTRE NE PROTÈGE RIEN À LUI SEUL. Quelqu'un qui appelle l'API
-         directement peut demander toutes les procédures. C'est la politique
-         RLS de `migration-publication.sql` qui fait respecter la règle — celle
-         d'ici ne fait qu'éviter un aller-retour inutile. */
-    ? supabase.from('procedures').select('*')
-        .eq('id', currentMembre.procedure_visitee)
-        .not('publiee_le', 'is', null)
-    : supabase.from('procedures').select('*')
-        .eq('entreprise_id', currentMembre.entreprise_id)
-        .not('publiee_le', 'is', null)
-        .order('titre')
+  /* La requête des procédures est envoyée par `requetesEquipe` (plus bas).
+     ⚠ RIEN POUR LE VISITEUR (27 octobre 2026) : sans le code de l'entreprise,
+     aucune procédure n'est demandée, pas même celle du QR.
+     ⚠ L'ÉQUIPE NE VOIT QUE CE QUI EST PUBLIÉ : `requetesEquipe` écarte les
+     brouillons, et la politique RLS le fait respecter côté base. */
 
   /* ⚠ HORS VISITEUR, TROIS REQUÊTES PARTENT ENSEMBLE : les procédures, mes
      lectures, mes favoris (voir `requetesEquipe`). Elles attendaient les unes
@@ -32426,7 +32425,10 @@ async function loadEquipeProcedures() {
      `enterApp` a pu les lancer en avance : on reprend alors ses réponses. */
   let procedures, error, mesValidations, favsPrelus
   if (estVisiteur()) {
-    ;({ data: procedures, error } = await requete)
+    /* ⚠ PLUS RIEN POUR LE VISITEUR (27 octobre 2026) : sans le code de
+       l'entreprise, la liste reste vide — la base ne lui donnerait d'ailleurs
+       plus la procédure scannée. */
+    procedures = []; error = null
   } else {
     const [rProc, rVal, rFav] = await (prendrePrelecture('equipe:' + currentMembre.id)
       || requetesEquipe(currentMembre))
@@ -34310,6 +34312,13 @@ document.addEventListener('pointerdown', (e) => {
 
 async function openEquipeDetail(procId) {
   if (await bloqueSiEssaiFini()) return
+  /* Le visiteur n'ouvre aucune procédure (27 octobre 2026) : il doit d'abord
+     entrer le code de l'entreprise. */
+  if (estVisiteur()) {
+    showEquipeScreen('e-list'); renderBlocVisiteur()
+    toast(tLang('Entrez le code de votre entreprise pour accéder aux procédures.'))
+    return
+  }
 
   const monTour = ++ouvertureCourante
   const perime = () => monTour !== ouvertureCourante

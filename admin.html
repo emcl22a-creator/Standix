@@ -14,8 +14,13 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Standix Admin">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600&display=swap">
+<!-- ⚠ POLITIQUE DE SÉCURITÉ (audit du 27 octobre 2026) : seul LE script de cette page,
+     tel quel, peut s'exécuter (empreinte sha256 ci-dessous). Toute modification du
+     script exige de recalculer l'empreinte, sinon le Dashboard ne démarre plus
+     (un encadré le dit au bout de quelques secondes). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-2tGFVDNkL2ID/8iA/bSPalNTsFqhtBoCtvEp1x0TkKk='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://standix.app https://tlrtsoahwqhtvtkhssbm.supabase.co wss://tlrtsoahwqhtvtkhssbm.supabase.co; worker-src 'self'; manifest-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="/polices.css">
 <!--
   ═══════════════════════════════════════════════════════════════════════
   DASHBOARD PRIVÉ STANDIX (25 octobre 2026)
@@ -809,6 +814,105 @@ a.groupe-ligne svg { width: 16px; height: 16px; color: var(--texte-3); flex: non
   .sim-sens .n { min-width: 0; }
 }
 
+/* ─── Version 5 (27 octobre 2026) : prospects, cohortes, robot, rapport, Claude ─── */
+.btn-demander { color: var(--accent); }
+.champ-feuille select { height: 48px; border-radius: 12px; border: 1px solid var(--bord-fort); background: var(--carte); padding: 0 12px; width: 100%; color: var(--texte); font: inherit; }
+.champ-feuille select:focus { border-color: var(--accent); outline: none; }
+.segments.seg-6 { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-flow: row; }
+.ligne-interrupteur small { color: var(--texte-3); font-weight: 400; }
+/* Prospects */
+.pr-filtres { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.pr-filtres::-webkit-scrollbar { display: none; }
+.pr-filtres .filtre { flex: none; }
+.pr-ligne .t span { white-space: normal; }
+.pr-lie { margin: 0 0 14px; }
+.pr-lie small { color: var(--texte-3); }
+.pr-contact { margin-bottom: 14px; }
+.pr-contact .gros-btn { margin-bottom: 0; }
+/* Entreprises de test */
+.tests-liste .test-ligne { min-height: 58px; }
+.tests-liste .gl-t { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.tests-liste .gl-t b { font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tests-liste .gl-t small { font-size: 12.5px; color: var(--texte-3); font-weight: 400; }
+.tests-liste .interrupteur { flex: none; }
+.tests-liste .interrupteur:disabled { opacity: .5; }
+/* Cohortes */
+.coh-grille { display: grid; grid-template-columns: minmax(0, 1.5fr) repeat(4, minmax(0, 1fr)); gap: 4px; align-items: stretch; margin: 6px 0 4px; }
+.coh-t { font-size: 12px; color: var(--texte-3); font-weight: 500; text-align: center; padding: 0 2px 4px; }
+.coh-t:first-child { text-align: left; }
+.coh-m { display: flex; flex-direction: column; justify-content: center; gap: 1px; padding: 6px 4px 6px 0; min-width: 0; }
+.coh-m b { font-size: 14px; font-weight: 600; text-transform: capitalize; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.coh-m small { font-size: 12px; color: var(--texte-3); }
+.coh-c { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 9px; padding: 6px 2px; min-height: 46px;
+  background: color-mix(in srgb, var(--ok) calc(var(--t, 0) * 100%), var(--carte-2)); }
+.coh-c b { font-size: 14px; font-variant-numeric: tabular-nums; }
+.coh-c small { font-size: 11px; color: var(--texte-2); }
+.coh-c.vide-c { background: var(--carte-2); color: var(--texte-3); font-size: 14px; }
+/* Robot */
+.robot-etat { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px; margin-bottom: 10px; }
+.robot-etat b { font-size: 17px; } .robot-etat span { font-size: 13px; color: var(--texte-2); }
+.robot-etat.ok { background: var(--ok-doux); } .robot-etat.ok b { color: var(--ok); }
+.robot-etat.grave { background: var(--grave-doux); } .robot-etat.grave b { color: var(--grave); }
+.robot-points { display: grid; grid-template-columns: repeat(48, minmax(0, 1fr)); gap: 2px; margin: 0 0 12px; }
+.robot-points i { height: 18px; border-radius: 3px; background: var(--ok); opacity: .85; }
+.robot-points i.ko { background: var(--grave); opacity: 1; }
+.robot .etats .n { color: var(--texte-3); font-size: 12.5px; white-space: nowrap; }
+/* Claude : réponse préparée et questions */
+.ia-btn { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--accent); }
+.ia-brouillon textarea { font-size: 15px; }
+.ia-exemples { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 14px; }
+.ia-exemples .filtre { height: auto; min-height: 30px; padding: 5px 11px; white-space: normal; text-align: left; line-height: 1.3; font-size: 13px; }
+.ia-rep { background: var(--carte); border: 1px solid var(--bord); border-radius: 14px; padding: 14px 16px; margin: 6px 0 16px; }
+.ia-q { font-size: 13px; color: var(--texte-3); margin-bottom: 8px; }
+.ia-texte { font-size: 15px; line-height: 1.55; }
+.ia-texte p { margin: 0 0 8px; } .ia-texte ul { margin: 0 0 8px; padding-left: 20px; display: grid; gap: 4px; }
+.ia-texte b { font-weight: 700; }
+.ia-rep .note { margin: 6px 0 0; }
+.ia-hist-titre { margin-top: 18px; }
+.ia-h .gl-t { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; padding: 8px 0; }
+.ia-h .gl-t b { font-size: 14.5px; font-weight: 500; white-space: normal; line-height: 1.35; }
+.ia-h .gl-t small { font-size: 12px; color: var(--texte-3); font-weight: 400; }
+/* Rapport du mois : l'aperçu garde la page A4 et se réduit */
+.rapport-cadre { position: relative; overflow: hidden; border-radius: 10px; border: 1px solid var(--bord-fort); margin: 4px 0 14px; background: #fff; }
+.rapport-apercu { width: 794px; transform-origin: 0 0; }
+.rapport { width: 794px; min-height: 1060px; padding: 44px 48px 36px; box-sizing: border-box; background: #fff; color: #15161A; font: 13px/1.45 Inter, Arial, sans-serif; display: flex; flex-direction: column; gap: 18px; }
+.rapport .rp-tete { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; border-bottom: 2px solid #1F4CEE; padding-bottom: 12px; }
+.rapport .rp-marque { font: 700 15px/1 Poppins, Inter, Arial, sans-serif; color: #1F4CEE; letter-spacing: -.01em; margin-bottom: 6px; }
+.rapport h1 { font-size: 24px; margin: 0; letter-spacing: -.02em; }
+.rapport .rp-tete p { margin: 0; text-align: right; color: #666A73; font-size: 11.5px; }
+.rapport .rp-tuiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.rapport .rp-tuile { border: 1px solid #E3E4E8; border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.rapport .rp-tuile span { font-size: 11px; color: #666A73; text-transform: uppercase; letter-spacing: .03em; font-weight: 600; }
+.rapport .rp-tuile b { font-size: 22px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.rapport .rp-tuile small { font-size: 11px; color: #666A73; }
+.rapport .rp-ev { font-weight: 600; } .rapport .rp-ev.hausse { color: #16A34A; } .rapport .rp-ev.baisse { color: #DC2626; }
+.rapport .rp-deux { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.rapport h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: #1F4CEE; margin: 0 0 6px; }
+.rapport .rp-h2b { margin-top: 12px; }
+.rapport table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.rapport th { font-size: 11px; color: #666A73; font-weight: 600; text-align: left; padding: 0 4px 4px; }
+.rapport td { border-top: 1px solid #ECEDF0; padding: 5px 4px; }
+.rapport .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.rapport .rp-b { color: #8A8C94; }
+.rapport ul, .rapport ol { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 12.5px; }
+.rapport .rp-phrase { margin: 0 0 8px; font-style: italic; }
+.rapport .rp-vide { color: #8A8C94; margin: 0; }
+.rapport .rp-pied { margin-top: auto; border-top: 1px solid #E3E4E8; padding-top: 8px; font-size: 10.5px; color: #8A8C94; }
+@media print {
+  @page { size: A4; margin: 0; }
+  body.imprime-rapport { background: #fff !important; }
+  body.imprime-rapport > *:not(#impression) { display: none !important; }
+  body.imprime-rapport #impression { display: block; }
+  body.imprime-rapport .rapport { min-height: 297mm; width: 210mm; padding: 14mm 15mm 12mm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+@media (max-width: 860px) {
+  .entete .btn-demander { height: 32px; border-radius: 16px; font-size: 13px; background: var(--accent-doux); border-color: transparent; font-weight: 600; }
+  .coh-m b { font-size: 13px; }
+  .coh-c b { font-size: 13px; }
+  .robot-points { gap: 1px; }
+  .robot-points i { height: 16px; border-radius: 2px; }
+}
+
 /* ─── Tablette ─── */
 @media (max-width: 1180px) {
   .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -952,9 +1056,13 @@ a.groupe-ligne svg { width: 16px; height: 16px; color: var(--texte-3); flex: non
 @media (max-width: 380px) {
   .tuile .val { font-size: 20px; }
 }
+.csp-bloque { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 9999; max-width: 560px; margin: 0 auto; padding: 14px 16px; border-radius: 14px;
+  background: #FFF4F2; color: #7A1A10; border: 1px solid #F3B4AA; font: 14px/1.45 system-ui, sans-serif; opacity: 0; pointer-events: none; animation: csp-vu 0s 5s forwards; }
+@keyframes csp-vu { to { opacity: 1; pointer-events: auto; } }
 </style>
 </head>
 <body>
+<div class="csp-bloque" id="csp-bloque" role="alert"><b>Le Dashboard ne démarre pas.</b> Actualise la page. Si admin.html vient d’être modifié : l’empreinte de sécurité (Content-Security-Policy, en haut du fichier) doit être recalculée — demande-le à Claude.</div>
 
 <!-- ═══ Connexion ═══ -->
 <div class="porte cache" id="porte">
@@ -1024,17 +1132,25 @@ a.groupe-ligne svg { width: 16px; height: 16px; color: var(--texte-3); flex: non
 <div class="toast" id="toast"></div>
 
 <script type="module">
+/* Jamais dans un cadre d'un autre site (clic détourné). */
+if (top !== self) { document.documentElement.innerHTML = ''; throw new Error('Dashboard dans un cadre : refusé') }
+document.getElementById('csp-bloque')?.remove()
 /* ═══════════════════════════════════════════════════════════════════════
    1. CONNEXION À SUPABASE
-   Même bibliothèque et même session que l'app : si tu es déjà connecté
-   à l'app sur cet appareil, le Dashboard s'ouvre directement.
+   Même bibliothèque que l'app, mais une session À PART (clé « stx-admin ») :
+   la session du Dashboard (mot de passe + code à 6 chiffres) n'est pas
+   celle de l'app (audit du 27 octobre 2026). Plus de secours sur un site
+   extérieur (jsDelivr) : ce code aurait eu accès à la session.
    ═══════════════════════════════════════════════════════════════════════ */
 const SUPABASE_URL = 'https://tlrtsoahwqhtvtkhssbm.supabase.co'
 const SUPABASE_CLE = 'sb_publishable_pzGIsj3EE2Sh_OBt21QbGg_4lKfitFw'
 let createClient
 try { ({ createClient } = await import('/app/supabase.js')) }
-catch (e) { ({ createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')) }
-const sb = createClient(SUPABASE_URL, SUPABASE_CLE)
+catch (e) {
+  document.body.insertAdjacentHTML('afterbegin', '<div style="margin:16px;padding:14px;border-radius:12px;background:#FFF4F2;color:#7A1A10">Impossible de charger le Dashboard (fichier /app/supabase.js). Vérifie la connexion, puis actualise la page.</div>')
+  throw e
+}
+const sb = createClient(SUPABASE_URL, SUPABASE_CLE, { auth: { storageKey: 'stx-admin' } })
 
 const $ = (s, r = document) => r.querySelector(s)
 const $$ = (s, r = document) => [...r.querySelectorAll(s)]
@@ -1103,6 +1219,10 @@ const I = {
   conformite: '<path d="M12 3v18M7 21h10M5 7h14"/><path d="m5 7-3 7a3 3 0 0 0 6 0z"/><path d="m19 7-3 7a3 3 0 0 0 6 0z"/>',
   dossier: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   strategie: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>',
+  prospects: '<circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2M19 8v6M16 11h6"/>',
+  telephone: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>',
+  bulle: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/>',
+  rapport: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"/><path d="M8 18v-3M12 18v-6M16 18v-4"/>',
 }
 const ico = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`
 
@@ -1115,6 +1235,7 @@ const PAGES = [
   { id: 'argent', nom: 'Argent', icone: 'argent', couleur: '#30A46C', groupe: 'Business', desc: 'Ce que tu gagnes, ce que tu payes, et ce qu’il reste' },
   { id: 'conformite', nom: 'Conformité', icone: 'conformite', couleur: '#C2841B', groupe: 'Business', desc: 'Seuils, échéances et papiers de la micro-entreprise' },
   { id: 'clients', nom: 'Clients', icone: 'clients', couleur: '#6E56CF', groupe: 'Business', desc: 'Toutes les entreprises inscrites : essais, abonnés, à relancer' },
+  { id: 'prospects', nom: 'Prospects', icone: 'prospects', couleur: '#AD7F58', groupe: 'Business', desc: 'Les entreprises que tu démarches, et quoi faire aujourd’hui' },
   { id: 'strategie', nom: 'Stratégie', icone: 'strategie', couleur: '#AB4ABA', groupe: 'Business', desc: 'Rentable ou pas, objectifs, conseil du mois, concurrents, plan' },
   { id: 'usage', nom: 'Usage de l’app', court: 'Usage', icone: 'usage', couleur: '#F76B15', groupe: 'Produit', desc: 'Comment les entreprises utilisent l’app au quotidien' },
   { id: 'site', nom: 'Site internet', court: 'Site', icone: 'site', couleur: '#0894B3', groupe: 'Produit', desc: 'Qui visite standix.app, d’où, et ce qu’ils cliquent · sans cookie' },
@@ -1157,6 +1278,31 @@ function toast(t) {
   const el = $('#toast'); el.textContent = t; el.classList.add('vu')
   clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('vu'), 2600)
 }
+/* Une modification ou un effacement refusé par les règles d'accès ne renvoie PAS d'erreur :
+   aucune ligne n'est touchée. On le vérifie : sinon la page dirait « Enregistré » sans que
+   rien ne soit écrit (connexion expirée, ligne effacée ailleurs). Audit du 27 octobre 2026. */
+async function ecrit(q) {
+  const { data, error } = await q.select()
+  if (error) return { data: null, error }
+  if (!data?.length) return { data: null, error: { message: 'rien n’a été enregistré (connexion expirée, ou ligne déjà supprimée). Actualise la page.' } }
+  return { data, error: null }
+}
+/* Les chiffres reçus, complétés là où une liste ou un bloc manque : une donnée absente
+   ne doit pas vider une page entière. */
+function normaliserS(d) {
+  const x = d || {}
+  for (const c of ['kpi', 'securite', 'site', 'reglages']) if (!x[c] || typeof x[c] !== 'object') x[c] = {}
+  if (!x.technique || typeof x.technique !== 'object') x.technique = {}
+  for (const c of ['stockage', 'tables']) if (!Array.isArray(x.technique[c])) x.technique[c] = []
+  for (const c of ['entreprises', 'echecs_ia', 'erreurs', 'couts_fixes', 'serie', 'abonnements', 'analyses_par_mois', 'traductions_par_mois']) if (!Array.isArray(x[c])) x[c] = []
+  if (!x.usage || typeof x.usage !== 'object') x.usage = {}
+  if (!Array.isArray(x.usage.top_procedures)) x.usage.top_procedures = []
+  for (const c of ['par_type', 'par_langue', 'source', 'langue_membres']) if (!x.usage[c] || typeof x.usage[c] !== 'object') x.usage[c] = {}
+  for (const c of ['derniers_comptes', 'mouvements']) if (!Array.isArray(x.securite[c])) x.securite[c] = []
+  return x
+}
+const normaliserST = (d) => ({ ...d, par_mois: d.par_mois || [], solde: d.solde || { disponible: 0, en_attente: 0 }, par_statut: d.par_statut || {},
+  par_offre: d.par_offre || {}, clients: d.clients || [], evolution: { mrr_mois: [], prevision: [], ...(d.evolution || {}) } })
 
 /* ═══════════════════════════════════════════════════════════════════════
    3. ENTRÉE : SESSION → ADMIN ? → DASHBOARD
@@ -1179,12 +1325,16 @@ async function entrer() {
   $('#porte').classList.add('cache')
   $('#coque').classList.remove('cache')
   construireNav()
+  clearInterval(minuteur)
+  const g = generation
   await charger(true)
+  if (g !== generation) return   // refusé pendant le chargement : déjà déconnecté
   lireEtatPush().then(() => { if (['vue', 'securite'].includes(page)) afficher() })
   brancherDirect()
   clearInterval(minuteur)
   minuteur = setInterval(() => {
     if (finSession && Date.now() >= finSession.getTime()) return expirer()
+    if (!finSession) sessionExpiree()            // la fin de session n'a pas pu être lue : on redemande
     if (document.visibilityState === 'visible') charger()
   }, 60000)
 }
@@ -1194,7 +1344,10 @@ const DUREE_SESSION_J = 7
 let finSession = null
 async function sessionExpiree() {
   const { data, error } = await sb.rpc('admin_session_fin')
-  if (error) return false                         // fichier SQL pas encore lancé : rien à vérifier
+  if (error) {
+    if (refusAcces(error)) { await refuser(); return true }
+    finSession = null; return false              // réseau : le minuteur redemande dans une minute
+  }
   finSession = data ? new Date(data) : new Date(0) // session inconnue du serveur = expirée
   if (finSession.getTime() <= Date.now()) { await expirer(); return true }
   clearTimeout(sessionExpiree.t)
@@ -1202,13 +1355,38 @@ async function sessionExpiree() {
   majFinSession()
   return false
 }
-async function expirer() {
-  clearInterval(minuteur); clearTimeout(sessionExpiree.t)
+/* Tout arrêter et tout vider : minuteurs, temps réel, chiffres en mémoire, pages affichées,
+   et ce qui reste sur l'appareil (audit du 27 octobre 2026). */
+let generation = 0   // change à chaque déconnexion : une lecture partie avant ne réaffiche rien après
+function nettoyer() {
+  generation++
+  clearInterval(minuteur); clearTimeout(sessionExpiree.t); clearTimeout(brancherDirect.t); brancherDirect.t = null
   try { if (canal) sb.removeChannel(canal) } catch (e) {}
-  try { await sb.auth.signOut({ scope: 'local' }) } catch (e) {}
-  fermerPanneau?.()
-  montrerPorte('Par sécurité, une connexion au Dashboard dure ' + DUREE_SESSION_J + ' jours. Reconnecte-toi avec ton mot de passe et ton code.')
+  canal = null
+  S = null; ST = null; SU = { alertes: [], acces: [] }; AV = []; CA = null; SA = null; BO = null; NO = []; ME = null; CI = null; chargementCI = false
+  CO = null; CS = null; RE = null; SG = null; PR = null; CH = null; RB = null
+  try { fermerPanneau() } catch (e) {}
+  const pr = $('#principal'); if (pr) pr.innerHTML = ''
+  const pa = $('#panneau'); if (pa) pa.innerHTML = ''
+  oublierAppareil()
 }
+/* « Déjà vu » (des empreintes, sans nom) reste : sinon tout ce qui arrive pendant la déconnexion
+   serait marqué comme vu à la connexion suivante. Le reste part. */
+function oublierAppareil() {
+  try {
+    localStorage.removeItem('stx_vu_v1')
+    Object.keys(localStorage).filter((k) => k.startsWith('stx_code_') || k.startsWith('stx_rapport_phrase_')).forEach((k) => localStorage.removeItem(k))
+  } catch (e) {}
+}
+async function expirer(message) {
+  nettoyer()
+  try { await sb.auth.signOut({ scope: 'local' }) } catch (e) {}
+  montrerPorte(typeof message === 'string' ? message : 'Par sécurité, une connexion au Dashboard dure ' + DUREE_SESSION_J + ' jours. Reconnecte-toi avec ton mot de passe et ton code.')
+}
+/* Le serveur refuse (session de plus de 7 jours, code à 6 chiffres différent de celui
+   enregistré pour ce compte, accès retiré) : on ne garde rien à l'écran. */
+const refusAcces = (e) => !!e && (e.code === '42501' || /Accès refusé/i.test(e.message || ''))
+const refuser = () => expirer('Le serveur refuse l’accès : connexion de plus de ' + DUREE_SESSION_J + ' jours, code à 6 chiffres différent de celui enregistré pour ce compte, ou accès retiré. Reconnecte-toi avec ton mot de passe et ton code.')
 function texteFinSession() {
   if (!finSession || finSession.getTime() <= 0) return ''
   const ms = finSession.getTime() - Date.now()
@@ -1240,6 +1418,7 @@ async function demanderCode(dejaInscrit) {
   if (dejaInscrit) {
     facteurCode = (liste?.totp || []).find((f) => f.status === 'verified') || null
     $('#inscription-code').classList.add('cache')
+    if (!facteurCode) $('#porte-msg').textContent = 'Aucun code à 6 chiffres lisible pour ce compte. Actualise la page ; si ça recommence, demande à Claude.'
   } else {
     /* ⚠ LA CLÉ NE DOIT PAS CHANGER PENDANT L'INSCRIPTION (25 octobre 2026).
        Recharger la page, ouvrir un 2ᵉ onglet ou revenir de l'app « Mots de
@@ -1288,7 +1467,7 @@ $('#c-code').addEventListener('input', (e) => {
 })
 $('#form-code').addEventListener('submit', async (e) => {
   e.preventDefault()
-  if (!facteurCode) return
+  if (!facteurCode || $('#c-code-btn').disabled) return   // une vérification est déjà en cours
   const btn = $('#c-code-btn'); btn.disabled = true; $('#porte-msg').textContent = ''
   const { error } = await sb.auth.mfa.challengeAndVerify({ factorId: facteurCode.id, code: $('#c-code').value })
   btn.disabled = false
@@ -1325,7 +1504,7 @@ $('#form-connexion').addEventListener('submit', async (e) => {
   if (error) { $('#porte-msg').textContent = 'E-mail ou mot de passe incorrect.'; return }
   entrer()
 })
-async function sortir() { await sb.auth.signOut(); location.reload() }
+async function sortir() { nettoyer(); await sb.auth.signOut(); location.reload() }
 $('#sortir').onclick = sortir
 $('#porte-sortir').onclick = sortir
 
@@ -1333,33 +1512,38 @@ $('#porte-sortir').onclick = sortir
    4. CHARGEMENT DES CHIFFRES
    ═══════════════════════════════════════════════════════════════════════ */
 async function charger(premier = false) {
+  const gen = generation
   const t0 = performance.now()
   const stats = sb.rpc('admin_stats').then((r) => { mesures.base = Math.round(performance.now() - t0); return r })
   const t1 = performance.now()
   const stripe = sb.functions.invoke('admin-stripe', { body: {} }).then((r) => { mesures.fonctions = Math.round(performance.now() - t1); return r })
   const suspects = sb.rpc('admin_suspects')
-  sb.rpc('admin_avertissements').then(({ data }) => { if (Array.isArray(data)) AV = data }, () => {})
+  sb.rpc('admin_avertissements').then(({ data }) => { if (gen === generation && Array.isArray(data)) AV = data }, () => {})
   /* Les blocs de la version 2 : s'ils ne répondent pas (SQL pas encore
      exécuté), la page s'affiche quand même, avec « à activer ». */
   const v2 = Promise.allSettled(['admin_clients_analyse', 'admin_sante', 'admin_bouclier', 'admin_notifications', 'admin_messages'].map((f) => sb.rpc(f)))
     .then(([ca, sa, bo, no, me]) => {
+      if (gen !== generation) return
       const ok = (x) => x.status === 'fulfilled' && !x.value.error ? x.value.data : null
       CA = ok(ca); SA = ok(sa); BO = ok(bo); NO = ok(no) || []; ME = ok(me)
     })
   if (!VERSION_EN_LIGNE) fetch('/app/index.html?v=' + Date.now(), { cache: 'no-store' }).then((r) => r.text())
     .then((h) => { VERSION_EN_LIGNE = (h.match(/app\.js\?v=([\w-]+)/) || [])[1] || null }, () => {})
   /* Conformité : si conformite.sql n'est pas encore exécuté, la page affiche « à activer ». */
-  const conf = sb.rpc('admin_conformite').then(({ data, error }) => { if (!error && data) { CO = data; CO_ERR = ''; memoConf = null } else if (!CO) CO_ERR = error?.message || '' }, () => {})
+  const conf = sb.rpc('admin_conformite').then(({ data, error }) => { if (gen !== generation) return; if (!error && data) { CO = data; CO_ERR = ''; memoConf = null } else if (!CO) CO_ERR = error?.message || '' }, () => {})
   const v3 = chargerV3()   // dashboard-v3.sql : rentabilité par client, résumé du lundi
   const v4 = chargerV4()   // dashboard-v4.sql : stratégie, canaux
-  const [rs, rst, rsu] = await Promise.allSettled([stats, stripe, suspects, v2, conf, v3, v4])
+  const v5 = chargerV5()   // dashboard-v5.sql : prospects, cohortes, robot
+  const [rs, rst, rsu] = await Promise.allSettled([stats, stripe, suspects, v2, conf, v3, v4, v5])
+  if (gen !== generation) return   // déconnecté entre-temps : on n'affiche rien
   if (rsu.status === 'fulfilled' && !rsu.value.error && rsu.value.data) SU = rsu.value.data
   else SU = { alertes: [], acces: [], erreur: rsu.reason?.message || rsu.value?.error?.message || 'inconnue' }
 
-  if (rs.status === 'fulfilled' && !rs.value.error) { S = rs.value.data; mesures.baseOk = true }
+  if (rs.status === 'fulfilled' && refusAcces(rs.value.error)) return refuser()
+  if (rs.status === 'fulfilled' && !rs.value.error) { S = normaliserS(rs.value.data); mesures.baseOk = true }
   else { mesures.baseOk = false; if (!S) { $('#principal').innerHTML = `<div class="encart">Impossible de lire les chiffres : ${echap(rs.reason?.message || rs.value?.error?.message)}</div>`; return } }
 
-  if (rst.status === 'fulfilled' && !rst.value.error && rst.value.data && !rst.value.data.error) { ST = rst.value.data; mesures.fonctionsOk = true }
+  if (rst.status === 'fulfilled' && !rst.value.error && rst.value.data && !rst.value.data.error) { ST = normaliserST(rst.value.data); mesures.fonctionsOk = true }
   else {
     let msg = rst.reason?.message || rst.value?.data?.error || rst.value?.error?.message || 'inconnue'
     try { const c = await rst.value?.error?.context?.json?.(); if (c?.error) msg = c.error } catch (e) {}
@@ -1385,11 +1569,24 @@ function brancherDirect() {
   canal = sb.channel('erreurs-direct')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'journal_erreurs' }, (p) => {
       const e = p.new || {}
-      toast('Nouvelle erreur · ' + (e.code || e.genre || '') + ' — ' + String(e.message || '').slice(0, 60))
-      clearTimeout(brancherDirect.t)
-      brancherDirect.t = setTimeout(() => charger().then(() => {
-        const el = $(`.erreur[data-emp="${e.empreinte}"]`); if (el) el.classList.add('fraiche')
-      }), 800)
+      /* Une erreur peut être envoyée par n'importe quel visiteur : un message toutes les 10 s au plus,
+         et seulement les chiffres de base relus, une fois par minute au plus, onglet visible (audit du 27 oct.). */
+      if (Date.now() - (brancherDirect.dernierMsg || 0) > 10e3) {
+        brancherDirect.dernierMsg = Date.now()
+        toast('Nouvelle erreur · ' + (e.code || e.genre || '') + ' — ' + String(e.message || '').slice(0, 60))
+      }
+      if (brancherDirect.t) return
+      brancherDirect.t = setTimeout(async () => {
+        brancherDirect.t = null
+        if (document.visibilityState !== 'visible' || !S) return
+        brancherDirect.dernier = Date.now()
+        const g = generation
+        const { data, error } = await sb.rpc('admin_stats')
+        if (g !== generation || error || !data) return
+        S = normaliserS(data); majHorloge(); majPastilles()
+        if (!$('.panneau.ouvert')) { const y = scrollY; afficher(); scrollTo(0, y) }
+        const el = $(`.erreur[data-emp="${CSS.escape(String(e.empreinte || ''))}"]`); if (el) el.classList.add('fraiche')
+      }, Math.max(800, 60e3 - (Date.now() - (brancherDirect.dernier || 0))))
     })
     .subscribe((statut) => {
       enDirect = statut === 'SUBSCRIBED'
@@ -1399,7 +1596,11 @@ function brancherDirect() {
       const b = $('#badge-direct'); if (b) { b.textContent = enDirect ? 'En direct' : 'Hors direct'; b.classList.toggle('ok', enDirect) }
     })
 }
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S) charger() })
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !S) return
+  if (finSession && Date.now() >= finSession.getTime()) return expirer()
+  charger()
+})
 
 /* ═══════════════════════════════════════════════════════════════════════
    5. NAVIGATION
@@ -1429,10 +1630,14 @@ function aller(p) {
 }
 /* Le téléphone a 5 onglets ; les 4 autres pages sont dans « Plus ». */
 const ONGLETS = ['vue', 'argent', 'erreurs', 'clients', 'plus']
-const DANS_PLUS = ['messages', 'conformite', 'strategie', 'sante', 'usage', 'site', 'securite']
+const DANS_PLUS = ['messages', 'conformite', 'prospects', 'strategie', 'sante', 'usage', 'site', 'securite']
 const mobile = () => matchMedia('(max-width: 860px)').matches
 
+/* Chaque ouverture ou fermeture change le jeton : une réponse qui arrive après ne remplit
+   pas le panneau d'un autre compte ou d'une autre entreprise (audit du 27 octobre 2026). */
+let jetonPanneau = 0
 function ouvrirFeuille(html) {
+  jetonPanneau++
   const p = $('#panneau')
   p.innerHTML = '<div class="poignee" aria-hidden="true"></div>' + html
   p.classList.add('ouvert'); p.setAttribute('aria-hidden', 'false'); $('#voile').classList.add('ouvert')
@@ -1502,7 +1707,7 @@ document.addEventListener('touchend', async () => {
    la page marque tout comme vu. Au tout premier lancement, l'existant est
    considéré comme déjà vu (sinon tout serait « nouveau »). */
 function elementsParPage() {
-  const el = { erreurs: [], clients: [], argent: [], conformite: [], securite: [], sante: [], usage: [], site: [], messages: [], strategie: [] }
+  const el = { erreurs: [], clients: [], argent: [], conformite: [], securite: [], sante: [], usage: [], site: [], messages: [], strategie: [], prospects: [] }
   if (!S) return el
   const maintenant = Date.now()
   ;(S.erreurs || []).filter((e) => e.statut === 'nouveau').forEach((e) =>
@@ -1532,16 +1737,21 @@ function elementsParPage() {
   if (CO) reglesConf().filter((r) => r.niveau !== 'info').forEach((r) => el.conformite.push({ cle: r.cle, grave: r.niveau === 'grave' }))
   elementsV3(el)
   elementsV4(el)
+  elementsV5(el)
   return el
 }
-const CLE_VU = 'stx_vu_v1'
+/* « Déjà vu » : gardé sur l'appareil sous forme d'empreintes (jamais un nom de client ou de
+   procédure), effacé à la déconnexion (audit du 27 octobre 2026). */
+const CLE_VU = 'stx_vu_v2'
+try { localStorage.removeItem('stx_vu_v1') } catch (e) {}
+const empreinteVu = (t) => { let h = 2166136261; for (const c of String(t)) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619) } return (h >>> 0).toString(36) }
 function lireVu() { try { return JSON.parse(localStorage.getItem(CLE_VU) || 'null') } catch (e) { return null } }
 function ecrireVu(v) { try { localStorage.setItem(CLE_VU, JSON.stringify(v)) } catch (e) {} }
 function marquerVu(pageId) {
   const el = elementsParPage()
   let vu = lireVu() || {}
   const pages = pageId === '*' ? Object.keys(el) : [pageId]
-  pages.forEach((p) => { if (el[p]) vu[p] = el[p].map((x) => x.cle) })
+  pages.forEach((p) => { if (el[p]) vu[p] = el[p].map((x) => empreinteVu(x.cle)) })
   ecrireVu(vu)
 }
 function nouveautes() {
@@ -1551,7 +1761,7 @@ function nouveautes() {
   const res = {}
   Object.entries(el).forEach(([p, l]) => {
     const deja = new Set(vu[p] || [])
-    const nv = l.filter((x) => !deja.has(x.cle))
+    const nv = l.filter((x) => !deja.has(empreinteVu(x.cle)))
     res[p] = { n: nv.length, grave: nv.some((x) => x.grave) }
   })
   res.plus = DANS_PLUS.reduce((a, p) => ({ n: a.n + (res[p]?.n || 0), grave: a.grave || !!res[p]?.grave }), { n: 0, grave: false })
@@ -1580,15 +1790,17 @@ function afficher() {
     $('.tb-ico', plus).innerHTML = sous ? ico(sous.icone) : ico('plus3')
     $('.tb-nom', plus).textContent = sous ? (sous.court || sous.nom) : 'Plus'
   }
-  const fn = { vue: pageVue, messages: pageMessages, argent: pageArgent, conformite: pageConformite, erreurs: pageErreurs, sante: pageSante, clients: pageClients, usage: pageUsage, site: pageSite, securite: pageSecurite, strategie: pageStrategie }[page]
-  $('#principal').innerHTML = fn()
-  document.title = 'Standix · ' + PAGES.find((p) => p.id === page).nom
-  ajouterLegendes()
-  dessinerGraphiques()
-  brancherPage()
-  construireSommaire()
-  surveillerTitre()
-  majPastilles()
+  const fn = { vue: pageVue, messages: pageMessages, argent: pageArgent, conformite: pageConformite, erreurs: pageErreurs, sante: pageSante, clients: pageClients, usage: pageUsage, site: pageSite, securite: pageSecurite, strategie: pageStrategie, prospects: pageProspects }[page]
+  let html
+  try { html = fn() } catch (e) {
+    console.error('[afficher]', page, e)
+    html = `<div class="encart grave" style="margin-top:12px"><b>Cette page n’a pas pu s’afficher.</b> ${echap(e?.message || String(e))}. Actualise ; si ça recommence, copie ce message à Claude.</div>`
+  }
+  $('#principal').innerHTML = html
+  document.title = 'Standix · ' + (PAGES.find((p) => p.id === page)?.nom || 'Dashboard')
+  for (const f of [ajouterLegendes, dessinerGraphiques, brancherPage, construireSommaire, surveillerTitre, majPastilles]) {
+    try { f() } catch (e) { console.error('[afficher]', f.name, e) }
+  }
 }
 
 function entete(titre, sous, actions = '') {
@@ -1597,7 +1809,7 @@ function entete(titre, sous, actions = '') {
       <div class="ent-gauche">${p.icone ? pastilleIcone(p, 'grand') : ''}
         <div><div class="ent-groupe">${p.groupe || ''}</div><h1>${titre}</h1><p>${p.desc || sous || ''}</p></div>
       </div>
-      <div class="actions">${actions}<button class="btn btn-guide" data-action="guide">${ico('question')}Comment lire cette page</button><button class="btn" data-action="actualiser">${ico('maj')}Actualiser</button></div>
+      <div class="actions">${actions}<button class="btn btn-demander" data-action="demander">${ico('bulle')}Demander</button><button class="btn btn-guide" data-action="guide">${ico('question')}Comment lire cette page</button><button class="btn" data-action="actualiser">${ico('maj')}Actualiser</button></div>
     </div>
     ${page === 'vue' ? '' : etatPage()}
     <nav class="sommaire" id="sommaire" aria-label="Sur cette page"></nav>`
@@ -1636,16 +1848,18 @@ function construireSommaire() {
 /* ═══════════════════════════════════════════════════════════════════════
    6. CALCULS PARTAGÉS (argent)
    ═══════════════════════════════════════════════════════════════════════ */
-const moisCourant = () => new Date().toISOString().slice(0, 7)
+const moisCourant = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' }).slice(0, 7)   // heure de Paris
 function reglage(cle, defaut) { return Number(S?.reglages?.[cle]?.valeur ?? defaut) }
-function coutsFixesMensuels() {
-  return (S.couts_fixes || []).filter((c) => c.actif).reduce((s, c) => s + (c.periodicite === 'annuel' ? Number(c.montant) / 12 : Number(c.montant)), 0)
+/* m (AAAA-MM) : seulement les coûts déjà ajoutés ce mois-là (l'historique ne change plus quand on ajoute un coût). */
+function coutsFixesMensuels(m) {
+  return (S.couts_fixes || []).filter((c) => c.actif && (!m || !c.cree_le || String(c.cree_le).slice(0, 7) <= m)).reduce((s, c) => s + (c.periodicite === 'annuel' ? Number(c.montant) / 12 : Number(c.montant)), 0)
 }
 function nbDuMois(liste, m) { return (liste || []).find((x) => x.m === m)?.n || 0 }
 function coutsDuMois(m) {
   const ia = nbDuMois(S.analyses_par_mois, m) * reglage('cout_analyse_ia', 0.3)
   const trad = nbDuMois(S.traductions_par_mois, m) * reglage('cout_traduction_ia', 0.02)
-  return { fixes: coutsFixesMensuels(), ia, trad, total: coutsFixesMensuels() + ia + trad }
+  const fixes = coutsFixesMensuels(m)
+  return { fixes, ia, trad, total: fixes + ia + trad }
 }
 function mrrEstime() {
   return (S.abonnements || []).reduce((s, a) => {
@@ -1757,7 +1971,10 @@ function ouvrirMessage(id) {
       <div><b>${echap(m.de_nom || m.de_email || 'Inconnu')}</b><span>${echap(m.de_email || '')}</span><span>${dateL(m.recu_le)}</span></div></div>
     <div class="feuille-titre" style="margin:14px 0 10px">${echap(m.objet || '(sans objet)')}</div>
     <div class="msg-corps">${echap(m.texte || '').replace(/\n/g, '<br>') || '<i>Message vide</i>'}</div>
+    ${m.repondre_a && m.de_email && String(m.repondre_a).toLowerCase() !== String(m.de_email).toLowerCase() ? `<div class="encart grave">Ce message demande qu’on réponde à une autre adresse : <b>${echap(m.repondre_a)}</b>. Le bouton « Répondre » ci-dessous écrit bien à ${echap(m.de_email)} ; depuis Gmail, vérifie l’adresse avant d’envoyer.</div>` : ''}
+    ${m.authentifie === false ? `<div class="encart">Adresse non prouvée : Gmail n’a pas pu confirmer que ce message vient vraiment de ${echap(m.de_email || 'cette adresse')}. Ne donne aucune information sur un compte sans vérifier autrement.</div>` : ''}
     ${m.de_email ? `<a class="gros-btn plein lien-btn" href="mailto:${encodeURIComponent(m.de_email)}?subject=${sujet}">${ico('repondre')}Répondre</a>` : ''}
+    ${boutonIAMessage(m)}
     ${boutonRgpdMessage(m)}
     <div class="deux-btn">
       <button class="gros-btn gris" data-msg-id="${m.id}" data-msg-action="${m.archive ? 'desarchiver' : 'archiver'}">${m.archive ? 'Remettre dans la boîte' : 'Archiver'}</button>
@@ -1819,10 +2036,10 @@ const b64VersU8 = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g,
 async function activerNotifs() {
   try {
     if (etatPush === 'installer' || etatPush === 'impossible' || etatPush === 'refuse') return toast(TEXTE_PUSH[etatPush][1])
+    const perm = await Notification.requestPermission()   // tout de suite après le toucher : sinon l'iPhone peut refuser
+    if (perm !== 'granted') { await lireEtatPush(); afficher(); return toast('Notifications non autorisées') }
     const reg = await navigator.serviceWorker.register('/admin-sw.js', { scope: '/admin.html' })
     await navigator.serviceWorker.ready
-    const perm = await Notification.requestPermission()
-    if (perm !== 'granted') { await lireEtatPush(); afficher(); return toast('Notifications non autorisées') }
     let cle = SA?.veilleur?.cle_push
     if (!cle) cle = (await sb.rpc('admin_cle_push')).data
     if (!cle) return toast('Le veilleur démarre : réessaie dans 5 minutes')
@@ -1854,7 +2071,7 @@ function filActivite(nb = 8) {
   if (!l.length) return '<div class="vide">Le fil se remplit dès que le veilleur a fait son premier passage (toutes les 5 minutes).</div>'
   return `<div class="fil">${l.map((x) => { const p = pageDe(x.page) || pageDe('vue'); return `
     <button class="fil-ligne" data-aller="${p.id}">
-      <span class="fil-ico ${x.niveau}" style="--c:${p.couleur}">${ico(x.niveau === 'info' ? p.icone : ICO_NIVEAU[x.niveau])}</span>
+      <span class="fil-ico ${echap(x.niveau)}" style="--c:${p.couleur}">${ico(x.niveau === 'info' ? p.icone : ICO_NIVEAU[x.niveau])}</span>
       <span class="t"><b>${echap(x.titre)}</b>${x.corps ? `<span>${echap(x.corps)}</span>` : ''}</span>
       <time>${ilya(x.cree_le)}</time>
     </button>` }).join('')}</div>`
@@ -1885,7 +2102,7 @@ function ouvrirEtape(cle) {
   ouvrirFeuille(`<div class="feuille-corps" style="--c:${pageDe('clients').couleur}">
     <div class="feuille-titre">${ETAPES_BLOCAGE[cle]}</div>
     <p class="note" style="margin:-6px 0 14px">${plur(l.length, 'entreprise')}, de la plus récente à la plus ancienne. Touche une entreprise pour ouvrir sa fiche et lui écrire.</p>
-    <div class="groupe">${l.length ? l.map((x) => `<button class="groupe-ligne sans-icone" data-ouvrir-ent="${x.id}"><span class="gl-t"><b>${echap(x.nom)}</b><small>${x.depuis ? 'depuis ' + ilya(x.depuis).replace('il y a ', '') : ''}${x.statut !== 'essai' ? ' · ' + x.statut : ''}</small></span>${ico('fleche')}</button>`).join('') : '<div class="vide">Aucune</div>'}</div>
+    <div class="groupe">${l.length ? l.map((x) => `<button class="groupe-ligne sans-icone" data-ouvrir-ent="${x.id}"><span class="gl-t"><b>${echap(x.nom)}</b><small>${x.depuis ? 'depuis ' + ilya(x.depuis).replace('il y a ', '') : ''}${x.statut !== 'essai' ? ' · ' + echap(x.statut) : ''}</small></span>${ico('fleche')}</button>`).join('') : '<div class="vide">Aucune</div>'}</div>
   </div>`)
   $$('[data-ouvrir-ent]').forEach((b) => b.onclick = () => ouvrirEntreprise(b.dataset.ouvrirEnt))
 }
@@ -1919,16 +2136,21 @@ function blocEvolution() {
 }
 let chargementCI = false
 function blocCoutsReels() {
-  if (!CI && !chargementCI) {
+  if ((!CI || (CI.erreur && Date.now() - (CI.quand || 0) > 300e3)) && !chargementCI) {
     chargementCI = true
-    sb.functions.invoke('admin-couts-ia', { body: {} }).then(({ data }) => { CI = data || { erreur: true }; if (page === 'argent') { const y = scrollY; afficher(); scrollTo(0, y) } }, () => { CI = { erreur: true } })
+    const redessiner = () => { if (page === 'argent' && !$('.panneau.ouvert')) { const y = scrollY; afficher(); scrollTo(0, y) } }
+    const g = generation
+    /* Après une erreur : nouvel essai 5 minutes plus tard, au prochain affichage de la page. */
+    const fin = (x) => { if (g !== generation) return; chargementCI = false; CI = x.erreur ? { erreur: true, quand: Date.now() } : x; redessiner() }
+    sb.functions.invoke('admin-couts-ia', { body: {} }).then(({ data, error }) => fin(!error && data && !data.error ? data : { erreur: true }), () => fin({ erreur: true }))
   }
   const l = (nom, x) => {
+    if (!x && CI?.erreur) return ligneEtat(false, nom, 'Lecture impossible pour l’instant : réessaie plus tard')
     if (!x) return ligneEtat(null, nom, 'Lecture en cours…')
     if (x.erreur && x.connecte !== false) return ligneEtat(false, nom, echap(String(x.erreur).slice(0, 120)))
     if (!x.connecte) return ligneEtat(null, nom, 'Non connecté : le coût reste estimé. Voir « Comment lire cette page ».')
     const prec = (x.mois || []).slice(-2, -1)[0]
-    return ligneEtat(true, nom, prec ? 'mois dernier : ' + nf1.format(prec.montant) + ' ' + x.devise : 'facture réelle', nf1.format(x.ce_mois || 0) + ' ' + x.devise)
+    return ligneEtat(true, nom, prec ? 'mois dernier : ' + nf1.format(prec.montant) + ' ' + echap(x.devise) : 'facture réelle', nf1.format(x.ce_mois || 0) + ' ' + echap(x.devise))
   }
   return `<div class="carte"><h3>Coûts réels de l’IA <small>factures, ce mois</small></h3>
     ${l('Claude (rédaction des procédures)', CI?.claude)}${l('Azure (transcription audio)', CI?.azure)}</div>`
@@ -2039,7 +2261,7 @@ function blocMisesEnLigne() {
   const NOMS = { suppression_massive: 'Suppression massive', admin_ajoute: 'Admin ajouté', admin_retire: 'Admin retiré', compte_admin_modifie: 'Compte admin modifié', mode_urgence: 'Mode urgence activé', compte_deconnecte: 'Compte déconnecté partout', integrite_validee: 'Mise en ligne validée', entreprise_supprimee: 'Entreprise supprimée' }
   return `<div class="section grille g2">
     <div class="carte"><h3>Dernières mises en ligne <small>dépôt GitHub</small></h3>
-      ${ml.length ? `<div class="liste">${ml.map((m) => `<div class="ligne"><span class="code">${echap(m.sha.slice(0, 7))}</span><div class="t"><b>${echap(m.message || '—')}</b><span>${echap(m.auteur || '?')} · ${ilya(m.quand)}${(m.fichiers || []).length ? ' · ' + echap(m.fichiers.slice(0, 3).join(', ')) : ''}</span></div>${m.connu ? '' : '<span class="badge grave">Inconnu</span>'}</div>`).join('')}</div>` : '<div class="vide">Apparaîtront au premier passage du veilleur</div>'}</div>
+      ${ml.length ? `<div class="liste">${ml.map((m) => `<div class="ligne"><span class="code">${echap(String(m.sha || '').slice(0, 7))}</span><div class="t"><b>${echap(m.message || '—')}</b><span>${echap(m.auteur || '?')} · ${ilya(m.quand)}${(m.fichiers || []).length ? ' · ' + echap(m.fichiers.slice(0, 3).join(', ')) : ''}</span></div>${m.connu ? '' : '<span class="badge grave">Inconnu</span>'}</div>`).join('')}</div>` : '<div class="vide">Apparaîtront au premier passage du veilleur</div>'}</div>
     <div class="carte"><h3>Journal de sécurité</h3>
       ${j.length ? `<div class="liste">${j.map((x) => `<div class="ligne"><div class="t"><b>${NOMS[x.type] || echap(x.type)}</b><span>${echap(x.detail?.email || x.detail?.nom || (x.detail?.table ? x.detail.n + ' ' + x.detail.table : '') || (x.detail?.sessions != null ? x.detail.sessions + ' session(s) fermée(s)' : ''))} · ${ilya(x.cree_le)}</span></div></div>`).join('')}</div>` : '<div class="vide">Rien à signaler</div>'}</div>
   </div>`
@@ -2068,7 +2290,8 @@ function versionSaine() {
   const aRemettre = [...new Set([...modifies.map((f) => FICHIERS_DEPOT[f.chemin]).filter(Boolean), ...apres.flatMap((m) => m.fichiers || [])])]
   return { ml, auto, choisie, apres, aRemettre, inconnus, modifies, horsDepot: modifies.length > 0 && !inconnus.length }
 }
-const lienExt = (url, texte) => `<a class="lien-ext" href="${url}" target="_blank" rel="noopener">${texte}${ico('externe')}</a>`
+const lienExt = (url, texte) => `<a class="lien-ext" href="${echap(url)}" target="_blank" rel="noopener">${echap(texte)}${ico('externe')}</a>`
+const cheminGH = (f) => String(f).split('/').map(encodeURIComponent).join('/')
 const etapeU = (n, titre, texte, liens = '') => `<div class="guide-ligne"><span class="num">${n}</span><div><b>${titre}</b><span>${texte}</span>${liens ? `<div class="liens-ext">${liens}</div>` : ''}</div></div>`
 function ouvrirUrgence() {
   const v = versionSaine(), c = v.choisie
@@ -2091,19 +2314,19 @@ function ouvrirUrgence() {
     ${v.horsDepot ? `<div class="encart grave" style="margin:0 0 10px"><b>Le dépôt GitHub n’a pas changé</b>, mais le site servi est différent. Soit c’est toi qui viens de mettre en ligne (touche « C’est moi qui ai mis en ligne » sur la page Sécurité), soit <b>l’adresse standix.app a été détournée</b> : vérifie le compte de ton fournisseur de nom de domaine et le « Custom domain » de GitHub Pages.</div>` : ''}
     <div class="groupe">
       <div class="guide-ligne"><span class="num">3</span><div><b>Revenir à la dernière version saine</b>
-        ${c ? `<span>Version du <b>${dateL(c.quand)}</b> · « ${echap((c.message || '').split('\n')[0].slice(0, 70))} » · <span class="code">${echap(c.sha.slice(0, 7))}</span>${v.auto && c.sha === v.auto.sha ? ' · choisie automatiquement' : ''}</span>
-          <div class="liens-ext">${lienExt(GH + '/archive/' + c.sha + '.zip', 'Télécharger cette version (ZIP)')}${lienExt(GH + '/tree/' + c.sha, 'La voir sur GitHub')}</div>`
+        ${c ? `<span>Version du <b>${dateL(c.quand)}</b> · « ${echap((c.message || '').split('\n')[0].slice(0, 70))} » · <span class="code">${echap(String(c.sha || '').slice(0, 7))}</span>${v.auto && c.sha === v.auto.sha ? ' · choisie automatiquement' : ''}</span>
+          <div class="liens-ext">${lienExt(GH + '/archive/' + encodeURIComponent(c.sha) + '.zip', 'Télécharger cette version (ZIP)')}${lienExt(GH + '/tree/' + encodeURIComponent(c.sha), 'La voir sur GitHub')}</div>`
         : '<span>Aucune mise en ligne connue pour l’instant : le veilleur les note toutes les 15 minutes.</span>'}
       </div></div>
       ${v.aRemettre.length ? `<div class="guide-ligne"><span class="num">4</span><div><b>Remettre ${v.aRemettre.length > 1 ? 'ces ' + v.aRemettre.length + ' fichiers' : 'ce fichier'}</b>
         <span>Ouvre chaque fichier, touche <b>Download raw file</b>, puis envoie-le au bon endroit avec « Upload files » (le dossier est indiqué).</span>
-        <div class="u-fichiers">${v.aRemettre.slice(0, 20).map((f) => `<a href="${GH}/blob/${c ? c.sha : 'main'}/${f}" target="_blank" rel="noopener"><span class="code">${echap(f)}</span>${ico('telecharger')}</a>`).join('')}</div>
-        <div class="liens-ext">${dossiers.map((d) => lienExt(GH + '/upload/main' + (d ? '/' + d : ''), 'Upload files · ' + (d ? 'dossier ' + d : 'racine'))).join('')}</div>
+        <div class="u-fichiers">${v.aRemettre.slice(0, 20).map((f) => `<a href="${echap(GH + '/blob/' + (c ? encodeURIComponent(c.sha) : 'main') + '/' + cheminGH(f))}" target="_blank" rel="noopener"><span class="code">${echap(f)}</span>${ico('telecharger')}</a>`).join('')}</div>
+        <div class="liens-ext">${dossiers.map((d) => lienExt(GH + '/upload/main' + (d ? '/' + cheminGH(d) : ''), 'Upload files · ' + (d ? 'dossier ' + d : 'racine'))).join('')}</div>
       </div></div>` : etapeU(4, 'Remettre les fichiers', 'Aucun fichier anormal détecté. Si tu as un doute, télécharge la version saine (ZIP) et renvoie les fichiers modifiés.')}
       ${etapeU(5, 'Remettre le site en ligne', 'Réglages GitHub Pages → Source : « Deploy from a branch » → branche <b>main</b>, dossier <b>/ (root)</b> → Save. Le site revient en 1 à 2 minutes.', lienExt(GH + '/settings/pages', 'Réglages GitHub Pages'))}
     </div>
     ${v.ml.length > 1 ? `<details class="u-autre"><summary>Choisir une autre version</summary>
-      <div class="groupe">${v.ml.slice(0, 20).map((m) => `<button class="groupe-ligne sans-icone" data-version-saine="${m.sha}"><span class="gl-t"><b>${echap((m.message || '—').split('\n')[0].slice(0, 60))}</b><small>${dateL(m.quand)} · ${echap(m.auteur || '?')}${m.connu ? '' : ' · <span style="color:var(--grave)">inconnu</span>'}</small></span>${c && m.sha === c.sha ? ico('ok') : ''}</button>`).join('')}</div></details>` : ''}
+      <div class="groupe">${v.ml.slice(0, 20).map((m) => `<button class="groupe-ligne sans-icone" data-version-saine="${echap(m.sha)}"><span class="gl-t"><b>${echap((m.message || '—').split('\n')[0].slice(0, 60))}</b><small>${dateL(m.quand)} · ${echap(m.auteur || '?')}${m.connu ? '' : ' · <span style="color:var(--grave)">inconnu</span>'}</small></span>${c && m.sha === c.sha ? ico('ok') : ''}</button>`).join('')}</div></details>` : ''}
 
     <div class="titre-bloc">3 · Verrouiller</div>
     <div class="groupe">
@@ -2141,7 +2364,9 @@ async function validerIntegrite() {
   toast('Validé : cette version devient la référence'); charger()
 }
 async function deconnecterCompte(uid) {
-  if (!confirm('Déconnecter ce compte sur tous ses appareils ? La personne devra se reconnecter.')) return
+  const p = (SU.partages || []).find((x) => x.user_id === uid)
+  const qui = p ? (p.membre || p.email || 'ce compte') + (p.entreprise ? ' (' + p.entreprise + ')' : '') : 'ce compte'
+  if (!confirm('Déconnecter « ' + qui + ' » sur tous ses appareils ? La personne devra se reconnecter.')) return
   const { data, error } = await sb.rpc('admin_deconnecter_compte', { p_user: uid })
   if (error) return toast('Échec : ' + error.message)
   fermerPanneau(); toast(plur(data || 0, 'session fermée', 'sessions fermées'))
@@ -2411,6 +2636,8 @@ function pageVue() {
    Une analyse automatique de tous les chiffres, en phrases courtes :
    « – » ce qui ne va pas (du plus grave au moins grave), « ✓ » ce qui va.
    Reprend aussi tout ce que listait « À traiter ». */
+/* Le texte d'un morceau de HTML (sans exécuter quoi que ce soit) : « L&#39;Atelier » → « L'Atelier ». */
+const texteDe = (h) => new DOMParser().parseFromString(String(h), 'text/html').body.textContent || ''
 function analyse() {
   const alertesBrutes = calculerAlertes()
   const k = S.kpi, a = argent(), mal = [], bien = []
@@ -2418,7 +2645,7 @@ function analyse() {
   const ajoute = (ok, texte, va, poids = 1) => (ok ? bien : mal).push({ texte, va, poids })
 
   // Tout ce que listait « À traiter » (erreurs, impayés, essais, IA, sécurité, Stripe)
-  alertesBrutes.forEach((x) => mal.push({ texte: x.t.replace(/<[^>]+>/g, '').replace(/\s+·\s+/, ' · '), va: x.va, poids: x.ton === 'grave' ? 3 : 2 }))
+  alertesBrutes.forEach((x) => mal.push({ texte: texteDe(x.t).replace(/\s+·\s+/, ' · '), va: x.va, poids: x.ton === 'grave' ? 3 : 2 }))
 
   // Erreurs
   if (!k.erreurs_ouvertes) ajoute(true, k.erreurs_24h ? 'Aucune erreur nouvelle à corriger' : 'Aucune erreur depuis 24 h', 'erreurs')
@@ -2444,9 +2671,10 @@ function analyse() {
   if (rythmePrec > 0) ajoute(rythme >= rythmePrec * 0.9, 'Analyses IA ' + (rythme >= rythmePrec ? 'en hausse' : 'en baisse') + ' : ' + nf1.format(rythme) + ' par jour contre ' + nf1.format(rythmePrec) + ' le mois dernier', 'usage')
   if (k.validations_30j) ajoute(true, plur(k.validations_30j, 'procédure lue', 'procédures lues') + ' par les équipes en 30 jours', 'usage')
   else ajoute(false, 'Aucune procédure lue par les équipes depuis 30 jours', 'usage')
-  const echec = k.procedures ? k.procedures_echec / k.procedures : 0
+  const procIA = k.procedures_ia ?? k.procedures
+  const echec = procIA ? k.procedures_echec / procIA : 0
   if (echec >= 0.1) ajoute(false, 'IA : ' + pct(echec) + ' des procédures en échec', 'erreurs')
-  else if (k.procedures) ajoute(true, 'IA fiable : ' + pct(1 - echec) + ' des procédures réussies', 'usage')
+  else if (procIA) ajoute(true, 'IA fiable : ' + pct(1 - echec) + ' des procédures réussies', 'usage')
   // Site
   const v7 = sum(s7, 'visites'), v14 = sum(s14, 'visites')
   if (v7 || v14) ajoute(v7 >= v14, plur(v7, 'visiteur') + ' sur le site cette semaine' + (v14 ? ' (' + (v7 >= v14 ? '+' : '') + Math.round((v7 - v14) / (v14 || 1) * 100) + ' %)' : ''), 'site')
@@ -2498,6 +2726,8 @@ function analyse() {
   analyseV3(ajoute)
   // Version 4 : seuil de rentabilité, conseil du mois, concurrents, plan, objectifs
   analyseV4(ajoute)
+  // Version 5 : prospects à relancer, robot
+  analyseV5(ajoute)
   // Conformité : seuils, échéances, factures, réglages (règles fixes)
   if (CO) {
     const R = reglesConf()
@@ -2544,10 +2774,9 @@ function pageArgent() {
   const abonnes = k.abonnes || 0
   const historique = []
   const debutStandix = S.entreprises.reduce((min, e) => (e.cree_le && e.cree_le.slice(0, 7) < min ? e.cree_le.slice(0, 7) : min), moisCourant())
-  const d = new Date(); d.setDate(1)
+  const [aC, mC] = moisCourant().split('-').map(Number)
   for (let i = 11; i >= 0; i--) {
-    const x = new Date(d.getFullYear(), d.getMonth() - i, 1)
-    const m = `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}`
+    const m = new Date(Date.UTC(aC, mC - 1 - i, 1)).toISOString().slice(0, 7)
     const enc = a.stripeOk ? (ST.par_mois.find((p) => p.m === m)?.net || 0) : 0
     /* Avant la première inscription, Standix n'existait pas : pas de coûts à compter. */
     const b = m < debutStandix ? 0 : Math.round(coutsDuMois(m).total * 100) / 100
@@ -2555,7 +2784,9 @@ function pageArgent() {
   }
   const clients = a.stripeOk ? [...ST.clients].sort((x, y) => (y.statut === 'active') - (x.statut === 'active') || y.mensuel - x.mensuel) : []
 
-  return entete('Argent', 'Ce que tu gagnes, ce que tu payes') + `
+  return entete('Argent', 'Ce que tu gagnes, ce que tu payes', `<button class="btn" data-action="rapport">${ico('rapport')}Rapport du mois</button>`) + `
+  ${a.stripeOk && (ST.devises || []).some((d) => d !== 'EUR') ? `<div class="encart">Des montants Stripe sont en ${echap(ST.devises.filter((d) => d !== 'EUR').join(', '))} : ils sont additionnés aux euros sans conversion dans le revenu et le solde ci-dessous.</div>` : ''}
+  ${a.stripeOk && ST.complet === false ? '<div class="encart">Stripe : plus de 3 000 lignes, la liste lue est incomplète.</div>' : ''}
   ${a.stripeOk ? (ST.mode === 'test' ? '<div class="encart">Stripe est en <b>mode test</b> : ces revenus ne sont pas réels.</div>' : '') : `<div class="encart">Stripe ne répond pas (${echap(ST?.erreur)}). Les revenus ci-dessous sont <b>estimés</b> d’après les abonnements enregistrés dans Standix.</div>`}
   <div class="grille g4">
     ${tuile('Revenu mensuel récurrent', eur(a.mrr), 'MRR · ' + eur(a.mrr * 12) + ' par an', { heros: 1 })}
@@ -2580,7 +2811,7 @@ function pageArgent() {
 
   <div class="section grille g2">
     <div class="carte"><h3>Abonnements Stripe <small>${a.stripeOk ? Object.entries(ST.par_statut).map(([s, v]) => v + ' ' + ({ active: 'actif', past_due: 'impayé', canceled: 'résilié', trialing: 'essai', incomplete: 'incomplet', incomplete_expired: 'expiré', unpaid: 'impayé', paused: 'en pause' }[s] || s) + (v > 1 && !/é$/.test(s) ? 's' : '')).join(' · ') : ''}</small></h3>
-      ${clients.length ? `<div class="liste">${clients.map((c) => `<div class="ligne"><div class="t"><b>${echap(c.nom)}</b><span>${NOM_OFFRE[c.offre] || echap(c.offre)} · ${c.rythme} · ${c.statut === 'active' ? (c.resiliation_prevue ? 'résiliation le ' : 'renouvellement le ') + dateC((c.fin_periode || 0) * 1000) : 'depuis le ' + dateC(c.debut * 1000)}</span></div>${c.statut === 'active' ? (c.resiliation_prevue ? '<span class="badge alerte">Se termine</span>' : '<span class="badge ok">Actif</span>') : c.statut === 'past_due' || c.statut === 'unpaid' ? '<span class="badge grave">Impayé</span>' : `<span class="badge">${echap(c.statut)}</span>`}<span class="n">${eur(c.mensuel)}<small style="color:var(--texte-3);font-weight:400">/mois</small></span></div>`).join('')}</div>` : `<div class="vide">${a.stripeOk ? 'Aucun abonnement' : 'Stripe indisponible'}</div>`}
+      ${clients.length ? `<div class="liste">${clients.map((c) => `<div class="ligne"><div class="t"><b>${echap(c.nom)}</b><span>${NOM_OFFRE[c.offre] || echap(c.offre)} · ${echap(c.rythme)} · ${c.statut === 'active' ? (c.resiliation_prevue ? 'résiliation le ' : 'renouvellement le ') + dateC((c.fin_periode || 0) * 1000) : 'depuis le ' + dateC(c.debut * 1000)}</span></div>${c.statut === 'active' ? (c.resiliation_prevue ? '<span class="badge alerte">Se termine</span>' : '<span class="badge ok">Actif</span>') : c.statut === 'past_due' || c.statut === 'unpaid' ? '<span class="badge grave">Impayé</span>' : `<span class="badge">${echap(c.statut)}</span>`}<span class="n">${eur(c.mensuel)}<small style="color:var(--texte-3);font-weight:400">/mois</small></span></div>`).join('')}</div>` : `<div class="vide">${a.stripeOk ? 'Aucun abonnement' : 'Stripe indisponible'}</div>`}
     </div>
     <div class="carte"><h3>Revenu par offre</h3>
       ${a.stripeOk ? hbars(Object.entries(ST.par_offre).map(([k2, v]) => ({ k: (NOM_OFFRE[k2] || k2) + ' · ' + v.n + ' client' + (v.n > 1 ? 's' : ''), n: v.mrr })), { fmt: (v) => eur(v) + '/mois', vide: 'Aucun abonné' }) : hbars((S.abonnements || []).map((x) => ({ k: (NOM_OFFRE[x.palier] || x.palier) + ' · ' + x.rythme, n: x.n })), { vide: 'Aucun abonné' })}
@@ -2598,7 +2829,7 @@ function pageArgent() {
     <button class="btn ajout-desktop" data-action="ajout-cout" style="margin-top:10px">${ico('plus')}Ajouter un coût</button>
     <button class="ajout-m couts-m" data-action="ajout-cout-m">+ Ajouter un coût</button>
     <h3 style="margin-top:24px">Coûts variables <small>Estimations par utilisation</small></h3>
-    ${Object.entries(S.reglages || {}).filter(([cle]) => cle !== 'budget_ia_mois' && cle !== 'tresorerie_depart').map(([cle, r]) => `<div class="cout" style="grid-template-columns:minmax(0,1fr) 100px"><span>${echap(r.libelle)}</span><input type="number" step="0.01" min="0" value="${r.valeur}" data-reglage="${cle}"></div>`).join('')}
+    ${Object.entries(S.reglages || {}).filter(([cle]) => cle !== 'budget_ia_mois' && cle !== 'tresorerie_depart').map(([cle, r]) => `<div class="cout" style="grid-template-columns:minmax(0,1fr) 100px"><span>${echap(r.libelle)}</span><input type="number" step="0.0001" min="0" value="${echap(r.valeur)}" data-reglage="${echap(cle)}"></div>`).join('')}
     <p class="note">Les coûts variables d’IA (Azure, Claude) ne sont pas encore lus sur les factures : ils sont estimés à partir du nombre d’analyses et de traductions. Ajuste le prix unitaire quand tu reçois une facture.</p>
   </div>`
 }
@@ -2610,7 +2841,7 @@ function ligneCoutMobile(c) {
   </div>`
 }
 function ouvrirCout(id) {
-  const c = S.couts_fixes.find((x) => x.id === id); if (!c) return
+  const c = S.couts_fixes.find((x) => String(x.id) === String(id)); if (!c) return
   const p = ouvrirFeuille(`<div class="feuille-corps">
     <div class="feuille-titre">${echap(c.nom)}</div>
     <div class="champ-feuille"><label for="f-nom">Nom</label><input id="f-nom" value="${echap(c.nom)}"></div>
@@ -2629,20 +2860,21 @@ function ouvrirCout(id) {
     const champs = {
       nom: $('#f-nom', p).value.trim() || c.nom,
       categorie: $('#f-cat', p).value.trim() || 'Autre',
-      montant: Math.max(0, parseFloat($('#f-mt', p).value.replace(',', '.')) || 0),
+      montant: lireNombre($('#f-mt', p).value),
       periodicite: $('[data-per][aria-pressed="true"]', p)?.dataset.per || 'mensuel',
       actif: $('#f-actif', p).getAttribute('aria-checked') === 'true',
     }
-    const { error } = await sb.from('couts_fixes').update(champs).eq('id', id)
+    if (champs.montant === null || champs.montant < 0) return toast('Montant non reconnu : écris par exemple 49,90')
+    const { error } = await ecrit(sb.from('couts_fixes').update(champs).eq('id', id))
     if (error) return toast('Échec : ' + error.message)
     Object.assign(c, champs); fermerPanneau(); toast('Enregistré')
     const y = scrollY; afficher(); scrollTo(0, y)
   }
   $('#f-suppr', p).onclick = async () => {
     if (!confirm('Supprimer « ' + c.nom + ' » ?')) return
-    const { error } = await sb.from('couts_fixes').delete().eq('id', id)
+    const { error } = await ecrit(sb.from('couts_fixes').delete().eq('id', id))
     if (error) return toast('Échec : ' + error.message)
-    S.couts_fixes = S.couts_fixes.filter((x) => x.id !== id); fermerPanneau(); toast('Supprimé')
+    S.couts_fixes = S.couts_fixes.filter((x) => String(x.id) !== String(id)); fermerPanneau(); toast('Supprimé')
     const y = scrollY; afficher(); scrollTo(0, y)
   }
 }
@@ -2684,8 +2916,9 @@ function pageErreurs() {
   </div>`
 }
 function carteErreur(e) {
-  const genre = { js: 'Code', promesse: 'Code', console: 'Console', reseau: 'Serveur', ressource: 'Fichier', manuel: 'Signalée', ia: 'IA' }[e.genre] || e.genre
-  return `<button class="erreur${e.statut === 'nouveau' ? ' nouvelle' : ''}" data-erreur="${e.empreinte}" data-emp="${e.empreinte}">
+  /* genre : envoyé par n'importe quel visiteur (signaler_erreur) → toujours échappé. */
+  const genre = echap({ js: 'Code', promesse: 'Code', console: 'Console', reseau: 'Serveur', ressource: 'Fichier', manuel: 'Signalée', ia: 'IA', intrusion: 'Intrusion' }[e.genre] || e.genre)
+  return `<button class="erreur${e.statut === 'nouveau' ? ' nouvelle' : ''}" data-erreur="${echap(e.empreinte)}" data-emp="${echap(e.empreinte)}">
     <div class="haut"><span class="code">${echap(e.code || 'ERREUR')}</span><span class="badge sans-point">${e.source === 'site' ? 'Site' : 'App'} · ${genre}</span>${e.statut === 'corrige' ? '<span class="badge ok">Corrigée</span>' : e.statut === 'ignore' ? '<span class="badge">Ignorée</span>' : ''}</div>
     <div class="msg">${echap(e.message)}</div>
     <div class="compte"><b>${n(e.n)}</b><span>${e.n_24h ? n(e.n_24h) + ' en 24 h' : 'fois'}</span></div>
@@ -2710,9 +2943,12 @@ async function ouvrirErreur(emp) {
     </div>`
   p.insertAdjacentHTML('afterbegin', '<div class="poignee" aria-hidden="true"></div>')
   p.classList.add('ouvert'); p.setAttribute('aria-hidden', 'false'); $('#voile').classList.add('ouvert')
+  ouvrirErreur.e = e; ouvrirErreur.occ = []
+  const jeton = ++jetonPanneau
   const { data, error } = await sb.rpc('admin_erreur_detail', { p_empreinte: emp })
+  if (jeton !== jetonPanneau) return
   const occ = data || []
-  ouvrirErreur.occ = occ; ouvrirErreur.e = e
+  ouvrirErreur.occ = occ
   $('.panneau-corps', p).innerHTML = error ? `<div class="encart">${echap(error.message)}</div>` : `<h3 style="font-size:13.5px;margin:0 0 10px">${occ.length >= 50 ? '50 dernières' : occ.length} occurrence${occ.length > 1 ? 's' : ''}</h3>` + occ.map((o) => `
     <div class="occ"><b>${dateL(o.cree_le)}</b>
       <dl>
@@ -2728,6 +2964,7 @@ async function ouvrirErreur(emp) {
     </div>`).join('')
 }
 function fermerPanneau() {
+  jetonPanneau++
   $('#panneau').classList.remove('ouvert'); $('#panneau').setAttribute('aria-hidden', 'true'); $('#voile').classList.remove('ouvert')
 }
 $('#voile').onclick = fermerPanneau
@@ -2785,7 +3022,8 @@ function pageSante() {
   const stock = t.stockage.reduce((s, x) => s + Number(x.octets), 0)
   const LIM_BASE = 8 * 1024 ** 3, LIM_STOCK = 100 * 1024 ** 3
   const ligne = (ok, titre, detail, val) => `<div class="sante"><span class="badge ${ok === true ? 'ok' : ok === false ? 'grave' : 'alerte'}">${ok === true ? 'OK' : ok === false ? 'En panne' : 'À vérifier'}</span><div class="t"><b>${titre}</b><span>${detail}</span></div><span class="n">${val || ''}</span></div>`
-  const tauxEchec = k.procedures ? k.procedures_echec / k.procedures : 0
+  const procIA = k.procedures_ia ?? k.procedures   // toutes les procédures, entreprises de test comprises
+  const tauxEchec = procIA ? k.procedures_echec / procIA : 0
   return entete('Santé technique', 'Tout ce qui fait tourner Standix') + `
   <div class="grille g2">
     <div class="carte"><h3>Services <small>testés à l’ouverture de la page</small></h3>
@@ -2796,12 +3034,13 @@ function pageSante() {
       <div id="sante-sites">${ligne(null, 'Site et app', 'Test en cours…')}</div>
     </div>
     <div class="carte"><h3>Intelligence artificielle</h3>
-      ${ligne(tauxEchec < 0.1 ? true : tauxEchec < 0.25 ? null : false, 'Générations réussies', `${n(k.procedures - k.procedures_echec)} sur ${n(k.procedures)} procédures`, pct(1 - tauxEchec))}
+      ${ligne(tauxEchec < 0.1 ? true : tauxEchec < 0.25 ? null : false, 'Générations réussies', `${n(procIA - k.procedures_echec)} sur ${n(procIA)} procédures`, pct(1 - tauxEchec))}
       ${ligne(true, 'Analyses ce mois', `${n(k.analyses_mois_dernier)} le mois dernier`, n(k.analyses_mois))}
       ${ligne(true, 'Traductions IA', 'procédures traduites', n(k.traductions))}
       ${ligne(S.echecs_ia.length ? null : true, 'Échecs à revoir', 'voir la page Erreurs', n(S.echecs_ia.length))}
     </div>
   </div>
+  ${blocRobot()}
   ${blocsSante()}
   <div class="section grille g2">
     <div class="carte"><h3>Stockage <small>Supabase Pro</small></h3>
@@ -2837,6 +3076,7 @@ function pageClients() {
     ${tuile('Impayés · résiliés', `${n(k.impayes)} <small>· ${n(k.resilies)}</small>`, 'à relancer', { ton: k.impayes ? 'grave' : '' })}
   </div>
   <div class="section"><h2>Parcours des clients <small>où ils s’arrêtent</small></h2>${blocParcours()}</div>
+  ${blocCohortes()}
   ${blocRisquesOpportunites()}
   <div class="section grille g2">
     <div class="carte"><h3>Essais en cours <small>du plus urgent au moins urgent</small></h3>
@@ -2848,7 +3088,7 @@ function pageClients() {
   </div>
   <div class="section carte"><h3>Inscriptions par jour <small>90 jours</small></h3>${graph('barres', inscr90, { h: 150, lib: 'inscriptions' })}</div>
   <div class="section carte liste-entreprises">
-    <h3>Toutes les entreprises</h3>
+    <h3>Toutes les entreprises <small>${lienTests()}</small></h3>
     <div class="outils-clients" id="outils-clients">
       <input class="recherche" id="recherche" type="search" placeholder="Rechercher une entreprise" value="${echap(rechercheClients)}">
       <div class="segments">${[['tout', 'Toutes'], ['essai', 'Essai'], ['abonnes', 'Abonnés'], ['relancer', 'À relancer']].map(([v, t]) => `<button data-fc="${v}" aria-pressed="${filtreClients === v}">${t}</button>`).join('')}</div>
@@ -2968,7 +3208,7 @@ const MODELES_AV = {
   },
 }
 function composerAvertissement(cible) {
-  const deja = AV.filter((a) => (cible.entreprise_id && a.entreprise_id === cible.entreprise_id) || (cible.entreprise && a.entreprise === cible.entreprise))
+  const deja = AV.filter((a) => (cible.entreprise_id && a.entreprise_id === cible.entreprise_id) || (cible.compte_vise && a.compte_vise === cible.compte_vise))
   let niveau = deja.some((a) => a.niveau !== 'info') ? 'dernier' : 'avertissement'
   const modele = MODELES_AV[cible.contexte] || MODELES_AV.general
   let modifie = false
@@ -2991,9 +3231,9 @@ function composerAvertissement(cible) {
   $('#av-envoyer', p).onclick = async (ev) => {
     const titre = $('#av-titre', p).value.trim(), message = $('#av-msg', p).value.trim()
     if (!titre || !message) return toast('Le titre et le message sont obligatoires')
-    ev.currentTarget.disabled = true
+    const b = ev.currentTarget; b.disabled = true
     const { error } = await sb.rpc('admin_envoyer_avertissement', { p: { entreprise_id: cible.entreprise_id || '', compte_vise: cible.compte_vise || '', niveau, titre, message } })
-    if (error) { ev.currentTarget.disabled = false; return toast('Échec : ' + error.message) }
+    if (error) { b.disabled = false; return toast('Échec : ' + error.message) }
     fermerPanneau(); toast('Envoyé : il s’affichera à la prochaine ouverture de l’app')
     const { data } = await sb.rpc('admin_avertissements'); if (Array.isArray(data)) AV = data
     const y = scrollY; afficher(); scrollTo(0, y)
@@ -3027,10 +3267,10 @@ document.addEventListener('click', (ev) => {
 
 /* ─── Fiche entreprise (depuis Clients) ─── */
 async function ouvrirEntreprise(id) {
-  const e = S.entreprises.find((x) => x.id === id); if (!e) return
+  const e = S.entreprises.find((x) => x.id === id) || (S.entreprises_test || []).find((x) => x.id === id); if (!e) return
   const pan = $('#panneau')
   pan.innerHTML = `<div class="poignee" aria-hidden="true"></div><div class="panneau-haut" id="fiche-entreprise" data-id="${id}"><button class="icone-btn x" data-action="fermer" aria-label="Fermer">${ico('x')}</button>
-    <div style="display:flex;align-items:center;gap:10px;padding-right:40px"><span style="font-weight:700;font-size:19px">${echap(e.nom)}</span>${badgeStatut(e)}</div>
+    <div style="display:flex;align-items:center;gap:10px;padding-right:40px"><span style="font-weight:700;font-size:19px">${echap(e.nom)}</span>${badgeStatut(e)}${e.test ? '<span class="badge">Test</span>' : ''}</div>
     <div style="color:var(--texte-3);font-size:13px">Inscrite le ${dateC(e.cree_le)} · active ${ilya(e.derniere_activite)}</div>
     <div class="mini-stats">
       <div><b>${e.membres}${e.membres_max ? '<small style="font-size:12px;color:var(--texte-3)">/' + e.membres_max + '</small>' : ''}</b><span>membres</span></div>
@@ -3039,9 +3279,11 @@ async function ouvrirEntreprise(id) {
       <div><b>${n(e.analyses_mois)}</b><span>IA ce mois</span></div>
     </div></div>
     <div class="panneau-corps"><div class="chargement" style="min-height:120px"><div class="roue"></div></div></div>
-    <div class="panneau-pied"><button class="btn btn-plein" data-avertir-entreprise="${id}">${ico('avertir')}Envoyer un avertissement</button></div>`
+    <div class="panneau-pied"><button class="btn btn-plein" data-avertir-entreprise="${id}">${ico('avertir')}Envoyer un avertissement</button>${sqlV5() && !e.robot ? `<button class="btn" data-test-ent="${id}" data-test-oui="${e.test ? '0' : '1'}">${e.test ? 'Remettre dans les chiffres' : 'Marquer comme test'}</button>` : ''}</div>`
   pan.classList.add('ouvert'); pan.setAttribute('aria-hidden', 'false'); $('#voile').classList.add('ouvert')
+  const jeton = ++jetonPanneau
   const { data: gerants } = await sb.rpc('admin_entreprise_gerants', { p_ent: id })
+  if (jeton !== jetonPanneau) return
   const corps = $('.panneau-corps', pan); if (!corps) return
   const avs = AV.filter((a) => a.entreprise_id === id)
   corps.innerHTML = `
@@ -3083,9 +3325,12 @@ async function ouvrirPartage(uid) {
       <div><b>${p.simultane_max}</b><span>en même temps</span></div>
       <div><b>${p.connexions}</b><span>connexions</span></div>
     </div></div>
-    <div class="panneau-corps"><div class="chargement" style="min-height:120px"><div class="roue"></div></div></div>`
+    <div class="panneau-corps"><div class="chargement" style="min-height:120px"><div class="roue"></div></div></div>
+    <div class="panneau-pied"><button class="btn btn-plein" data-avertir-compte="${echap(uid)}">${ico('avertir')}Envoyer un avertissement</button><button class="btn btn-grave" data-deconnecter="${echap(uid)}">Déconnecter partout</button></div>`
   pan.classList.add('ouvert'); pan.setAttribute('aria-hidden', 'false'); $('#voile').classList.add('ouvert')
+  const jeton = ++jetonPanneau
   const { data, error } = await sb.rpc('admin_partage_detail', { p_user: uid })
+  if (jeton !== jetonPanneau) return
   const corps = $('.panneau-corps', pan); if (!corps) return
   if (error) { corps.innerHTML = `<div class="encart">${echap(error.message)}</div>`; return }
   const res = (r) => r ? String(r).replace(/\.0$/, '.x').replace(/::$/, '::…') : '—'
@@ -3098,7 +3343,6 @@ async function ouvrirPartage(uid) {
     ${(d.appareils || []).length ? `<div class="groupe">${d.appareils.map((a) => `<div class="occ-ligne"><b>${echap(a.nom)}</b><span>${(a.reseaux || []).map(res).join(', ') || 'réseau inconnu'} · ${a.connexions} connexion${a.connexions > 1 ? 's' : ''} · dernière activité ${ilya(a.derniere)}</span></div>`).join('')}</div>` : '<div class="vide">Pas d\u2019activité enregistrée sur 14 jours</div>'}
     ${(d.presences || []).length ? `<h3 class="titre-bloc">Appareils vus par l\u2019app</h3><div class="groupe">${d.presences.map((a) => `<div class="occ-ligne"><b>${echap(a.nom || 'Appareil')}${a.revoquee ? ' · révoqué' : ''}</b><span>${echap(a.reseau || '—')} · vu de ${dateC(a.premiere_fois)} à ${ilya(a.derniere_fois)}</span></div>`).join('')}</div>` : ''}
     <p class="note">Les réseaux sont tronqués (85.2.14.x) : l\u2019adresse complète n\u2019est jamais enregistrée.</p>`
-  if (!$('.panneau-pied', pan)) pan.insertAdjacentHTML('beforeend', `<div class="panneau-pied"><button class="btn btn-plein" data-avertir-compte="${uid}">${ico('avertir')}Envoyer un avertissement</button><button class="btn btn-grave" data-deconnecter="${uid}">Déconnecter partout</button></div>`)
 }
 
 function pageSecurite() {
@@ -3301,6 +3545,13 @@ function totauxConf(an) {
   })
 }
 /* En franchise de TVA cette année ? (année passée sous le seuil, année en cours sous le seuil majoré) */
+/* Franchise de TVA à une date : l'an passé sous le seuil, et cette année pas encore au-dessus
+   du seuil majoré à ce jour-là (une facture d'avant le dépassement garde la mention 293 B). */
+function franchiseAu(date) {
+  const an = +String(date).slice(0, 4)
+  const fr = rc('franchise_tva', an - 1) ?? rc('franchise_tva', an), frm = rc('franchise_tva_majoree', an)
+  return !(fr !== null && fr !== undefined && totauxConf(an - 1).ca > fr) && !(frm !== null && frm !== undefined && encaisseEntre(an + '-01-01', String(date).slice(0, 10)) > frm)
+}
 function franchiseConf(an) {
   const fr = rc('franchise_tva', an - 1) ?? rc('franchise_tva', an), frm = rc('franchise_tva_majoree', an)
   return !(fr !== null && fr !== undefined && totauxConf(an - 1).ca > fr) && !(frm !== null && frm !== undefined && totauxConf(an).ca > frm)
@@ -3332,7 +3583,8 @@ function cotisationsConf(an) {
   const faits = new Set(CO?.faits || [])
   const calc = (p, t) => { const ca = encaisseEntre(p.debut, p.fin); return { ...p, ca, cot: ca * t, fait: faits.has(p.cle) } }
   /* Les périodes de l'année passée à déclarer cette année (T4, décembre) : leur argent est encore à mettre de côté en janvier. */
-  const prec = periodesConf(an - 1).filter((p) => p.limite >= an + '-01-01').map((p) => calc(p, tauxP))
+  const il120 = new Date(Date.now() - 120 * 86400e3).toISOString().slice(0, 10)
+  const prec = periodesConf(an - 1).filter((p) => p.limite >= an + '-01-01' || (!faits.has(p.cle) && p.limite >= il120)).map((p) => calc(p, tauxP))
   const rows = periodesConf(an).map((p) => calc(p, taux))
   const total = totauxConf(an).ca * taux
   const declare = rows.filter((r) => r.fait).reduce((t, r) => t + r.cot, 0)
@@ -3393,7 +3645,7 @@ function reglesConf() {
     // Factures
     const dern = (CS.factures || []).slice().sort((a, b) => b.date.localeCompare(a.date))[0]
     if (dern) {
-      const m = manquesFacture(dern, franchiseConf(+dern.date.slice(0, 4)))
+      const m = manquesFacture(dern, franchiseAu(dern.date))
       if (m.length) aj('facture:' + dern.id, 'facture', 'alerte', `La dernière facture Stripe (${dern.numero || dern.id}) n’a pas tout : ${m.join(', ')}`, 'Compléter le pied de page des factures : Stripe → Paramètres → Facturation → Factures. Les factures déjà émises ne se modifient pas.')
     }
   }
@@ -3621,7 +3873,7 @@ function blocFactures(Y) {
   if (!D.stOk) return `<div class="section carte"><h3>Contrôle des factures</h3><div class="vide">${CS ? 'Stripe ne répond pas' : 'Lecture de Stripe…'}</div></div>`
   const franchise = franchiseConf(Y)
   const parCharge = new Map(D.recettes.map((r) => [r.cle, r]))
-  const l = (CS.factures || []).filter((f) => f.date.startsWith(Y + '-')).sort((a, b) => b.date.localeCompare(a.date)).map((f) => ({ f, m: manquesFacture(f, franchise), client: parCharge.get(f.charge)?.client || '' }))
+  const l = (CS.factures || []).filter((f) => f.date.startsWith(Y + '-')).sort((a, b) => b.date.localeCompare(a.date)).map((f) => ({ f, m: manquesFacture(f, franchiseAu(f.date)), client: parCharge.get(f.charge)?.client || '' }))
   const ok = l.filter((x) => !x.m.length).length
   return `<div class="section carte"><h3>Contrôle des factures <small>mentions lues sur les factures Stripe de ${Y}</small></h3>
     ${l.length ? ligneEtat(ok === l.length ? true : l[0].m.length ? false : null, ok === l.length ? 'Toutes les factures ont les mentions' : `${n(l.length - ok)} facture${l.length - ok > 1 ? 's' : ''} incomplète${l.length - ok > 1 ? 's' : ''} sur ${n(l.length)}`, l[0].m.length ? 'La plus récente n’a pas : ' + echap(l[0].m.join(', ')) : 'La plus récente est complète : le pied de page est bon.') : ''}
@@ -3719,20 +3971,24 @@ function blocReglages() {
 const valSeg = (p, att) => $(`[data-${att}][aria-pressed="true"]`, p)?.dataset[att]
 function brancherSegments(p, att) { $$(`[data-${att}]`, p).forEach((b) => b.onclick = () => $$(`[data-${att}]`, p).forEach((x) => x.setAttribute('aria-pressed', x === b))) }
 function brancherInterrupteurs(p) { $$('.feuille-corps .interrupteur', p).forEach((b) => b.onclick = () => b.setAttribute('aria-checked', b.getAttribute('aria-checked') !== 'true')) }
-/* « 83.600 » ou « 1.234,5 » : ambigus (milliers ou décimales ?), refusés. */
-const lireNombre = (s) => {
+/* « 83.600 », « 1.234,5 » ou « 1,500 » : ambigus (milliers ou décimales ?), refusés.
+   2 décimales au plus pour un montant ; 4 pour un taux (taux de change, pourcentage). */
+const lireNombre = (s, dec = 2) => {
   const t = String(s || '').replace(/[\s\u202f\u00a0']/g, '')
-  if (!/^-?\d+([.,]\d+)?$/.test(t) || /^-?\d+\.\d{3}$/.test(t)) return null
+  if (!new RegExp('^-?\\d+([.,]\\d{1,' + dec + '})?$').test(t) || /^-?\d+\.\d{3}$/.test(t)) return null
   const v = parseFloat(t.replace(',', '.')); return isFinite(v) ? v : null
 }
-const occupe = (b, texte) => { b.disabled = true; b.dataset.t = b.textContent; b.textContent = texte }
-const libere = (b) => { b.disabled = false; b.textContent = b.dataset.t || 'Enregistrer' }
+/* Un champ « number » : vide ou invalide → null (avant : 0 enregistré sans le dire). */
+const nombreChamp = (el) => el.value === '' || el.validity?.badInput || !isFinite(Number(el.value)) ? null : Number(el.value)
+/* Le bouton est retenu : après un « await », ev.currentTarget vaut null (audit du 27 oct.). */
+const occupe = (b, texte) => { if (!b) return; occupe.dernier = b; b.disabled = true; b.dataset.t = b.textContent; b.textContent = texte }
+const libere = (b) => { b = b || occupe.dernier; if (!b) return; b.disabled = false; b.textContent = b.dataset.t || 'Enregistrer' }
 
 async function basculerFait(cle) {
   const deja = (CO.faits || []).includes(cle)
   const ech = (CO.echeances || []).find((e) => e.cle === cle)
   if (!deja && ech && !faisable(ech)) return toast('Période pas encore finie')
-  const { error } = deja ? await sb.from('conformite_faits').delete().eq('cle', cle) : await sb.from('conformite_faits').upsert({ cle })
+  const { error } = deja ? await ecrit(sb.from('conformite_faits').delete().eq('cle', cle)) : await sb.from('conformite_faits').upsert({ cle })
   if (error) return toast('Échec : ' + error.message)
   CO.faits = deja ? CO.faits.filter((x) => x !== cle) : [...(CO.faits || []), cle]
   ;(CO.echeances || []).forEach((e) => { if (e.cle === cle) e.fait = !deja })
@@ -3742,7 +3998,7 @@ async function basculerFait(cle) {
 async function cyclerTache(id) {
   const t = (CO.taches || []).find((x) => x.id === id); if (!t) return
   const suivant = { a_faire: 'en_cours', en_cours: 'fait', fait: 'a_faire' }[t.statut] || 'a_faire'
-  const { error } = await sb.from('conformite_taches').update({ statut: suivant }).eq('id', id)
+  const { error } = await ecrit(sb.from('conformite_taches').update({ statut: suivant }).eq('id', id))
   if (error) return toast('Échec : ' + error.message)
   t.statut = suivant; toast(STATUTS_TACHE[suivant]); rerendreConf()
 }
@@ -3766,13 +4022,13 @@ function ouvrirTache(id) {
     occupe(ev.currentTarget, 'Enregistrement…')
     const { data, error } = t ? await sb.from('conformite_taches').update(champs).eq('id', t.id).select().single()
       : await sb.from('conformite_taches').insert({ ...champs, ordre: Math.max(0, ...(CO.taches || []).map((x) => x.ordre || 0)) + 1 }).select().single()
-    if (error) { libere(ev.currentTarget); return toast('Échec : ' + error.message) }
+    if (error) { libere(); return toast('Échec : ' + error.message) }
     CO.taches = t ? CO.taches.map((x) => x.id === t.id ? data : x) : [...(CO.taches || []), data]
     fermerPanneau(); toast('Enregistré'); rerendreConf()
   }
   if (t) $('#t-suppr', p).onclick = async () => {
     if (!confirm('Supprimer cette tâche ?')) return
-    const { error } = await sb.from('conformite_taches').delete().eq('id', t.id)
+    const { error } = await ecrit(sb.from('conformite_taches').delete().eq('id', t.id))
     if (error) return toast('Échec : ' + error.message)
     CO.taches = CO.taches.filter((x) => x.id !== t.id); fermerPanneau(); toast('Supprimée'); rerendreConf()
   }
@@ -3818,13 +4074,13 @@ function ouvrirEcheance(cle) {
     const champs = { titre: $('#e-titre', p).value.trim(), date: $('#e-date', p).value || null, annuelle: $('#e-an', p).getAttribute('aria-checked') === 'true', quoi_faire: $('#e-quoi', p).value.trim() || null }
     if (!champs.titre) return toast('Écris de quoi il s’agit')
     occupe(ev.currentTarget, 'Enregistrement…')
-    const { error } = e ? await sb.from('conformite_echeances').update(champs).eq('id', e.id) : await sb.from('conformite_echeances').insert(champs)
-    if (error) { libere(ev.currentTarget); return toast('Échec : ' + error.message) }
+    const { error } = e ? await ecrit(sb.from('conformite_echeances').update(champs).eq('id', e.id)) : await sb.from('conformite_echeances').insert(champs)
+    if (error) { libere(); return toast('Échec : ' + error.message) }
     await rechargerCO(); fermerPanneau(); toast('Enregistré'); rerendreConf(); majPastilles()
   }
   if (e) $('#e-suppr', p).onclick = async () => {
     if (!confirm('Supprimer « ' + (base?.titre || e.titre) + ' »' + (base?.annuelle ? ' (toutes les années)' : '') + ' ?')) return
-    const { error } = await sb.from('conformite_echeances').delete().eq('id', e.id)
+    const { error } = await ecrit(sb.from('conformite_echeances').delete().eq('id', e.id))
     if (error) return toast('Échec : ' + error.message)
     await rechargerCO(); fermerPanneau(); toast('Supprimée'); rerendreConf(); majPastilles()
   }
@@ -3876,13 +4132,13 @@ function ouvrirRecette(cle) {
     if (pays && !/^[A-Z]{2}$/.test(pays)) return toast('Pays : 2 lettres, par exemple FR')
     if (!montant) return toast('Montant non reconnu : écris par exemple 1500 ou 1500,50')
     occupe(ev.currentTarget, 'Enregistrement…')
-    const { error } = m ? await sb.from('conformite_recettes').update(champs).eq('id', m.id) : await sb.from('conformite_recettes').insert(champs)
-    if (error) { libere(ev.currentTarget); return toast('Échec : ' + error.message) }
+    const { error } = m ? await ecrit(sb.from('conformite_recettes').update(champs).eq('id', m.id)) : await sb.from('conformite_recettes').insert(champs)
+    if (error) { libere(); return toast('Échec : ' + error.message) }
     await rechargerCO(); fermerPanneau(); toast('Enregistré'); rerendreConf()
   }
   if (m) $('#r-suppr', p).onclick = async () => {
     if (!confirm('Supprimer cette recette ?')) return
-    const { error } = await sb.from('conformite_recettes').delete().eq('id', m.id)
+    const { error } = await ecrit(sb.from('conformite_recettes').delete().eq('id', m.id))
     if (error) return toast('Échec : ' + error.message)
     await rechargerCO(); fermerPanneau(); toast('Supprimée'); rerendreConf()
   }
@@ -3908,7 +4164,7 @@ function ouvrirClientConf(id) {
     const ligne = { stripe_client: id, pays: pays && pays !== c.paysStripe ? pays : null, tva: tva && tva !== c.tvaStripe ? tva : null, pro_verifie: $('#k-pro', p).getAttribute('aria-checked') === 'true', note: $('#k-note', p).value.trim() || null }
     occupe(ev.currentTarget, 'Enregistrement…')
     const { error } = await sb.from('conformite_clients').upsert(ligne, { onConflict: 'stripe_client' })
-    if (error) { libere(ev.currentTarget); return toast('Échec : ' + error.message) }
+    if (error) { libere(); return toast('Échec : ' + error.message) }
     await rechargerCO(); fermerPanneau(); toast('Enregistré'); rerendreConf(); majPastilles()
   }
 }
@@ -3945,7 +4201,7 @@ function ouvrirJustif(id) {
       fichier = chemin
     }
     const champs = { titre, genre, expire_le: $('#j-exp', p).value || null, note: $('#j-note', p).value.trim() || null, fichier }
-    const { error } = j ? await sb.from('conformite_justificatifs').update(champs).eq('id', j.id) : await sb.from('conformite_justificatifs').insert(champs)
+    const { error } = j ? await ecrit(sb.from('conformite_justificatifs').update(champs).eq('id', j.id)) : await sb.from('conformite_justificatifs').insert(champs)
     if (error) {
       if (f && fichier) sb.storage.from('conformite').remove([fichier]).catch(() => {})
       libere(b); return toast('Échec : ' + error.message)
@@ -3956,7 +4212,7 @@ function ouvrirJustif(id) {
   if (j) $('#j-suppr', p).onclick = async () => {
     if (!confirm('Supprimer « ' + j.titre + ' »' + (j.fichier ? ' et son fichier' : '') + ' ?')) return
     if (j.fichier) { const { error } = await sb.storage.from('conformite').remove([j.fichier]); if (error) return toast('Échec : ' + error.message) }
-    const { error } = await sb.from('conformite_justificatifs').delete().eq('id', j.id)
+    const { error } = await ecrit(sb.from('conformite_justificatifs').delete().eq('id', j.id))
     if (error) return toast('Échec : ' + error.message)
     await rechargerCO(); fermerPanneau(); toast('Supprimé'); rerendreConf(); majPastilles()
   }
@@ -3984,7 +4240,7 @@ function ouvrirReglageConf(cle) {
     else if (d.type === 'freq') { texte = valSeg(p, 'fq') || null; if (!texte) return toast('Choisis une fréquence') }
     else if (d.type === 'date') texte = $('#g-date', p).value || null
     else {
-      valeur = lireNombre($('#g-val', p).value)
+      valeur = lireNombre($('#g-val', p).value, d.cle === 'taux_chf' || d.unite === '%' ? 4 : 2)
       if (valeur === null || valeur < 0) return toast('Nombre non reconnu : écris par exemple 83600 ou 0,9272')
       if (d.unite === '%' && valeur > 100) return toast('Un pourcentage va de 0 à 100')
       if (d.cle === 'jours_rappel' && (valeur < 1 || valeur > 365)) return toast('Entre 1 et 365 jours')
@@ -3992,10 +4248,13 @@ function ouvrirReglageConf(cle) {
       if (d.groupe === 'Seuils' && valeur < 1) return toast('Un seuil doit être plus grand que 0')
     }
     const verif = $('#g-verif', p).getAttribute('aria-checked') === 'true'
-    const ligne = { annee: an, cle, valeur, texte, source: $('#g-src', p).value.trim() || null, verifie_le: verif ? aujConf() : (r.annee === an ? r.verifie_le : null) }
+    /* Une valeur changée n'est plus « vérifiée » : il faut cocher la case à nouveau. */
+    const meme = (a, b) => (a ?? null) === (b ?? null) || (a != null && b != null && Number(a) === Number(b))
+    const inchange = r.annee === an && meme(valeur, r.valeur) && (texte ?? null) === (r.texte ?? null)
+    const ligne = { annee: an, cle, valeur, texte, source: $('#g-src', p).value.trim() || null, verifie_le: verif ? aujConf() : inchange ? r.verifie_le : null }
     occupe(ev.currentTarget, 'Enregistrement…')
     const { error } = await sb.from('conformite_reglages').upsert(ligne, { onConflict: 'annee,cle' })
-    if (error) { libere(ev.currentTarget); return toast('Échec : ' + error.message) }
+    if (error) { libere(); return toast('Échec : ' + error.message) }
     await rechargerCO(); fermerPanneau(); toast('Enregistré'); rerendreConf(); majPastilles()
   }
 }
@@ -4148,7 +4407,7 @@ function rentabilite(mode = moisRenta) {
   const ca = reglage('cout_analyse_ia', 0.3), ct = reglage('cout_traduction_ia', 0.02), fs = fraisStripeTaux()
   const lignes = (RE.entreprises || []).map((e) => {
     const an = (dernier ? e.analyses_mois_dernier : e.analyses_mois) || 0, tr = (dernier ? e.traductions_mois_dernier : e.traductions_mois) || 0
-    const ia = an * ca + tr * ct, rev = revenuEntreprise(e, dernier)
+    const ia = an * ca + tr * ct, rev = e.test ? null : revenuEntreprise(e, dernier)
     const revenu = rev ? rev.mensuel : null
     /* Impayé : l'abonnement est dû mais l'argent n'est pas arrivé : rien d'encaissé ce mois. */
     const recu = rev?.impaye ? 0 : revenu
@@ -4252,7 +4511,7 @@ function ouvrirBudgetIA() {
   </div>`)
   const enregistrer = async (b, v) => {
     occupe(b, 'Enregistrement…')
-    const { error } = await sb.from('reglages_admin').update({ valeur: v }).eq('cle', 'budget_ia_mois')
+    const { error } = await ecrit(sb.from('reglages_admin').update({ valeur: v }).eq('cle', 'budget_ia_mois'))
     if (error) { libere(b); return toast('Échec : ' + error.message) }
     S.reglages.budget_ia_mois.valeur = v
     fermerPanneau(); toast(v ? 'Budget enregistré' : 'Budget retiré'); majPastilles()
@@ -4421,13 +4680,13 @@ function ouvrirRgpd(id, pre = null) {
     const limite1 = limiteRgpd({ recue_le: champs.recue_le, prolongee: false })
     if (champs.prolongee && !d?.prolongee && !closeRgpd(champs) && aujConf() > limite1) return toast('Trop tard pour prolonger : il fallait l’annoncer à la personne avant le ' + dateJ(limite1))
     occupe(ev.currentTarget, 'Enregistrement…')
-    const { error } = d ? await sb.from('conformite_demandes_rgpd').update(champs).eq('id', d.id) : await sb.from('conformite_demandes_rgpd').insert(champs)
-    if (error) { libere(ev.currentTarget); return toast('Échec : ' + error.message) }
+    const { error } = d ? await ecrit(sb.from('conformite_demandes_rgpd').update(champs).eq('id', d.id)) : await sb.from('conformite_demandes_rgpd').insert(champs)
+    if (error) { libere(); return toast('Échec : ' + error.message) }
     await rechargerCO(); fermerPanneau(); toast(page === 'conformite' ? 'Enregistré' : 'Enregistré · voir la page Conformité'); rerendreConf(); majPastilles()
   }
   if (d) $('#q-suppr', p).onclick = async () => {
     if (!confirm('Supprimer la demande de ' + d.personne + ' ? Mieux vaut la garder comme preuve de la réponse.')) return
-    const { error } = await sb.from('conformite_demandes_rgpd').delete().eq('id', d.id)
+    const { error } = await ecrit(sb.from('conformite_demandes_rgpd').delete().eq('id', d.id))
     if (error) return toast('Échec : ' + error.message)
     await rechargerCO(); fermerPanneau(); toast('Supprimée'); rerendreConf(); majPastilles()
   }
@@ -4657,8 +4916,8 @@ function ouvrirTresorerie() {
     const brut = $('#tr-val', p).value.trim(), x = brut === '' ? 0 : lireNombre(brut)
     if (x === null || x < 0 || x > 10000000) return toast('Montant non reconnu : écris par exemple 3000')
     occupe(ev.currentTarget, 'Enregistrement…')
-    const { error } = await sb.from('reglages_admin').update({ valeur: Math.round(x * 100) / 100 }).eq('cle', 'tresorerie_depart')
-    if (error) { libere(ev.currentTarget); return toast('Échec : ' + error.message) }
+    const { error } = await ecrit(sb.from('reglages_admin').update({ valeur: Math.round(x * 100) / 100 }).eq('cle', 'tresorerie_depart'))
+    if (error) { libere(); return toast('Échec : ' + error.message) }
     S.reglages.tresorerie_depart.valeur = Math.round(x * 100) / 100
     fermerPanneau(); toast('Enregistré'); reafficherV4()
   }
@@ -4763,12 +5022,12 @@ function ouvrirObjectif(cle) {
     occupe(ev.currentTarget, 'Enregistrement…')
     const ligne = { cle, cible: Math.round(v * 100) / 100, echeance: $('#o-date', p).value || null }
     const { error } = await sb.from('objectifs').upsert(ligne)
-    if (error) { libere(ev.currentTarget); return toast('Échec : ' + error.message) }
+    if (error) { libere(); return toast('Échec : ' + error.message) }
     SG.objectifs = { ...(SG.objectifs || {}), [cle]: { cible: ligne.cible, echeance: ligne.echeance, maj_le: new Date().toISOString() } }
     fermerPanneau(); toast('Objectif enregistré'); reafficherV4()
   }
   if (f) $('#o-suppr', p).onclick = async () => {
-    const { error } = await sb.from('objectifs').delete().eq('cle', cle)
+    const { error } = await ecrit(sb.from('objectifs').delete().eq('cle', cle))
     if (error) return toast('Échec : ' + error.message)
     const { [cle]: _, ...reste } = SG.objectifs || {}; SG.objectifs = reste
     fermerPanneau(); toast('Objectif retiré'); reafficherV4()
@@ -4931,7 +5190,7 @@ function blocPlan() {
 async function cyclerEtapePlan(id) {
   const t = (SG?.plan || []).find((x) => x.id === id); if (!t) return
   const suivant = { a_faire: 'en_cours', en_cours: 'fait', fait: 'a_faire' }[t.statut] || 'a_faire'
-  const { error } = await sb.from('plan_lancement').update({ statut: suivant }).eq('id', id)
+  const { error } = await ecrit(sb.from('plan_lancement').update({ statut: suivant }).eq('id', id))
   if (error) return toast('Échec : ' + error.message)
   t.statut = suivant; toast(STATUTS_PLAN[suivant]); reafficherV4()
 }
@@ -4956,13 +5215,13 @@ function ouvrirEtapePlan(id) {
     occupe(ev.currentTarget, 'Enregistrement…')
     const { data, error } = t ? await sb.from('plan_lancement').update(champs).eq('id', t.id).select().single()
       : await sb.from('plan_lancement').insert({ ...champs, ordre: Math.max(0, ...(SG.plan || []).map((x) => x.ordre || 0)) + 1 }).select().single()
-    if (error) { libere(ev.currentTarget); return toast('Échec : ' + error.message) }
+    if (error) { libere(); return toast('Échec : ' + error.message) }
     SG.plan = t ? SG.plan.map((x) => x.id === t.id ? data : x) : [...(SG.plan || []), data]
     fermerPanneau(); toast('Enregistré'); reafficherV4()
   }
   if (t) $('#p-suppr', p).onclick = async () => {
     if (!confirm('Supprimer cette étape ?')) return
-    const { error } = await sb.from('plan_lancement').delete().eq('id', t.id)
+    const { error } = await ecrit(sb.from('plan_lancement').delete().eq('id', t.id))
     if (error) return toast('Échec : ' + error.message)
     SG.plan = SG.plan.filter((x) => x.id !== t.id); fermerPanneau(); toast('Supprimé'); reafficherV4()
   }
@@ -5035,13 +5294,13 @@ function ouvrirDepense(id) {
     occupe(ev.currentTarget, 'Enregistrement…')
     const champs = { mois: mois + '-01', canal: canal.slice(0, 60), montant: Math.round(mt * 100) / 100, note: $('#d-note', p).value.trim().slice(0, 300) || null }
     const { data, error } = d ? await sb.from('depenses_pub').update(champs).eq('id', d.id).select().single() : await sb.from('depenses_pub').insert(champs).select().single()
-    if (error) { libere(ev.currentTarget); return toast('Échec : ' + error.message) }
+    if (error) { libere(); return toast('Échec : ' + error.message) }
     SG.depenses = d ? SG.depenses.map((x) => x.id === d.id ? data : x) : [...(SG.depenses || []), data]
     fermerPanneau(); toast('Enregistré'); reafficherV4()
   }
   if (d) $('#d-suppr', p).onclick = async () => {
     if (!confirm('Supprimer cette dépense ?')) return
-    const { error } = await sb.from('depenses_pub').delete().eq('id', d.id)
+    const { error } = await ecrit(sb.from('depenses_pub').delete().eq('id', d.id))
     if (error) return toast('Échec : ' + error.message)
     SG.depenses = SG.depenses.filter((x) => x.id !== d.id); fermerPanneau(); toast('Supprimé'); reafficherV4()
   }
@@ -5118,6 +5377,603 @@ GUIDES.site.si.push(['Savoir si une publicité marche', 'Mets ?utm_source=nom_du
   ['Une publicité Google', 'Ajoute ?utm_source=google_ads à l’adresse de l’annonce et saisis la dépense sous « Google Ads » : sinon elle se mélange avec les visiteurs venus de Google sans payer.'])
 
 /* ═══════════════════════════════════════════════════════════════════════
+   VERSION 5 (27 octobre 2026) : choix d'Em parmi les 10 idées
+   – Entreprises de test : retirées des chiffres (bouton dans Clients).
+   – ① Prospects : nouvelle page, avec rappel du matin sur le téléphone.
+   – ② Cohortes : la part des entreprises encore actives, semaine après semaine.
+   – ③ Réponses préparées par Claude (page Messages).
+   – ⑧ Rapport du mois : une page A4 à enregistrer en PDF (page Argent).
+   – ⑨ Robot : un faux client refait le parcours toutes les heures (page Santé).
+   – ⑩ Demander au Dashboard : une question en français, Claude répond.
+   Tout s'affiche « à activer » tant que dashboard-v5.sql n'est pas exécuté.
+   ═══════════════════════════════════════════════════════════════════════ */
+let PR = null, PR_OK = null        // admin_prospects()
+let CH = null, CH_OK = null        // admin_cohortes()
+let RB = null, RB_OK = null        // robot_passages (200 derniers)
+let filtrePr = 'actifs', recherchePr = ''
+let robotLance = 0
+const histoireIA = []              // les 3 derniers échanges de cette visite (questions de suivi)
+const aActiverV5 = (quoi) => `<div class="encart info">${quoi} : exécute le fichier <b>dashboard-v5.sql</b> dans Supabase (SQL Editor → coller → Run) pour l’activer.</div>`
+const absenteV5 = (r) => r.status === 'fulfilled' && fonctionAbsente({ status: 'fulfilled', value: r.value })
+const sqlV5 = () => Array.isArray(S?.entreprises_test)
+function chargerV5() {
+  return Promise.allSettled([
+    sb.rpc('admin_prospects'),
+    sb.rpc('admin_cohortes'),
+    sb.from('robot_passages').select('id, cree_le, ok, duree_ms, etapes, declenche_par').order('cree_le', { ascending: false }).limit(200),
+  ]).then(([p, c, r]) => {
+    if (p.status === 'fulfilled' && !p.value.error) { PR = p.value.data || []; PR_OK = true } else if (!PR && absenteV5(p)) PR_OK = false
+    if (c.status === 'fulfilled' && !c.value.error) { CH = c.value.data; CH_OK = true } else if (!CH && absenteV5(c)) CH_OK = false
+    if (r.status === 'fulfilled' && !r.value.error) { RB = r.value.data || []; RB_OK = true }
+    else if (!RB && r.status === 'fulfilled' && /robot_passages|does not exist|schema cache/i.test(r.value.error?.message || '')) RB_OK = false
+  })
+}
+const reafficherV5 = () => { if (!$('.panneau.ouvert')) { const y = scrollY; afficher(); scrollTo(0, y) } }
+const jourParis = (d = new Date()) => d.toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' })
+const ajouterJours = (j, n) => new Date(Date.parse(j + 'T12:00:00Z') + n * 86400e3).toISOString().slice(0, 10)
+
+/* ═══ Entreprises de test ═══════════════════════════════════════════════ */
+const toutesEntreprises = () => [...(S.entreprises || []), ...(S.entreprises_test || [])]
+const lienTests = () => sqlV5()
+  ? `<button class="lien-discret" data-action="tests">${S.entreprises_test.length ? plur(S.entreprises_test.length, 'entreprise de test', 'entreprises de test') + ' retirée' + (S.entreprises_test.length > 1 ? 's' : '') + ' des chiffres' : 'Retirer des entreprises de test'}</button>`
+  : ''
+function ouvrirTests() {
+  if (!sqlV5()) return toast('Exécute d’abord dashboard-v5.sql')
+  const l = toutesEntreprises().sort((a, b) => String(a.nom).localeCompare(String(b.nom), 'fr'))
+  const p = ouvrirFeuille(`<div class="feuille-corps" style="--c:${pageDe('clients').couleur}">
+    <div class="feuille-titre">Entreprises de test</div>
+    <div class="feuille-info">Une entreprise de test (tes essais, celle du robot) disparaît des chiffres des clients, de l’usage, des cohortes et du rapport du mois. L’argent reçu par Stripe, le coût de l’IA et les erreurs restent comptés : ils sont réels.</div>
+    <div class="groupe tests-liste">${l.map((e) => `<div class="groupe-ligne sans-icone test-ligne">
+      <span class="gl-t"><b>${echap(e.nom)}</b><small>${e.robot ? 'robot · toujours un test' : ({ actif: 'abonnée', essai: 'essai', impaye: 'paiement refusé', resilie: 'résiliée' }[e.statut] || echap(e.statut)) + ' · inscrite le ' + dateC(e.cree_le) + ' · ' + plur(e.procedures || 0, 'procédure')}</small></span>
+      <button class="interrupteur" role="switch" aria-checked="${!!e.test}" aria-label="Test : ${echap(e.nom)}" data-test="${e.id}"${e.robot ? ' disabled' : ''}></button>
+    </div>`).join('')}</div>
+    <button class="gros-btn plein" data-action="tests-ok">Terminé</button>
+  </div>`)
+  $$('[data-test]', p).forEach((b) => b.onclick = async () => {
+    const id = b.dataset.test, oui = b.getAttribute('aria-checked') !== 'true'
+    b.disabled = true
+    const { error } = oui ? await sb.from('entreprises_test').insert({ entreprise_id: id }) : await ecrit(sb.from('entreprises_test').delete().eq('entreprise_id', id))
+    b.disabled = false
+    if (error) return toast('Échec : ' + error.message)
+    b.setAttribute('aria-checked', oui)
+    toast(oui ? 'Retirée des chiffres' : 'Remise dans les chiffres')
+    charger()
+  })
+  $('[data-action="tests-ok"]', p).onclick = () => { fermerPanneau(); charger().then(() => afficher()) }
+}
+async function basculerTest(id, oui) {
+  const { error } = oui ? await sb.from('entreprises_test').insert({ entreprise_id: id }) : await ecrit(sb.from('entreprises_test').delete().eq('entreprise_id', id))
+  if (error) return toast('Échec : ' + error.message)
+  fermerPanneau(); toast(oui ? 'Retirée des chiffres' : 'Remise dans les chiffres')
+  await charger(); afficher()
+}
+
+/* ═══ ① Prospects ═══════════════════════════════════════════════════════ */
+const ETAPES_PR = { a_contacter: 'À contacter', contacte: 'Contacté', demo: 'Démo', essai: 'Essai', client: 'Client', perdu: 'Perdu' }
+const TON_PR = { a_contacter: '', contacte: 'accent', demo: 'accent', essai: 'alerte', client: 'ok', perdu: 'grave' }
+/* L'étape réelle : celle de l'entreprise inscrite si le prospect en a une. */
+function etapePr(p) {
+  if (p.etape_reelle) return p.etape_reelle   // calculée par la base : la même que pour le rappel du matin
+  const s = p.lie?.statut
+  if (!s) return p.etape
+  if (s === 'actif' || s === 'impaye') return 'client'
+  if (s === 'resilie') return 'perdu'
+  return ['client', 'perdu'].includes(p.etape) ? p.etape : 'essai'   // « Perdu » choisi à la main l'emporte sur l'essai
+}
+const enCoursPr = (p) => !p.ne_plus_contacter && !['client', 'perdu'].includes(etapePr(p))
+function aFairePr(jours = 0) {
+  const lim = ajouterJours(jourParis(), jours)
+  return (PR || []).filter((p) => enCoursPr(p) && p.prochaine_date && p.prochaine_date <= lim)
+    .sort((a, b) => a.prochaine_date.localeCompare(b.prochaine_date) || String(a.entreprise).localeCompare(String(b.entreprise), 'fr'))
+}
+function quandPr(d) {
+  const auj = jourParis(), j = Math.round((Date.parse(d + 'T12:00:00Z') - Date.parse(auj + 'T12:00:00Z')) / 86400e3)
+  return j < 0 ? ['En retard', 'grave'] : j === 0 ? ['Aujourd’hui', 'alerte'] : j === 1 ? ['Demain', 'accent'] : ['Dans ' + j + ' jours', '']
+}
+const badgePr = (p) => { const e = etapePr(p); return `<span class="badge ${p.ne_plus_contacter ? '' : TON_PR[e]}">${p.ne_plus_contacter ? 'Ne plus contacter' : ETAPES_PR[e]}</span>` }
+function lignePr(p, avecQuand = false) {
+  const q = avecQuand && p.prochaine_date ? quandPr(p.prochaine_date) : null
+  const sous = [p.contact, p.ville, p.secteur].filter(Boolean).map(echap).join(' · ')
+  return `<button class="ligne ligne-bouton pr-ligne" data-prospect="${p.id}"><div class="t"><b>${echap(p.entreprise)}</b>
+    <span>${avecQuand ? echap(p.prochaine_action || 'Action à faire') + (sous ? ' · ' + sous : '') : (sous || '—') + (p.lie ? ' · inscrit : ' + echap(p.lie.nom) : '')}</span></div>
+    ${q ? `<span class="badge ${q[1]}">${q[0]}</span>` : badgePr(p)}</button>`
+}
+function pageProspects() {
+  const act = `<button class="btn btn-plein" data-action="ajout-prospect">${ico('plus')}Ajouter un prospect</button>`
+  if (PR_OK === false) return entete('Prospects', '', act) + aActiverV5('La liste des prospects')
+  if (!PR) return entete('Prospects', '') + '<div class="chargement" style="min-height:160px"><div class="roue"></div></div>'
+  const nb = (e) => PR.filter((p) => !p.ne_plus_contacter && etapePr(p) === e).length
+  const urgents = aFairePr(0), semaine = aFairePr(7)
+  const filtres = [['actifs', 'En cours'], ['a_contacter', 'À contacter'], ['contacte', 'Contactés'], ['demo', 'Démo'], ['essai', 'Essai'], ['client', 'Clients'], ['perdu', 'Perdus'], ['tous', 'Tous']]
+  const q = recherchePr.trim().toLowerCase()
+  const l = PR.filter((p) => (filtrePr === 'tous' || (filtrePr === 'actifs' ? enCoursPr(p) : !p.ne_plus_contacter && etapePr(p) === filtrePr))
+      && (!q || [p.entreprise, p.contact, p.ville, p.secteur, p.email].some((x) => String(x || '').toLowerCase().includes(q))))
+  return entete('Prospects', 'Les entreprises que tu démarches', act) + `
+  <div class="grille g4">
+    ${tuile('À faire aujourd’hui', n(urgents.length), urgents.length ? urgents.filter((p) => p.prochaine_date < jourParis()).length + ' en retard' : 'rien en attente', { heros: 1, ton: urgents.some((p) => p.prochaine_date < jourParis()) ? 'grave' : urgents.length ? 'alerte' : 'ok' })}
+    ${tuile('En discussion', n(nb('contacte') + nb('demo')), n(nb('a_contacter')) + ' à contacter · ' + n(nb('demo')) + ' en démo', { heros: 1 })}
+    ${tuile('En essai', n(nb('essai')), 'inscrits sur Standix', { heros: 1 })}
+    ${tuile('Devenus clients', n(nb('client')), n(nb('perdu')) + ' perdu' + (nb('perdu') > 1 ? 's' : '') + (PR.length ? ' · ' + pct(nb('client') / Math.max(1, nb('client') + nb('perdu'))) + ' de réussite' : ''), { heros: 1, ton: nb('client') ? 'ok' : '' })}
+  </div>
+  <div class="section carte"><h3>À faire <small>aujourd’hui, en retard et les 7 prochains jours</small></h3>
+    ${semaine.length ? `<div class="liste">${semaine.map((p) => lignePr(p, true)).join('')}</div>` : `<div class="vide">${PR.length ? 'Aucune action prévue dans les 7 jours. Donne une prochaine action à chaque prospect en cours.' : 'Ajoute les entreprises que tu veux démarcher : le Dashboard te rappelle quoi faire, et quand.'}</div>`}
+  </div>
+  <div class="section carte"><h3>Tous les prospects <small>${plur(PR.length, 'prospect')}</small></h3>
+    <div class="outils-clients">
+      <input class="recherche" id="recherche-pr" type="search" placeholder="Rechercher un prospect" value="${echap(recherchePr)}">
+      <div class="filtres pr-filtres">${filtres.map(([v, t]) => `<button class="filtre" data-fpr="${v}" aria-pressed="${filtrePr === v}">${t}</button>`).join('')}</div>
+    </div>
+    <div id="liste-pr">${listePr(l)}</div>
+  </div>
+  <p class="note strat-avert">Prospection entre professionnels : toujours dire qui tu es et pourquoi tu écris, et arrêter dès qu’on te le demande (bouton « Ne plus contacter »). Repère, pas un avis de juriste.</p>`
+}
+const listePr = (l) => l.length ? `<div class="liste">${l.map((p) => lignePr(p)).join('')}</div>` : '<div class="vide">Aucun prospect ici</div>'
+const SOURCES_PR = ['LinkedIn', 'Recommandation', 'Salon', 'Site internet', 'E-mail', 'Téléphone', 'Visite sur place']
+function ouvrirProspect(id) {
+  const x = id ? (PR || []).find((p) => p.id === id) : null
+  if (id && !x) return
+  const etape = x ? x.etape : 'a_contacter'
+  const champ = (cle, lib, val, attrs = '') => `<div class="champ-feuille"><label for="pr-${cle}">${lib}</label><input id="pr-${cle}" value="${echap(val || '')}" ${attrs}></div>`
+  const ents = toutesEntreprises().sort((a, b) => String(a.nom).localeCompare(String(b.nom), 'fr'))
+  /* Une entreprise reliée à la main qui n'est plus dans la liste (supprimée ?) reste proposée : enregistrer ne coupe pas le lien. */
+  if (x?.entreprise_id && !ents.some((e) => e.id === x.entreprise_id)) ents.unshift({ id: x.entreprise_id, nom: x.lie?.nom || 'Entreprise reliée' })
+  const choixLien = x?.entreprise_id ? x.entreprise_id : x && x.lien_auto === false ? 'aucune' : ''
+  const p = ouvrirFeuille(`<div class="feuille-corps" style="--c:${pageDe('prospects').couleur}">
+    <div class="feuille-titre">${x ? echap(x.entreprise) : 'Nouveau prospect'}</div>
+    ${x?.lie ? `<div class="encart ok pr-lie">Inscrit sur Standix : <b>${echap(x.lie.nom)}</b> · ${({ actif: 'client payant', impaye: 'paiement refusé', resilie: 'abonnement résilié', essai: 'essai' })[x.lie.statut] || echap(x.lie.statut)}${x.lie.statut === 'essai' && x.lie.essai_fin ? ' jusqu’au ' + dateC(x.lie.essai_fin) : ''}${x.lie.par === 'domaine' ? ' <small>(reconnu par le domaine de l’e-mail)</small>' : ''}</div>` : ''}
+    ${x && (x.email || x.telephone) ? `<div class="deux-btn pr-contact">${x.email ? `<a class="gros-btn gris lien-btn" href="mailto:${encodeURIComponent(x.email)}">${ico('enveloppe')}Écrire</a>` : '<span></span>'}${x.telephone ? `<a class="gros-btn gris lien-btn" href="tel:${echap(String(x.telephone).replace(/[^\d+]/g, ''))}">${ico('telephone')}Appeler</a>` : ''}</div>` : ''}
+    ${champ('entreprise', 'Entreprise', x?.entreprise, 'maxlength="200" placeholder="par exemple : Boulangerie Martin"')}
+    <div class="champ-feuille"><label>Étape</label><div class="segments seg-6">${Object.entries(ETAPES_PR).map(([k, v]) => `<button type="button" data-pe="${k}" aria-pressed="${etape === k}">${v}</button>`).join('')}</div></div>
+    ${champ('action', 'Prochaine action', x?.prochaine_action, 'maxlength="300" placeholder="par exemple : rappeler mardi pour la démo"')}
+    <div class="champ-feuille"><label for="pr-date">Pour le</label><input id="pr-date" type="date" value="${x?.prochaine_date || ''}"></div>
+    ${champ('contact', 'Contact', x?.contact, 'maxlength="150" placeholder="Prénom Nom"')}
+    ${champ('fonction', 'Fonction', x?.fonction, 'maxlength="100" placeholder="par exemple : gérant"')}
+    ${champ('email', 'E-mail', x?.email, 'type="email" maxlength="200" autocomplete="off"')}
+    ${champ('tel', 'Téléphone', x?.telephone, 'type="tel" maxlength="50" autocomplete="off"')}
+    ${champ('ville', 'Ville', x?.ville, 'maxlength="100"')}
+    ${champ('secteur', 'Secteur', x?.secteur, 'maxlength="100" placeholder="par exemple : restauration"')}
+    <div class="champ-feuille"><label for="pr-source">D’où il vient</label><input id="pr-source" list="pr-sources" maxlength="100" value="${echap(x?.source || '')}"><datalist id="pr-sources">${SOURCES_PR.map((s) => `<option value="${s}">`).join('')}</datalist></div>
+    <div class="champ-feuille"><label for="pr-dernier">Dernier contact</label><input id="pr-dernier" type="date" value="${x?.dernier_contact || ''}"></div>
+    <div class="champ-feuille"><label for="pr-lien">Entreprise inscrite sur Standix</label><select id="pr-lien">
+      <option value=""${choixLien === '' ? ' selected' : ''}>${x?.lie?.par === 'domaine' ? 'Reconnue par l’e-mail : ' + echap(x.lie.nom) : 'Reconnue par l’e-mail (si elle s’inscrit)'}</option>
+      <option value="aucune"${choixLien === 'aucune' ? ' selected' : ''}>Aucune (ne jamais relier)</option>
+      ${ents.map((e) => `<option value="${echap(e.id)}"${choixLien === e.id ? ' selected' : ''}>${echap(e.nom)}${e.test ? ' (test)' : ''}</option>`).join('')}</select></div>
+    <div class="champ-feuille"><label for="pr-note">Notes</label><textarea id="pr-note" rows="4" maxlength="4000">${echap(x?.note || '')}</textarea></div>
+    <div class="ligne-interrupteur"><span>Ne plus contacter <small>(opposition : seuls le nom et l’e-mail restent)</small></span><button class="interrupteur" role="switch" id="pr-stop" aria-checked="${!!x?.ne_plus_contacter}"></button></div>
+    <button class="gros-btn plein" id="pr-ok">Enregistrer</button>
+    ${x ? '<button class="gros-btn rouge" id="pr-suppr">Supprimer</button>' : ''}
+  </div>`)
+  brancherSegments(p, 'pe'); brancherInterrupteurs(p)
+  $('#pr-ok', p).onclick = async (ev) => {
+    const v = (k) => $('#pr-' + k, p).value.trim()
+    const champs = { entreprise: v('entreprise'), etape: valSeg(p, 'pe') || 'a_contacter', prochaine_action: v('action') || null, prochaine_date: v('date') || null,
+      contact: v('contact') || null, fonction: v('fonction') || null, email: v('email') || null, telephone: v('tel') || null, ville: v('ville') || null,
+      secteur: v('secteur') || null, source: v('source') || null, dernier_contact: v('dernier') || null,
+      entreprise_id: ['', 'aucune'].includes(v('lien')) ? null : v('lien'), lien_auto: v('lien') !== 'aucune',
+      note: v('note') || null, ne_plus_contacter: $('#pr-stop', p).getAttribute('aria-checked') === 'true' }
+    if (!champs.entreprise) return toast('Indique le nom de l’entreprise')
+    if (champs.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(champs.email)) return toast('E-mail non reconnu')
+    /* Opposition à la prospection : on ne garde que de quoi ne plus la contacter (la base efface le reste, toujours). */
+    if (champs.ne_plus_contacter && !x?.ne_plus_contacter && !confirm('Ne plus contacter : son téléphone, le contact, les notes et la prochaine action seront effacés. Seuls le nom de l’entreprise et l’e-mail restent, pour ne plus lui écrire. Continuer ?')) return
+    if (champs.ne_plus_contacter) Object.assign(champs, { contact: null, fonction: null, telephone: null, ville: null, secteur: null, source: null, note: null, prochaine_action: null, prochaine_date: null, dernier_contact: null })
+    const b = ev.currentTarget
+    occupe(b, 'Enregistrement…')
+    const { error } = x ? await ecrit(sb.from('prospects').update(champs).eq('id', x.id)) : await sb.from('prospects').insert(champs)
+    if (error) { libere(b); return toast('Échec : ' + error.message) }
+    fermerPanneau(); toast('Enregistré')
+    await chargerV5(); reafficherV5()
+  }
+  if (x) $('#pr-suppr', p).onclick = async () => {
+    if (!confirm('Supprimer ce prospect ?')) return
+    const { error } = await ecrit(sb.from('prospects').delete().eq('id', x.id))
+    if (error) return toast('Échec : ' + error.message)
+    PR = PR.filter((y) => y.id !== x.id); fermerPanneau(); toast('Supprimé'); reafficherV5()
+  }
+}
+
+/* ═══ ② Cohortes (page Clients) ═════════════════════════════════════════ */
+const SEMAINES = [['1', '1 sem.'], ['4', '4 sem.'], ['8', '8 sem.'], ['12', '12 sem.']]
+const moisCourt = (m) => new Date(m + '-15T12:00:00Z').toLocaleDateString('fr-FR', { month: 'short', year: 'numeric', timeZone: 'UTC' })
+function blocCohortes() {
+  if (CH_OK === false) return `<div class="section carte"><h3>Cohortes</h3>${aActiverV5('Les cohortes')}</div>`
+  if (!CH) return ''
+  const l = CH.cohortes || []
+  const cellule = (s) => {
+    if (!s || !s.eligibles) return '<span class="coh-c vide-c">—</span>'
+    const t = s.actives / s.eligibles
+    return `<span class="coh-c" style="--t:${(0.08 + t * 0.62).toFixed(2)}" title="${s.actives} sur ${s.eligibles}"><b>${Math.round(t * 100)} %</b><small>${s.actives}/${s.eligibles}</small></span>`
+  }
+  return `<div class="section carte cohortes"><h3>Cohortes <small>encore actives après…</small></h3>
+    ${l.length ? `<div class="coh-grille">
+      <span class="coh-t">Inscrites en</span>${SEMAINES.map(([, t]) => `<span class="coh-t">${t}</span>`).join('')}
+      ${l.map((c) => `<span class="coh-m"><b>${moisCourt(c.mois)}</b><small>${plur(c.inscrites, 'inscrite')}${c.payantes ? ' · ' + plur(c.payantes, 'payante') : ''}</small></span>${SEMAINES.map(([k]) => cellule(c.semaines?.[k])).join('')}`).join('')}
+    </div>` : '<div class="vide">Pas encore d’inscription (entreprises de test exclues)</div>'}
+    <p class="note">Pour les entreprises inscrites chaque mois : la part qui a encore servi pendant la semaine qui suit 1, 4, 8 et 12 semaines (connexion, procédure créée ou modifiée, scan, lecture, analyse). « — » : trop tôt pour le savoir. Les connexions ne sont notées que depuis le ${CH.depuis ? dateC(CH.depuis) : '26 oct.'} ; avant, seules les autres actions comptent.</p>
+  </div>`
+}
+
+/* ═══ ③ Réponse préparée par Claude (page Messages) ═════════════════════ */
+const boutonIAMessage = (m) => m.de_email ? `<button class="gros-btn gris ia-btn" data-ia-reponse="${m.id}">${ico('etincelle')}Préparer une réponse avec Claude</button><div id="ia-brouillon"></div>` : ''
+async function preparerReponse(id, b) {
+  const m = (ME?.messages || []).find((x) => x.id === id); if (!m) return
+  occupe(b, 'Claude écrit le brouillon…')
+  let r = null, err = null
+  try {
+    r = await sb.functions.invoke('admin-ia', { body: { mode: 'reponse', message_id: id } })
+    if (r.error) { err = r.data?.error || r.error.message; try { const c = await r.error.context?.json?.(); if (c?.error) err = c.error } catch (e) {} }
+  } catch (e) { err = e?.message || String(e) }
+  if (err) { libere(b); return toast(/Failed to send|not found|404/i.test(err) ? 'La fonction admin-ia n’est pas encore en ligne' : 'Échec : ' + err) }
+  b.remove()
+  const sujet = (/^re\s*:/i.test(m.objet || '') ? '' : 'Re : ') + (m.objet || '')
+  const boite = $('#ia-brouillon'); if (!boite) return
+  boite.innerHTML = `<div class="champ-feuille ia-brouillon"><label for="ia-texte">Brouillon de Claude · relis et corrige avant d’envoyer</label>
+    <textarea id="ia-texte" rows="12">${echap(r.data.texte)}</textarea></div>
+    <a class="gros-btn plein lien-btn" id="ia-envoyer" href="#">${ico('repondre')}Ouvrir dans l’e-mail</a>
+    <button class="gros-btn gris lien-btn" id="ia-copier">${ico('copie')}Copier le brouillon</button>
+    <p class="note">Les passages entre crochets [ ] sont à compléter ou à décider par toi.${r.data.client ? ' Claude a tenu compte de sa fiche client.' : r.data.prouve === false ? ' Adresse de l’expéditeur non prouvée : Claude n’a reçu ni sa fiche client ni ses messages précédents.' : ''} Coût ≈ ${nf1.format((r.data.cout_usd || 0) * 0.93 * 100)} centime${(r.data.cout_usd || 0) * 93 >= 2 ? 's' : ''}.</p>`
+  const lien = $('#ia-envoyer', boite), zone = $('#ia-texte', boite)
+  const maj = () => { lien.href = `mailto:${encodeURIComponent(m.de_email)}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(zone.value)}` }
+  maj(); zone.oninput = maj
+  $('#ia-copier', boite).onclick = () => navigator.clipboard?.writeText(zone.value).then(() => toast('Brouillon copié'), () => toast('Copie impossible'))
+}
+
+/* ═══ ⑧ Rapport du mois (page Argent) ═══════════════════════════════════ */
+const moisPrecedent = (m) => { const [a, mm] = m.split('-').map(Number); const d = new Date(Date.UTC(a, mm - 2, 1)); return d.toISOString().slice(0, 7) }
+const bornesMois = (m) => { const [a, mm] = m.split('-').map(Number); return [Date.UTC(a, mm - 1, 1) / 1000, Date.UTC(a, mm, 1) / 1000 - 1] }
+function chiffresStripe(m) {
+  if (!ST || ST.erreur) return null
+  const [deb, fin] = bornesMois(m)
+  const cl = (ST.clients || []).filter((c) => c.payant !== false)
+  const actifA = (c, t) => c.debut <= t && (!c.fin || c.fin > t)
+  const pm = (ST.par_mois || []).find((x) => x.m === m) || { brut: 0, frais: 0, rembourse: 0, net: 0 }
+  const mrr = (ST.evolution?.mrr_mois || []).find((x) => x.m === m)?.mrr ?? cl.filter((c) => actifA(c, fin)).reduce((t, c) => t + (c.mensuel || 0), 0)
+  return { ...pm, mrr, clients: cl.filter((c) => actifA(c, fin)).length, nouveaux: cl.filter((c) => c.debut >= deb && c.debut <= fin).length,
+    partis: cl.filter((c) => c.fin && c.fin >= deb && c.fin <= fin).length, mode: ST.mode }
+}
+const evol = (a, b, fmt = n) => {
+  if (a === null || a === undefined || b === null || b === undefined) return ''
+  if (a === b) return '<small class="rp-ev">= mois préc.</small>'
+  const sens = a > b ? 'hausse' : 'baisse'
+  const p = b ? ` (${a > b ? '+' : '−'}${nf1.format(Math.abs(a / b - 1) * 100)} %)` : ''
+  return `<small class="rp-ev ${sens}">${a > b ? '▲' : '▼'} ${fmt(Math.abs(a - b))}${p}</small>`
+}
+function htmlRapport(m, D, phrase) {
+  const A = D[m] || {}, B = D[moisPrecedent(m)] || {}, st = chiffresStripe(m), stB = chiffresStripe(moisPrecedent(m))
+  const co = coutsDuMois(m), coB = coutsDuMois(moisPrecedent(m))
+  const res = st ? st.net - co.total : null, resB = stB ? stB.net - coB.total : null
+  const conv = A.essais_finis ? A.essais_finis_payants / A.essais_finis : null
+  const tuileR = (lib, val, ev = '', sous = '') => `<div class="rp-tuile"><span>${lib}</span><b>${val}</b>${ev}${sous ? `<small>${sous}</small>` : ''}</div>`
+  const ligneR = (lib, val, valB = '') => `<tr><td>${lib}</td><td class="num">${val}</td><td class="num rp-b">${valB}</td></tr>`
+  const pctO = (v) => v === null || v === undefined ? '—' : nf1.format(v * 100) + ' %'
+  /* Les faits marquants, tirés des chiffres. */
+  const faits = []
+  if (st) {
+    if (st.nouveaux) faits.push(plur(st.nouveaux, 'nouveau client payant', 'nouveaux clients payants'))
+    if (st.partis) faits.push(plur(st.partis, 'client parti', 'clients partis'))
+    if (stB && st.mrr !== stB.mrr && stB.mrr) faits.push(`Revenu mensuel récurrent ${st.mrr > stB.mrr ? 'en hausse' : 'en baisse'} de ${nf1.format(Math.abs(st.mrr / stB.mrr - 1) * 100)} %`)
+  }
+  if (A.inscriptions !== undefined && B.inscriptions !== undefined && A.inscriptions !== B.inscriptions) faits.push(`${plur(A.inscriptions, 'inscription')} contre ${n(B.inscriptions)} le mois précédent`)
+  if (A.mises_en_ligne) faits.push(plur(A.mises_en_ligne, 'mise à jour publiée', 'mises à jour publiées'))
+  if (A.prospects) faits.push(plur(A.prospects, 'nouveau prospect', 'nouveaux prospects') + (A.prospects_clients ? ', ' + plur(A.prospects_clients, 'devenu client', 'devenus clients') : ''))
+  if (A.disponibilite !== null && A.disponibilite !== undefined) faits.push(`Application disponible ${pctO(A.disponibilite)} du temps`)
+  const suivant = moisPrecedent(m) && (() => { const [a, mm] = m.split('-').map(Number); return new Date(Date.UTC(a, mm, 1)).toISOString().slice(0, 7) })()
+  const conseil = typeof analyses === 'function' ? analyses('conseil').find((a) => a.contenu && !a.erreur && a.mois === suivant) : null
+  const prio = conseil?.contenu?.priorites?.length ? conseil.contenu.priorites.slice(0, 3) : []
+  return `<div class="rapport">
+    <header class="rp-tete"><div><div class="rp-marque">Standix</div><h1>Rapport mensuel · ${moisNom(m)}</h1></div>
+      <p>Édité le ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}<br>standix.app · entreprise individuelle</p></header>
+    <section class="rp-tuiles">
+      ${tuileR('Revenu mensuel récurrent', st ? eur(st.mrr) : '—', st && stB ? evol(st.mrr, stB.mrr, eur) : '', 'en fin de mois')}
+      ${tuileR('Encaissé', st ? eur(st.net) : '—', st && stB ? evol(st.net, stB.net, eur) : '', 'net des frais Stripe')}
+      ${tuileR('Résultat du mois', res === null ? '—' : eur(res), res !== null && resB !== null ? evol(res, resB, eur) : '', 'encaissé − coûts')}
+      ${tuileR('Clients payants', st ? n(st.clients) : '—', st && stB ? evol(st.clients, stB.clients) : '', st ? `+${n(st.nouveaux)} / −${n(st.partis)} dans le mois` : '')}
+      ${tuileR('Inscriptions (essais)', n(A.inscriptions), evol(A.inscriptions, B.inscriptions))}
+      ${tuileR('Entreprises actives', n(A.actives), evol(A.actives, B.actives), 'au moins une action dans le mois')}
+    </section>
+    <div class="rp-deux">
+      <section><h2>Argent</h2><table><thead><tr><th></th><th class="num">${moisLib(m)}</th><th class="num rp-b">${moisLib(moisPrecedent(m))}</th></tr></thead><tbody>
+        ${ligneR('Encaissé brut', st ? eur2(st.brut) : '—', stB ? eur2(stB.brut) : '—')}
+        ${ligneR('Frais Stripe', st ? eur2(st.frais) : '—', stB ? eur2(stB.frais) : '—')}
+        ${ligneR('Remboursements', st ? eur2(st.rembourse) : '—', stB ? eur2(stB.rembourse) : '—')}
+        ${ligneR('Coûts fixes', eur2(co.fixes), eur2(coB.fixes))}
+        ${ligneR('Intelligence artificielle', eur2(co.ia + co.trad), eur2(coB.ia + coB.trad))}
+        ${ligneR('<b>Résultat</b>', res === null ? '—' : '<b>' + eur2(res) + '</b>', resB === null ? '—' : eur2(resB))}
+      </tbody></table></section>
+      <section><h2>Clients et usage</h2><table><thead><tr><th></th><th class="num">${moisLib(m)}</th><th class="num rp-b">${moisLib(moisPrecedent(m))}</th></tr></thead><tbody>
+        ${ligneR('Essais terminés', n(A.essais_finis), n(B.essais_finis))}
+        ${ligneR('… devenus clients', A.essais_finis ? n(A.essais_finis_payants) + ' (' + pctO(conv) + ')' : '—', B.essais_finis ? n(B.essais_finis_payants) : '—')}
+        ${ligneR('Procédures créées', n(A.procedures), n(B.procedures))}
+        ${ligneR('Analyses vidéo IA', n(A.analyses), n(B.analyses))}
+        ${ligneR('Lectures de procédures', n(A.lectures), n(B.lectures))}
+        ${ligneR('Scans de QR codes', n(A.scans), n(B.scans))}
+        ${ligneR('Membres ajoutés', n(A.membres), n(B.membres))}
+      </tbody></table></section>
+    </div>
+    <div class="rp-deux">
+      <section><h2>Fiabilité</h2><table><tbody>
+        ${ligneR('Disponibilité de l’app', pctO(A.disponibilite))}
+        ${ligneR('Parcours client réussi (robot)', pctO(A.robot))}
+        ${ligneR('Erreurs rencontrées', n(A.erreurs))}
+        ${ligneR('Mises à jour publiées', n(A.mises_en_ligne))}
+        ${ligneR('Messages reçus', n(A.messages))}
+      </tbody></table></section>
+      <section><h2>Faits marquants</h2>${phrase ? `<p class="rp-phrase">${echap(phrase)}</p>` : ''}
+        ${faits.length ? `<ul>${faits.map((f) => `<li>${echap(f)}</li>`).join('')}</ul>` : '<p class="rp-vide">Rien de notable dans les chiffres.</p>'}
+        ${prio.length ? `<h2 class="rp-h2b">Priorités du mois suivant</h2><ol>${prio.map((x) => `<li>${echap(x)}</li>`).join('')}</ol>` : ''}
+      </section>
+    </div>
+    <footer class="rp-pied">Chiffres tirés du tableau de bord de Standix ; l’argent vient de Stripe${st?.mode === 'test' ? ' (en mode test : montants non réels)' : ''}. Entreprises de test exclues. Coûts : coûts fixes actuels et estimation de l’IA. Document interne, non audité.</footer>
+  </div>`
+}
+async function ouvrirRapport() {
+  const auj = new Date(), cour = moisCourant()
+  const defaut = auj.getDate() <= 20 ? moisPrecedent(cour) : cour
+  const mois = Array.from({ length: 12 }, (_, i) => { let m = cour; for (let k = 0; k < i; k++) m = moisPrecedent(m); return m })
+  let phrase = ''
+  try { phrase = localStorage.getItem('stx_rapport_phrase_' + defaut) || '' } catch (e) {}
+  const p = ouvrirFeuille(`<div class="feuille-corps large" style="--c:${pageDe('argent').couleur}">
+    <div class="feuille-titre">Rapport du mois</div>
+    <div class="feuille-info">Une page A4 à envoyer à une banque, un associé ou un investisseur. Sur iPhone : « Enregistrer en PDF », puis Partager → Enregistrer dans Fichiers.</div>
+    <div class="champ-feuille"><label for="rp-mois">Mois</label><select id="rp-mois">${mois.map((m) => `<option value="${m}"${m === defaut ? ' selected' : ''}>${moisNom(m)}${m === cour ? ' (en cours)' : ''}</option>`).join('')}</select></div>
+    <div class="champ-feuille"><label for="rp-phrase">Ta phrase (facultatif)</label><textarea id="rp-phrase" rows="2" maxlength="400" placeholder="par exemple : lancement de l’offre Pro, premier client en Suisse">${echap(phrase)}</textarea></div>
+    <div class="rapport-cadre"><div class="rapport-apercu" id="rp-apercu"><div class="chargement" style="min-height:200px"><div class="roue"></div></div></div></div>
+    <button class="gros-btn plein" id="rp-pdf" disabled>${ico('telecharger')}Enregistrer en PDF</button>
+  </div>`)
+  let D = null
+  const dessiner = () => { if (D) { $('#rp-apercu', p).innerHTML = htmlRapport($('#rp-mois', p).value, D, $('#rp-phrase', p).value.trim()); ajusterApercu(p) } }
+  const lire = async () => {
+    const m = $('#rp-mois', p).value
+    $('#rp-pdf', p).disabled = true
+    const { data, error } = await sb.rpc('admin_rapport_mois', { p_mois: m })
+    if (error) { $('#rp-apercu', p).innerHTML = fonctionAbsente({ status: 'fulfilled', value: { error } }) ? aActiverV5('Le rapport du mois') : `<div class="encart grave">Lecture impossible : ${echap(error.message)}</div>`; return }
+    D = data; dessiner(); $('#rp-pdf', p).disabled = false
+  }
+  $('#rp-mois', p).onchange = () => { try { $('#rp-phrase', p).value = localStorage.getItem('stx_rapport_phrase_' + $('#rp-mois', p).value) || '' } catch (e) {} lire() }
+  $('#rp-phrase', p).oninput = () => { try { localStorage.setItem('stx_rapport_phrase_' + $('#rp-mois', p).value, $('#rp-phrase', p).value) } catch (e) {} dessiner() }
+  $('#rp-pdf', p).onclick = () => imprimerRapport($('#rp-mois', p).value, D, $('#rp-phrase', p).value.trim())
+  lire()
+}
+/* L'aperçu garde la mise en page A4 (794 px de large) et se réduit à la largeur de la feuille. */
+function ajusterApercu(p) {
+  const cadre = $('.rapport-cadre', p), ap = $('#rp-apercu', p); if (!cadre || !ap) return
+  const k = Math.min(1, cadre.clientWidth / 794)
+  ap.style.transform = `scale(${k})`
+  cadre.style.height = Math.ceil(ap.scrollHeight * k) + 'px'
+}
+function imprimerRapport(m, D, phrase) {
+  if (!D) return
+  let el = $('#impression'); if (!el) { el = document.createElement('div'); el.id = 'impression'; document.body.appendChild(el) }
+  el.innerHTML = htmlRapport(m, D, phrase)
+  const titre = document.title
+  document.title = 'Standix-rapport-' + m
+  document.body.classList.add('imprime-rapport')
+  addEventListener('afterprint', () => { document.body.classList.remove('imprime-rapport'); el.innerHTML = ''; document.title = titre }, { once: true })
+  window.print()
+}
+
+/* ═══ ⑨ Robot (page Santé) ══════════════════════════════════════════════ */
+const robotDernier = () => (RB || [])[0] || null
+const tauxRobot = (heures) => { const l = (RB || []).filter((x) => Date.now() - new Date(x.cree_le) < heures * 3600e3); return l.length ? { t: l.filter((x) => x.ok).length / l.length, n: l.length } : null }
+function blocRobot() {
+  if (RB_OK === false) return `<div class="section carte"><h3>Parcours client testé par un robot</h3>${aActiverV5('Le robot')}</div>`
+  if (!RB) return ''
+  const d = robotDernier(), t24 = tauxRobot(24), t7 = tauxRobot(168)
+  const points = [...(RB || [])].slice(0, 48).reverse()
+  const enCours = robotLance && Date.now() - robotLance < 90e3
+  return `<div class="section carte robot"><h3>Parcours client testé par un robot <small>toutes les heures</small></h3>
+    ${d ? `<div class="robot-etat ${d.ok ? 'ok' : 'grave'}"><b>${d.ok ? 'Le parcours marche' : 'Le parcours est cassé'}</b><span>Dernier passage ${ilya(d.cree_le)} · ${nf1.format((d.duree_ms || 0) / 1000)} s${t24 ? ' · ' + pct(t24.t) + ' réussis sur 24 h' : ''}${t7 ? ' · ' + pct(t7.t) + ' sur 7 jours' : ''}</span></div>
+    <div class="robot-points" role="img" aria-label="Les ${points.length} derniers passages">${points.map((x) => `<i class="${x.ok ? 'ok' : 'ko'}" title="${dateL(x.cree_le)} · ${x.ok ? 'réussi' : 'raté : ' + echap((x.etapes || []).find((e) => !e.ok)?.nom || '')}"></i>`).join('')}</div>
+    <div class="etats">${(d.etapes || []).filter((e) => e.cle !== 'preparation' || !e.ok).map((e) => ligneEtat(e.ok, echap(e.nom), echap(e.detail || ''), `<span class="n">${e.ms < 1000 ? n(e.ms) + ' ms' : nf1.format(e.ms / 1000) + ' s'}</span>`)).join('')}</div>`
+    : '<div class="vide">Pas encore de passage : le premier a lieu à la prochaine heure pile + 17 minutes. Tu peux aussi le lancer maintenant.</div>'}
+    <p class="note">Un faux client (entreprise « Robot Standix », retirée des chiffres) ouvre l’app, se connecte, ouvre une procédure comme après un scan de QR code, la valide, puis vérifie qu’un inconnu ne lit rien et que les fonctions serveur répondent. Deux échecs de suite : notification sur ton téléphone.</p>
+    <div class="outils-conf bas"><button class="btn" data-action="robot"${enCours ? ' disabled' : ''}>${ico('maj')}${enCours ? 'En cours…' : 'Lancer maintenant'}</button></div>
+  </div>`
+}
+async function lancerRobot(b) {
+  occupe(b, 'Le robot fait le parcours…')
+  robotLance = Date.now()
+  let r = null, err = null
+  try {
+    r = await sb.functions.invoke('robot-parcours', { body: {} })
+    if (r.error) { err = r.data?.error || r.error.message; try { const c = await r.error.context?.json?.(); if (c?.error) err = c.error } catch (e) {} }
+  } catch (e) { err = e?.message || String(e) }
+  robotLance = 0
+  if (err) { libere(b); return toast('Échec : ' + err) }
+  toast(r.data?.ok ? 'Parcours réussi' : 'Parcours raté : ' + ((r.data?.etapes || []).find((e) => !e.ok)?.nom || ''))
+  await chargerV5(); reafficherV5()
+}
+
+/* ═══ ⑩ Demander au Dashboard ═══════════════════════════════════════════ */
+/* Les chiffres envoyés à Claude : ceux du Dashboard, sans e-mail, sans nom de personne,
+   sans contenu de procédure (titres compris), sans texte libre. Les entreprises et les
+   prospects y sont désignés par un code (C-01, P-01) ; la réponse les remplace par leur
+   nom dans cette page seulement (audit du 27 octobre 2026). */
+const CODES_IA = new Map()   // code → nom
+/* Le code vient de l'identifiant (C-3F2A) : il ne change pas quand une entreprise est ajoutée,
+   supprimée ou marquée comme test, donc l'historique garde les bons noms. */
+function codesIA() {
+  CODES_IA.clear()
+  const parId = new Map()
+  const coder = (prefixe, id, nom) => {
+    const h = String(id).replace(/[^0-9a-f]/gi, '').toUpperCase() || '0000'
+    let n = 4, c = prefixe + h.slice(0, n)
+    while (CODES_IA.has(c) && CODES_IA.get(c) !== nom && n < h.length) c = prefixe + h.slice(0, ++n)
+    CODES_IA.set(c, nom); return c
+  }
+  ;(S.entreprises || []).forEach((e) => parId.set(e.id, coder('C-', e.id, e.nom)))
+  ;(PR || []).forEach((p) => parId.set('p:' + p.id, coder('P-', p.id, p.entreprise)))
+  return parId
+}
+/* Un nom d'entreprise tapé dans la question part sous son code — seulement en mot entier
+   (« Pro » ne touche pas « prospects »), apostrophes droites ou courbes confondues. */
+const echRe = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/['’]/g, "['’]")
+const codesQuestion = (q) => [...CODES_IA.entries()].filter(([, nom]) => nom && String(nom).trim().length >= 3).sort((a, b) => String(b[1]).length - String(a[1]).length)
+  .reduce((t, [c, nom]) => t.replace(new RegExp('(?<![\\p{L}\\p{N}])' + echRe(String(nom).trim()) + '(?![\\p{L}\\p{N}])', 'giu'), c), q)
+const nomsIA = (t) => String(t || '').replace(/\b[CP]-[0-9A-F]{2,32}\b/g, (c) => CODES_IA.has(c) ? CODES_IA.get(c) : c)
+function contexteIA() {
+  const sur = (f) => { try { return f() } catch (e) { return null } }
+  const k = S.kpi || {}
+  const code = codesIA()
+  const jour = (t) => t ? new Date(typeof t === 'number' ? t * 1000 : t).toISOString().slice(0, 10) : null
+  return {
+    a_savoir: 'Les entreprises clientes (C-…) et les prospects (P-…) sont désignés par un code : garde ces codes tels quels dans ta réponse.',
+    page_ouverte: pageDe(page)?.nom,
+    chiffres_cles: k,
+    par_jour_90j: (S.serie || []).map((d) => ({ j: d.j, inscriptions: d.entreprises, membres: d.membres, procedures: d.procedures, analyses_ia: d.analyses, scans: d.scans, lectures: d.validations, erreurs: d.erreurs, visites_site: d.visites, connexions: d.connexions })),
+    entreprises: (S.entreprises || []).map((e) => ({ code: code.get(e.id), statut: e.statut, offre: e.palier, rythme: e.rythme, inscrite: jour(e.cree_le), fin_essai: jour(e.essai_fin), membres: e.membres, places: e.membres_max,
+      procedures: e.procedures, analyses_ia_ce_mois: e.analyses_mois, lectures: e.validations, scans: e.scans, erreurs_7j: e.erreurs_7j, derniere_activite: jour(e.derniere_activite) })),
+    entreprises_test: (S.entreprises_test || []).length,
+    argent_stripe: ST && !ST.erreur ? { mode: ST.mode, revenu_mensuel_recurrent: ST.mrr, annuel: ST.arr, par_offre: ST.par_offre, encaisse_par_mois: ST.par_mois, evolution: ST.evolution,
+      abonnements: (ST.clients || []).map((c) => ({ offre: c.offre, rythme: c.rythme, par_mois: c.mensuel, statut: c.statut, debut: jour(c.debut), fin: jour(c.fin), payant: c.payant })) } : { erreur: ST?.erreur || 'Stripe ne répond pas' },
+    couts: { fixes_par_mois: sur(coutsFixesMensuels), detail_fixes: (S.couts_fixes || []).filter((c) => c.actif).map((c) => ({ nom: c.nom, montant: Number(c.montant), periodicite: c.periodicite })),
+      ce_mois: sur(() => argent().couts), benefice_ce_mois: sur(() => argent().benefice), analyses_ia_par_mois: S.analyses_par_mois, traductions_par_mois: S.traductions_par_mois,
+      reglages: Object.fromEntries(Object.entries(S.reglages || {}).map(([c, v]) => [c, v.valeur])) },
+    seuil_rentabilite: sur(() => { const E = economie(); return { prix_moyen: E.prix, ia_par_client: E.ia, frais_stripe: E.taux, couts_fixes: E.fixes, marge_par_client: E.contrib, clients_necessaires: E.seuil, clients_payants: E.abonnes } }),
+    parcours_clients: CA ? { etapes: CA.etapes, delais_medians_jours: CA.delais, risques: (CA.risques || []).map((x) => ({ entreprise: code.get(x.id) || 'C-?', raison: x.texte })), opportunites: (CA.opportunites || []).map((x) => ({ entreprise: code.get(x.id) || 'C-?', raison: x.texte })) } : null,
+    cohortes: CH?.cohortes || null,
+    prospects: PR ? PR.map((p) => ({ code: code.get('p:' + p.id), etape: etapePr(p), ne_plus_contacter: p.ne_plus_contacter || undefined, secteur: p.secteur, source: p.source,
+      action_prevue: !!p.prochaine_action || undefined, pour_le: p.prochaine_date, dernier_contact: p.dernier_contact, ajoute: jour(p.cree_le), inscrit_sur_standix: p.lie ? (code.get(p.lie.id) || 'oui') : undefined })) : null,
+    strategie: SG ? { objectifs: SG.objectifs, plan: (SG.plan || []).map((x) => ({ etape: x.titre, statut: x.statut, date: x.date })), depenses_pub: (SG.depenses || []).map((d) => ({ mois: d.mois, canal: d.canal, montant: Number(d.montant) })),
+      conseil_du_mois: derniereReussie('conseil')?.contenu?.priorites || null, concurrents: (derniereReussie('concurrents')?.contenu?.concurrents || []).map((c) => ({ nom: c.nom, type: c.type, prix: c.prix })) } : null,
+    site: S.site, usage: S.usage ? { ...S.usage, top_procedures: undefined } : null,
+    erreurs: { ouvertes: k.erreurs_ouvertes, dernieres_24h: k.erreurs_24h, echecs_ia: (S.echecs_ia || []).length },
+    robot: RB ? { dernier: robotDernier() ? { quand: robotDernier().cree_le, reussi: robotDernier().ok } : null, reussite_24h: tauxRobot(24)?.t ?? null, reussite_7j: tauxRobot(168)?.t ?? null } : null,
+    messages_non_lus: (ME?.messages || []).filter((m) => !m.lu && !m.archive).length,
+    conformite: CO ? sur(() => { const an = anneeConf(); const T = totauxConf(an); return { annee: an, encaisse_annee_ht: T?.ca ?? null, seuil_micro: rc('plafond_micro', an), franchise_tva: rc('franchise_tva', an) } }) : null,
+  }
+}
+/* Le texte de Claude : gras et listes simples, rien d'autre (tout le reste est échappé). */
+function texteIA(t) {
+  const lignes = echap(nomsIA(t)).split('\n'), out = []
+  let liste = false
+  for (const l of lignes) {
+    const g = l.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    if (/^\s*[-•]\s+/.test(l)) { if (!liste) { out.push('<ul>'); liste = true } out.push('<li>' + g.replace(/^\s*[-•]\s+/, '') + '</li>') }
+    else { if (liste) { out.push('</ul>'); liste = false } if (g.trim()) out.push('<p>' + g + '</p>') }
+  }
+  if (liste) out.push('</ul>')
+  return out.join('')
+}
+const EXEMPLES_IA = ['Où en est la conversion des essais ce mois-ci ?', 'Quels clients risquent de partir ?', 'Combien me coûte un client en IA ?', 'Quels prospects relancer cette semaine ?']
+function ouvrirDemander() {
+  if (S) codesIA()   // pour remettre les noms dans l'historique
+  const p = ouvrirFeuille(`<div class="feuille-corps" style="--c:var(--accent)">
+    <div class="feuille-titre">Demander au Dashboard</div>
+    <div class="feuille-info">Pose ta question en français : Claude répond avec les chiffres du Dashboard, tels qu’ils sont maintenant. Il ne reçoit ni e-mail, ni nom de personne, ni contenu de procédure : les entreprises et les prospects lui sont donnés sous un code, remplacé ici par leur nom. Environ 10 centimes par question.</div>
+    <div class="champ-feuille"><label for="ia-q">Ta question</label><textarea id="ia-q" rows="3" maxlength="500" placeholder="par exemple : combien d’essais sont devenus clients ce mois-ci ?"></textarea></div>
+    <div class="ia-exemples">${EXEMPLES_IA.map((x) => `<button type="button" class="filtre" data-ia-ex="${echap(x)}">${echap(x)}</button>`).join('')}</div>
+    <button class="gros-btn plein lien-btn" id="ia-demander">${ico('etincelle')}Demander</button>
+    <div id="ia-reponse"></div>
+    <div class="titre-bloc ia-hist-titre">Tes dernières questions</div>
+    <div id="ia-histoire"><div class="vide">Chargement…</div></div>
+  </div>`)
+  const q = $('#ia-q', p)
+  $$('[data-ia-ex]', p).forEach((b) => b.onclick = () => { q.value = b.dataset.iaEx; q.focus() })
+  q.onkeydown = (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) $('#ia-demander', p).click() }
+  $('#ia-demander', p).onclick = async (ev) => {
+    const question = q.value.trim()
+    if (question.length < 3) return toast('Écris ta question')
+    const b = ev.currentTarget
+    occupe(b, 'Claude réfléchit…')
+    $('#ia-reponse', p).innerHTML = ''
+    let r = null, err = null
+    try {
+      const contexte = contexteIA()
+      r = await sb.functions.invoke('admin-ia', { body: { mode: 'question', question: codesQuestion(question), contexte, historique: histoireIA.slice(-3) } })
+      if (r.error) { err = r.data?.error || r.error.message; try { const c = await r.error.context?.json?.(); if (c?.error) err = c.error } catch (e) {} }
+    } catch (e) { err = e?.message || String(e) }
+    libere(b); b.innerHTML = ico('etincelle') + 'Demander'
+    if (err) return $('#ia-reponse', p).innerHTML = `<div class="encart grave">${/Failed to send|not found|404/i.test(err) ? 'La fonction admin-ia n’est pas encore en ligne.' : echap(err)}</div>`
+    histoireIA.push({ q: codesQuestion(question), r: r.data.reponse }); if (histoireIA.length > 3) histoireIA.shift()
+    $('#ia-reponse', p).innerHTML = `<div class="ia-rep"><div class="ia-q">${echap(question)}</div><div class="ia-texte">${texteIA(r.data.reponse)}</div>
+      <div class="note">Réponse de Claude d’après les chiffres du moment : à vérifier avant de décider. Coût ≈ ${nf1.format((r.data.cout_usd || 0) * 93)} centimes.</div></div>`
+    q.value = ''
+    chargerHistoireIA(p)
+  }
+  chargerHistoireIA(p)
+  setTimeout(() => q.focus(), 60)
+}
+async function chargerHistoireIA(p) {
+  const { data, error } = await sb.from('ia_dashboard').select('id, cree_le, question, reponse, erreur').eq('genre', 'question').order('cree_le', { ascending: false }).limit(20)
+  const boite = $('#ia-histoire', p); if (!boite) return
+  if (error) { boite.innerHTML = /ia_dashboard|does not exist|schema cache/i.test(error.message) ? aActiverV5('L’historique des questions') : `<div class="vide">${echap(error.message)}</div>`; return }
+  const l = (data || []).filter((x) => x.reponse)
+  boite.innerHTML = l.length ? `<div class="groupe">${l.map((x) => `<button class="groupe-ligne sans-icone ia-h" data-ia-h="${x.id}"><span class="gl-t"><b>${echap(nomsIA(x.question))}</b><small>${ilya(x.cree_le)}</small></span>${ico('fleche')}</button>`).join('')}</div>` : '<div class="vide">Aucune question pour l’instant</div>'
+  $$('[data-ia-h]', boite).forEach((b) => b.onclick = () => {
+    const x = l.find((y) => y.id === b.dataset.iaH); if (!x) return
+    $('#ia-reponse', p).innerHTML = `<div class="ia-rep"><div class="ia-q">${echap(nomsIA(x.question))}</div><div class="ia-texte">${texteIA(x.reponse)}</div><div class="note">Réponse du ${dateL(x.cree_le)}, d’après les chiffres de ce moment-là.</div></div>`
+    $('#ia-reponse', p).scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  })
+}
+
+/* ═══ Le point, les pastilles, les clics ════════════════════════════════ */
+function analyseV5(ajoute) {
+  if (PR) {
+    const u = aFairePr(0), retard = u.filter((p) => p.prochaine_date < jourParis())
+    if (retard.length) ajoute(false, plur(retard.length, 'action de prospection en retard', 'actions de prospection en retard'), 'prospects', 2)
+    else if (u.length) ajoute(false, plur(u.length, 'action de prospection à faire aujourd’hui', 'actions de prospection à faire aujourd’hui'), 'prospects', 1)
+  }
+  const d = robotDernier()
+  if (d && !d.ok && Date.now() - new Date(d.cree_le) < 3 * 3600e3) ajoute(false, 'Le robot n’arrive pas à faire le parcours client : ' + ((d.etapes || []).find((e) => !e.ok)?.nom || '').toLowerCase(), 'sante', 3)
+  else if (d?.ok && Date.now() - new Date(d.cree_le) < 3 * 3600e3) ajoute(true, 'Parcours client testé ' + ilya(d.cree_le) + ' : tout marche', 'sante')
+  else if (d && RB_OK) ajoute(false, 'Le robot n’est pas passé depuis ' + ilya(d.cree_le).replace(/^il y a /, ''), 'sante', 1)
+}
+function elementsV5(el) {
+  el.prospects = el.prospects || []
+  if (PR) aFairePr(0).forEach((p) => el.prospects.push({ cle: 'pr:' + p.id + ':' + p.prochaine_date, grave: p.prochaine_date < jourParis() }))
+  const d = robotDernier()
+  if (d && !d.ok) el.sante.push({ cle: 'robot:' + d.id, grave: true })
+}
+function brancherV5(P) {
+  $$('[data-action="demander"]', P).forEach((b) => b.onclick = ouvrirDemander)
+  $$('[data-action="tests"]', P).forEach((b) => b.onclick = ouvrirTests)
+  $$('[data-action="rapport"]', P).forEach((b) => b.onclick = ouvrirRapport)
+  $$('[data-action="robot"]', P).forEach((b) => b.onclick = () => lancerRobot(b))
+  $$('[data-action="ajout-prospect"]', P).forEach((b) => b.onclick = () => ouvrirProspect(null))
+  $$('[data-prospect]', P).forEach((b) => b.onclick = () => ouvrirProspect(b.dataset.prospect))
+  $$('[data-fpr]', P).forEach((b) => b.onclick = () => { filtrePr = b.dataset.fpr; reafficherV5() })
+  const r = $('#recherche-pr', P)
+  if (r) r.oninput = () => {
+    recherchePr = r.value
+    const q = recherchePr.trim().toLowerCase()
+    const l = (PR || []).filter((p) => (filtrePr === 'tous' || (filtrePr === 'actifs' ? enCoursPr(p) : !p.ne_plus_contacter && etapePr(p) === filtrePr))
+      && (!q || [p.entreprise, p.contact, p.ville, p.secteur, p.email].some((x) => String(x || '').toLowerCase().includes(q))))
+    $('#liste-pr', P).innerHTML = listePr(l)
+    $$('[data-prospect]', $('#liste-pr', P)).forEach((b) => b.onclick = () => ouvrirProspect(b.dataset.prospect))
+  }
+}
+/* Les boutons de la feuille ouverte (fiche d'une entreprise, message). */
+$('#panneau').addEventListener('click', (ev) => {
+  const b = ev.target.closest('button'); if (!b) return
+  if (b.dataset.testEnt) basculerTest(b.dataset.testEnt, b.dataset.testOui === '1')
+  if (b.dataset.iaReponse) preparerReponse(b.dataset.iaReponse, b)
+})
+
+/* ─── Les explications ─── */
+Object.assign(LEGENDES, {
+  'Cohortes': 'Pour chaque mois d’inscription : la part des entreprises qui servent encore Standix 1, 4, 8 et 12 semaines plus tard. Si ça baisse vite, les clients essaient puis abandonnent.',
+  'Parcours client testé par un robot': 'Toutes les heures, un faux client refait ce que fait un vrai : ouvrir l’app, se connecter, ouvrir une procédure par QR code, la valider. Chaque point est un passage : vert réussi, rouge raté.',
+  'À faire': 'Les prospects dont la prochaine action est prévue aujourd’hui, en retard, ou dans les 7 jours. Touche une ligne pour l’ouvrir.',
+  'Tous les prospects': 'Les entreprises que tu démarches, par étape. Un prospect inscrit sur Standix passe tout seul en « Essai », puis « Client ».',
+})
+GUIDES.prospects = {
+  role: 'Suivre les entreprises que tu démarches, de la première prise de contact au client payant, sans en oublier une.',
+  parties: [['Les 4 chiffres', 'Les actions à faire aujourd’hui, les prospects en discussion (contactés ou en démo), ceux qui essaient Standix, ceux devenus clients.'],
+    ['À faire', 'Chaque prospect en cours a une prochaine action et une date. Le matin du jour prévu, une notification arrive sur ton téléphone.'],
+    ['Tous les prospects', 'Filtre par étape, cherche par nom, ville ou secteur. Touche une ligne pour modifier, écrire ou appeler.'],
+    ['Inscrit sur Standix', 'Si une entreprise s’inscrit avec le même domaine d’e-mail que le prospect (pas gmail, orange…), elle est reliée toute seule : son étape suit l’essai puis l’abonnement. Tu peux aussi la choisir à la main.']],
+  si: [['Quelqu’un ne veut plus être contacté', 'Ouvre-le, active « Ne plus contacter » et enregistre : ses coordonnées sont effacées, seuls le nom et l’e-mail restent pour ne plus l’écrire. C’est une obligation, sans condition.'],
+    ['Un prospect a dit non', 'Mets-le en « Perdu » et note pourquoi : utile pour comprendre ce qui bloque.'],
+    ['D’où viennent les noms', 'Tu ajoutes toi-même les prospects (salon, recommandation, LinkedIn…). Écris toujours qui tu es et pourquoi tu écris. Repère, pas un avis de juriste.']],
+}
+GUIDES.clients.parties.push(['Cohortes', 'Les entreprises inscrites chaque mois, et la part qui sert encore Standix 1, 4, 8 et 12 semaines plus tard.'],
+  ['Entreprises de test', 'Le lien sous « Toutes les entreprises » retire tes essais (et le robot) de tous les chiffres des clients. L’argent reçu, l’IA et les erreurs restent comptés.'])
+GUIDES.messages.parties.push(['Préparer une réponse avec Claude', 'Dans un message : Claude écrit un brouillon d’après le message, les précédents de la même adresse et la fiche du client s’il en a une. Relis, corrige, puis « Ouvrir dans l’e-mail ». Environ 1 à 2 centimes.'])
+GUIDES.argent.parties.push(['Rapport du mois', 'Le bouton en haut de la page : une page A4 avec le revenu, les clients, les coûts, l’usage et la fiabilité du mois, comparés au mois précédent. À enregistrer en PDF.'])
+GUIDES.sante.parties.push(['Parcours testé par un robot', 'Toutes les heures, un faux client se connecte, ouvre une procédure par QR code, la valide, et vérifie qu’un inconnu ne lit rien. Deux échecs de suite : notification.'])
+GUIDES.sante.si.push(['Le robot échoue', 'Regarde l’étape en rouge et son message : « Connexion » = la connexion des clients est en panne ; « Sécurité des données » = urgent, ouvre le mode urgence (page Sécurité). Copie le message pour Claude.'])
+
+/* ═══════════════════════════════════════════════════════════════════════
    8. ACTIONS DES PAGES
    ═══════════════════════════════════════════════════════════════════════ */
 function brancherPage() {
@@ -5165,7 +6021,7 @@ function brancherPage() {
     $$('[data-vu]', P).forEach((b) => b.onclick = async () => {
       const cle = b.dataset.vu, vue = b.dataset.etat === '1'
       b.disabled = true
-      const { error } = vue ? await sb.from('alertes_vues').delete().eq('cle', cle) : await sb.from('alertes_vues').upsert({ cle })
+      const { error } = vue ? await ecrit(sb.from('alertes_vues').delete().eq('cle', cle)) : await sb.from('alertes_vues').upsert({ cle })
       if (error) { b.disabled = false; return toast('Échec : ' + error.message) }
       const a = SU.alertes.find((x) => x.cle === cle); if (a) a.vue = !vue
       majPastilles(); const y = scrollY; afficher(); scrollTo(0, y)
@@ -5180,6 +6036,7 @@ function brancherPage() {
   }
   brancherV3(P)
   brancherV4(P)
+  brancherV5(P)
   if (mobile()) limiterListes()
 }
 /* Sur téléphone, une longue liste montre 5 lignes et un « Voir tout ». */
@@ -5212,7 +6069,7 @@ $('#panneau').addEventListener('click', (ev) => {
   const b = ev.target.closest('button'); if (!b) return
   if (b.dataset.action === 'fermer') fermerPanneau()
   if (b.dataset.avertirCompte) { const p = (SU.partages || []).find((x) => x.user_id === b.dataset.avertirCompte); composerAvertissement({ compte_vise: b.dataset.avertirCompte, entreprise: p?.entreprise, contexte: 'partage', qui: p?.membre || p?.email }) }
-  if (b.dataset.avertirEntreprise) { const e = S.entreprises.find((x) => x.id === b.dataset.avertirEntreprise); composerAvertissement({ entreprise_id: e?.id, entreprise: e?.nom, contexte: 'general' }) }
+  if (b.dataset.avertirEntreprise) { const e = (S.entreprises || []).concat(S.entreprises_test || []).find((x) => x.id === b.dataset.avertirEntreprise); composerAvertissement({ entreprise_id: e?.id, entreprise: e?.nom, contexte: 'general' }) }
   if (b.dataset.retirerAv) retirerAvertissement(b.dataset.retirerAv)
   if (b.dataset.deconnecter) deconnecterCompte(b.dataset.deconnecter)
   if (b.dataset.action === 'notifs') activerNotifs()
@@ -5233,16 +6090,16 @@ function brancherCouts() {
   const boite = $('#couts')
   const enregistrer = async (ligne, champ, valeur) => {
     const id = ligne.dataset.cout
-    const { error } = await sb.from('couts_fixes').update({ [champ]: valeur }).eq('id', id)
+    const { error } = await ecrit(sb.from('couts_fixes').update({ [champ]: valeur }).eq('id', id))
     if (error) return toast('Échec : ' + error.message)
-    const c = S.couts_fixes.find((x) => x.id === id); if (c) c[champ] = valeur
+    const c = S.couts_fixes.find((x) => String(x.id) === String(id)); if (c) c[champ] = valeur
     toast('Enregistré')
     rafraichirTuilesArgent()
   }
   boite.addEventListener('change', (ev) => {
     const el = ev.target, ligne = el.closest('[data-cout]'); if (!ligne || !el.dataset.champ) return
     let v = el.value
-    if (el.dataset.champ === 'montant') { v = Math.max(0, parseFloat(String(v).replace(',', '.')) || 0) }
+    if (el.dataset.champ === 'montant') { v = nombreChamp(el); if (v === null || v < 0) return toast('Montant non reconnu : écris par exemple 49,90'); v = Math.round(v * 100) / 100 }
     if (el.dataset.champ === 'nom' && !v.trim()) return toast('Le nom ne peut pas être vide')
     enregistrer(ligne, el.dataset.champ, v)
   })
@@ -5257,9 +6114,9 @@ function brancherCouts() {
     if (b.dataset.action === 'suppr-cout') {
       const nom = $('[data-champ="nom"]', ligne).value
       if (!confirm('Supprimer « ' + nom + ' » ?')) return
-      const { error } = await sb.from('couts_fixes').delete().eq('id', ligne.dataset.cout)
+      const { error } = await ecrit(sb.from('couts_fixes').delete().eq('id', ligne.dataset.cout))
       if (error) return toast('Échec : ' + error.message)
-      S.couts_fixes = S.couts_fixes.filter((x) => x.id !== ligne.dataset.cout)
+      S.couts_fixes = S.couts_fixes.filter((x) => String(x.id) !== String(ligne.dataset.cout))
       ligne.remove(); toast('Supprimé'); rafraichirTuilesArgent()
     }
   })
@@ -5269,9 +6126,9 @@ function brancherCouts() {
       ev.stopPropagation()
       const id = bascule.dataset.bascule, v = bascule.getAttribute('aria-checked') !== 'true'
       bascule.setAttribute('aria-checked', v)
-      const { error } = await sb.from('couts_fixes').update({ actif: v }).eq('id', id)
+      const { error } = await ecrit(sb.from('couts_fixes').update({ actif: v }).eq('id', id))
       if (error) return toast('Échec : ' + error.message)
-      const c = S.couts_fixes.find((x) => x.id === id); if (c) c.actif = v
+      const c = S.couts_fixes.find((x) => String(x.id) === String(id)); if (c) c.actif = v
       toast(v ? 'Compté dans les coûts' : 'Plus compté'); rafraichirTuilesArgent()
       return
     }
@@ -5292,8 +6149,9 @@ function brancherCouts() {
     const champ = boite.lastElementChild.querySelector('[data-champ="nom"]'); champ.focus(); champ.select()
   }
   $$('[data-reglage]').forEach((el) => el.onchange = async () => {
-    const v = Math.max(0, parseFloat(String(el.value).replace(',', '.')) || 0)
-    const { error } = await sb.from('reglages_admin').update({ valeur: v }).eq('cle', el.dataset.reglage)
+    const v = nombreChamp(el)
+    if (v === null || v < 0) return toast('Nombre non reconnu : écris par exemple 0,30')
+    const { error } = await ecrit(sb.from('reglages_admin').update({ valeur: v }).eq('cle', el.dataset.reglage))
     if (error) return toast('Échec : ' + error.message)
     S.reglages[el.dataset.reglage].valeur = v; toast('Enregistré'); rafraichirTuilesArgent()
   })
@@ -5455,7 +6313,7 @@ $('#haut-mobile')?.addEventListener('click', () => window.scrollTo({ top: 0, beh
 /* Pincement sur iOS (le double appui est réglé en CSS). */
 ;['gesturestart', 'gesturechange', 'gestureend'].forEach((t) => document.addEventListener(t, (e) => e.preventDefault(), { passive: false }))
 
-sb.auth.onAuthStateChange((evt) => { if (evt === 'SIGNED_OUT') montrerPorte() })
+sb.auth.onAuthStateChange((evt) => { if (evt === 'SIGNED_OUT') { nettoyer(); montrerPorte() } })
 window.addEventListener('hashchange', () => { const p = location.hash.slice(1); if (S && p !== page && PAGES.some((x) => x.id === p)) aller(p) })
 entrer()
 </script>

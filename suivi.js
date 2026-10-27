@@ -146,7 +146,8 @@
           message: message.slice(0, 1000),
           pile: extra.pile ? String(extra.pile).slice(0, 3000) : null,
           statut_http: extra.statut_http || null,
-          page: (location.pathname + location.hash).slice(0, 200),
+          // Jamais de jeton de connexion (lien « mot de passe oublié ») dans le journal.
+          page: (location.pathname + location.hash.replace(/((?:access|refresh|provider)_token|token_hash|token|code)=[^&]*/gi, '$1=…')).slice(0, 200),
           url: extra.url ? String(extra.url).slice(0, 500) : null,
           appareil: APPAREIL, systeme: SYSTEME, navigateur: NAVIGATEUR,
           ecran: ECRAN, langue: LANGUE, version: SOURCE === 'app' ? version() : null,

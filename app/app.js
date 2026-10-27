@@ -14,7 +14,7 @@ try {
     // Filet : si le fichier n'a pas encore été déposé dans le dépôt, on retombe
     // sur le serveur tiers plutôt que de laisser l'app inutilisable.
     console.warn('supabase.js introuvable en local, repli sur jsDelivr :', localErr && localErr.message)
-    supabaseModule = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
+    supabaseModule = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.114.0/+esm')
     window.jalon?.('Supabase prêt (jsDelivr, repli)')
   }
   createClient = supabaseModule.createClient
@@ -3595,15 +3595,22 @@ let nomsEnCours = ''
 
 function cleNoms(eid, langue) { return `standix_noms_${eid}_${langue}` }
 
+/* \u26a0 UNE TRADUCTION DE NOM NE PORTE JAMAIS DE BALISE (audit du 27 octobre
+   2026). Elle vient de l'IA, \u00e0 partir d'un titre que n'importe quel g\u00e9rant
+   \u00e9crit : un titre pi\u00e9g\u00e9 pouvait lui faire rendre du HTML, affich\u00e9 tel quel en
+   anglais ou en allemand. Un nom de proc\u00e9dure n'a aucune raison de contenir
+   < ou >. */
+function nomSansBalise(t) { return typeof t === 'string' ? t.replace(/[<>]/g, '') : t }
+
 function nomTraduit(texte) {
   if (langueApp === 'fr' || !NOMS.size || typeof texte !== 'string') return null
   const k = cleTexte(texte)
   if (!k) return null
-  if (NOMS.has(k)) return NOMS.get(k)
+  if (NOMS.has(k)) return nomSansBalise(NOMS.get(k))
   if (k.includes(' \u203a ')) {
     const morceaux = k.split(' \u203a ')
     const trad = morceaux.map(m => NOMS.get(m) ?? m)
-    return trad.some((t, i) => t !== morceaux[i]) ? trad.join(' \u203a ') : null
+    return trad.some((t, i) => t !== morceaux[i]) ? nomSansBalise(trad.join(' \u203a ')) : null
   }
   return null
 }
@@ -15081,7 +15088,7 @@ function peindreListesAccueil() {
       <div class="ac-carte-t">${tLang('Dernière procédure créée')}</div>
       <button type="button" class="ac-carte-lig" data-proc="${derniere.id}">
         <span class="ac-vign${derniere.image_url ? '' : ' nue'}"${
-          derniere.image_url ? ` style="background-image:url('${derniere.image_url}')"` : ''}>
+          derniere.image_url ? ` style="background-image:url('${escapeHtml(derniere.image_url)}')"` : ''}>
           ${derniere.video_url ? `<span class="ac-play">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.4 5.6v12.8L19 12z"/></svg>
           </span>` : ''}
